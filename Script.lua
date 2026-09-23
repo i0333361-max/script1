@@ -1,4 +1,4 @@
---[[ ECLIPSE-STYLE MENU — версия без GunMod + Мои координаты + Телепорты + Ghost с вращением камеры ]]
+--[[ ECLIPSE-STYLE MENU — версия без GunMod + Мои координаты + Телепорты + Ghost с вращением камеры + Точный Aimbot ]]
 
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
@@ -440,64 +440,143 @@ local function stopESP()
     clearESP(); playerConns = {}; statCache = {}
 end
 
--- ═══ AIMBOT ═══
+-- ═══ AIMBOT (ТОЧНЫЙ) ═══
 local aimbotOn = false
 local aimbotConn = nil
 local aimbotFOV = 300
 local aimbotSmooth = 0.35
 local aimbotVisible = true
 local aimbotButtonMode = "RMB"
+local aimbotPrediction = true
+local aimbotSticky = true
+local aimbotTargetMode = "Auto" -- "Auto" | "Head" | "Body"
+local currentTarget = nil
+
 local function isAimbotActive()
     if aimbotButtonMode == "Always" then return true end
     if aimbotButtonMode == "RMB" then return uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) end
     if aimbotButtonMode == "LMB" then return uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) end
     return false
 end
-local function getClosestTarget()
-    local closest, minDist = nil, aimbotFOV
+
+local function getPing(plr)
+    local ok, p = pcall(function() return plr:GetNetworkPing() end)
+    if ok and type(p) == "number" and p > 0 then return p end
+    return 0.05
+end
+
+local function rayVisible(from, to, ignoreChar)
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    local filter = {}
+    if player.Character then table.insert(filter, player.Character) end
+    if ignoreChar then table.insert(filter, ignoreChar) end
+    params.FilterDescendantsInstances = filter
+    local ray = workspace:Raycast(from, to - from, params)
+    return ray == nil -- ничего не задели => видно
+end
+
+local function getAimParts(char)
+    local out = {}
+    if aimbotTargetMode == "Head" then
+        local h = char:FindFirstChild("Head")
+        if h then table.insert(out, h) end
+    elseif aimbotTargetMode == "Body" then
+        local u = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso") or char:FindFirstChild("HumanoidRootPart")
+        if u then table.insert(out, u) end
+    else -- Auto
+        local h = char:FindFirstChild("Head")
+        local u = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso") or char:FindFirstChild("HumanoidRootPart")
+        if h then table.insert(out, h) end
+        if u and u ~= h then table.insert(out, u) end
+    end
+    return out
+end
+
+local function scoreTarget(part, scrCenter, myPos)
+    local sp, onScreen = camera:WorldToViewportPoint(part.Position)
+    if not onScreen then return nil end
+    local d2d = (Vector2.new(sp.X, sp.Y) - scrCenter).Magnitude
+    if d2d > aimbotFOV then return nil end
+    if aimbotVisible and not rayVisible(myPos, part.Position, part.Parent) then return nil end
+    local d3d = (myPos - part.Position).Magnitude
+    return d2d + d3d * 0.05
+end
+
+local function findTarget()
     local myPos = camera.CFrame.Position
     local scrCenter = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)
+    local best, bestScore = nil, math.huge
     for _, plr in ipairs(game.Players:GetPlayers()) do
         if plr ~= player and plr.Character then
             local hum = plr.Character:FindFirstChildOfClass("Humanoid")
-            local head = plr.Character:FindFirstChild("Head")
-            local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
-            if hum and hum.Health > 0 and (head or hrp) then
-                local tp = head or hrp
-                local sp, onScreen = camera:WorldToViewportPoint(tp.Position)
-                if onScreen then
-                    local dist2D = (Vector2.new(sp.X, sp.Y) - scrCenter).Magnitude
-                    if dist2D < minDist then
-                        if aimbotVisible then
-                            local params = RaycastParams.new()
-                            params.FilterType = Enum.RaycastFilterType.Exclude
-                            params.FilterDescendantsInstances = {player.Character, tp.Parent}
-                            local ray = workspace:Raycast(myPos, (tp.Position - myPos), params)
-                            if not (ray and ray.Instance and not ray.Instance:IsDescendantOf(tp.Parent)) then
-                                minDist = dist2D; closest = tp
-                            end
-                        else minDist = dist2D; closest = tp end
+            if hum and hum.Health > 0 then
+                for _, part in ipairs(getAimParts(plr.Character)) do
+                    local score = scoreTarget(part, scrCenter, myPos)
+                    if score and score < bestScore then
+                        bestScore = score
+                        best = {part = part, character = plr.Character, player = plr}
                     end
                 end
             end
         end
     end
-    return closest
+    return best
 end
+
+local function validateTarget(t)
+    if not t or not t.player or not t.player.Parent then return false end
+    if not t.character or not t.character.Parent then return false end
+    if t.part.Parent ~= t.character then return false end
+    local hum = t.character:FindFirstChildOfClass("Humanoid")
+    if not hum or hum.Health <= 0 then return false end
+    local myPos = camera.CFrame.Position
+    local scrCenter = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)
+    local score = scoreTarget(t.part, scrCenter, myPos)
+    if not score or score > aimbotFOV * 1.5 then return false end
+    return true
+end
+
+local function predictPos(target)
+    if not aimbotPrediction then return target.part.Position end
+    local vel = target.part.AssemblyLinearVelocity
+    if not vel or vel.Magnitude < 1 then return target.part.Position end
+    local ping = getPing(target.player)
+    local lead = ping + 0.03 -- пинг + небольшой запас на "время пули"
+    return target.part.Position + vel * lead
+end
+
 local function startAimbot()
     if aimbotConn then aimbotConn:Disconnect() end
-    aimbotConn = runService.RenderStepped:Connect(function()
+    currentTarget = nil
+    aimbotConn = runService.RenderStepped:Connect(function(dt)
         if not aimbotOn then return end
-        if not isAimbotActive() then return end
-        local t = getClosestTarget()
-        if t then
-            local c = camera.CFrame
-            camera.CFrame = c:Lerp(CFrame.new(c.Position, t.Position), aimbotSmooth)
+        if not isAimbotActive() then currentTarget = nil; return end
+        if dt <= 0 then return end
+
+        local target
+        if aimbotSticky and currentTarget and validateTarget(currentTarget) then
+            target = currentTarget
+        else
+            target = findTarget()
+            currentTarget = target
+        end
+
+        if target then
+            local aimPos = predictPos(target)
+            local camPos = camera.CFrame.Position
+            local desired = CFrame.new(camPos, aimPos)
+            -- Фрейм-независимая плавность:
+            -- smooth=0.05 → мгновенно, smooth=1 → медленно
+            local alpha = math.clamp(dt / math.max(aimbotSmooth, 0.01) * 10, 0, 1)
+            camera.CFrame = camera.CFrame:Lerp(desired, alpha)
         end
     end)
 end
+
 local function stopAimbot()
     if aimbotConn then aimbotConn:Disconnect(); aimbotConn = nil end
+    currentTarget = nil
 end
 
 makeSectionLabel(aimbotPage, "🎯 УПРАВЛЕНИЕ")
@@ -534,6 +613,44 @@ end
 btnRMB.MouseButton1Click:Connect(function() setMode("RMB") end)
 btnLMB.MouseButton1Click:Connect(function() setMode("LMB") end)
 btnAlways.MouseButton1Click:Connect(function() setMode("Always") end)
+
+makeSectionLabel(aimbotPage, "🎯 ЦЕЛЬ")
+makeToggle(aimbotPage, "Предсказание (упреждение)", true, function(on) aimbotPrediction = on end)
+makeToggle(aimbotPage, "Держать цель (sticky)", true, function(on) aimbotSticky = on; if not on then currentTarget = nil end end)
+
+local partRow = Instance.new("Frame")
+partRow.Size = UDim2.new(1,-12,0,62); partRow.BackgroundColor3 = C.row
+partRow.BorderSizePixel = 0; partRow.Parent = aimbotPage
+Instance.new("UICorner", partRow).CornerRadius = UDim.new(0,6)
+local partLbl = Instance.new("TextLabel")
+partLbl.Size = UDim2.new(1,-20,0,18); partLbl.Position = UDim2.new(0,12,0,4)
+partLbl.BackgroundTransparency = 1; partLbl.Text = "Точка прицеливания"
+partLbl.TextColor3 = C.text; partLbl.Font = Enum.Font.GothamMedium
+partLbl.TextSize = 12; partLbl.TextXAlignment = Enum.TextXAlignment.Left; partLbl.Parent = partRow
+
+local function makePartBtn(text, x, mode)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0.31,-6,0,28); b.Position = UDim2.new(x,0,0,28)
+    b.Text = text; b.TextColor3 = C.text
+    b.BackgroundColor3 = (aimbotTargetMode == mode) and C.accent or C.badge
+    b.Font = Enum.Font.GothamBold; b.TextSize = 11; b.BorderSizePixel = 0; b.Parent = partRow
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0,4)
+    return b
+end
+local pBtnAuto = makePartBtn("Авто", 0.02, "Auto")
+local pBtnHead = makePartBtn("Голова", 0.345, "Head")
+local pBtnBody = makePartBtn("Тело", 0.67, "Body")
+local partBtns = {Auto=pBtnAuto, Head=pBtnHead, Body=pBtnBody}
+local function setTargetMode(m)
+    aimbotTargetMode = m
+    for k, b in pairs(partBtns) do
+        if k == m then b.BackgroundColor3 = C.accent else b.BackgroundColor3 = C.badge end
+    end
+    currentTarget = nil
+end
+pBtnAuto.MouseButton1Click:Connect(function() setTargetMode("Auto") end)
+pBtnHead.MouseButton1Click:Connect(function() setTargetMode("Head") end)
+pBtnBody.MouseButton1Click:Connect(function() setTargetMode("Body") end)
 
 makeSectionLabel(aimbotPage, "⚙️ ПАРАМЕТРЫ")
 makeSlider(aimbotPage, "FOV (радиус)", 50, 800, 300, false, function(v) aimbotFOV = v end)
@@ -2035,5 +2152,5 @@ closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
-print("✅ Eclipse Menu + Ghost с вращением камеры загружен.")
+print("✅ Eclipse Menu + Ghost + Точный Aimbot загружен.")
 print("⌨️ RightShift — открыть/закрыть меню.")
