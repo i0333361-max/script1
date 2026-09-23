@@ -709,7 +709,7 @@ local function stopFly()
 end
 makeToggle(armyPage, "Fly", true, function(on) if on then startFly() else stopFly() end end)
 
--- 👻 GHOST с вращением камеры
+-- 👻 GHOST с вращением камеры + слайдер скорости
 local ghostOn = false
 local ghostCamConn = nil
 local ghostMouseConn = nil
@@ -822,6 +822,7 @@ end
 makeToggle(armyPage, "👻 Ghost (стою, но летаю)", true, function(on)
     if on then ghostOn = true; startGhost() else stopGhost() end
 end)
+makeSlider(armyPage, "👻 Скорость Ghost", 10, 300, 70, false, function(v) ghostSpeed = v end)
 
 local ncConn
 local function startNC()
@@ -1633,6 +1634,11 @@ makeButton(tpPage, "💼 Брокеры", Color3.fromRGB(100, 70, 130), function
     teleportTo(1661.7, 25.0, -1937.1, "Брокеры")
 end)
 
+makeSectionLabel(tpPage, "🌪️ ИВЕНТЫ")
+makeButton(tpPage, "🌪️ ШТОРМ", Color3.fromRGB(70, 90, 120), function()
+    teleportTo(441.3, 9.0, 997.0, "Шторм")
+end)
+
 -- 👁️ СПЕКТАТОР
 local specGui, specRows, specSelected = nil, {}, nil
 local specOriginalSubject, specOriginalType = nil, nil
@@ -2152,5 +2158,5 @@ closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
-print("✅ Eclipse Menu + Ghost + Точный Aimbot загружен.")
+print("✅ Eclipse Menu + Ghost + Точный Aimbot + Шторм загружен.")
 print("⌨️ RightShift — открыть/закрыть меню.")
