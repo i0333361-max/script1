@@ -4,7 +4,6 @@ local camera=workspace.CurrentCamera
 local runService=game:GetService("RunService")
 local uis=game:GetService("UserInputService")
 local lighting=game:GetService("Lighting")
-local RS=game:GetService("ReplicatedStorage")
 local toggleKey=Enum.KeyCode.F4
 local waitingForMenuKey=false
 local setMenuKeyDisplay=nil
@@ -13,122 +12,75 @@ local specSelected=nil
 local stopSpectate=nil
 local C={bg=Color3.fromRGB(15,15,22),topbar=Color3.fromRGB(20,20,30),sidebar=Color3.fromRGB(18,18,26),row=Color3.fromRGB(22,22,32),accent=Color3.fromRGB(130,70,220),accentDk=Color3.fromRGB(90,40,160),text=Color3.fromRGB(220,220,230),textDim=Color3.fromRGB(140,140,160),badge=Color3.fromRGB(35,30,50),badgeText=Color3.fromRGB(150,130,180),toggleOff=Color3.fromRGB(50,50,65),knob=Color3.fromRGB(230,230,240),red=Color3.fromRGB(180,40,40),green=Color3.fromRGB(80,130,80)}
 local gui=Instance.new("ScreenGui")
-gui.Name="EclipseMenu"
-gui.ResetOnSpawn=false
-gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+gui.Name="EclipseMenu";gui.ResetOnSpawn=false;gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
 gui.Parent=player:WaitForChild("PlayerGui")
 local main=Instance.new("Frame")
-main.Size=UDim2.new(0,540,0,460)
-main.Position=UDim2.new(0.5,-270,0.5,-230)
-main.BackgroundColor3=C.bg
-main.BorderSizePixel=0
-main.Active=true
-main.Parent=gui
+main.Size=UDim2.new(0,540,0,460);main.Position=UDim2.new(0.5,-270,0.5,-230)
+main.BackgroundColor3=C.bg;main.BorderSizePixel=0;main.Active=true;main.Parent=gui
 Instance.new("UICorner",main).CornerRadius=UDim.new(0,8)
-local mStroke=Instance.new("UIStroke",main)
-mStroke.Color=C.accentDk
-mStroke.Thickness=1
-mStroke.Transparency=0.4
+local mStroke=Instance.new("UIStroke",main);mStroke.Color=C.accentDk;mStroke.Thickness=1;mStroke.Transparency=0.4
 local topbar=Instance.new("Frame")
-topbar.Size=UDim2.new(1,0,0,40)
-topbar.BackgroundColor3=C.topbar
-topbar.BorderSizePixel=0
-topbar.Parent=main
-topbar.Active=true
+topbar.Size=UDim2.new(1,0,0,40);topbar.BackgroundColor3=C.topbar;topbar.BorderSizePixel=0
+topbar.Parent=main;topbar.Active=true
 Instance.new("UICorner",topbar).CornerRadius=UDim.new(0,8)
 local titleLbl=Instance.new("TextLabel")
-titleLbl.Size=UDim2.new(0,200,1,0)
-titleLbl.Position=UDim2.new(0,18,0,0)
-titleLbl.Text="ECLIPSE"
-titleLbl.TextColor3=Color3.fromRGB(240,240,245)
-titleLbl.BackgroundTransparency=1
-titleLbl.Font=Enum.Font.GothamBold
-titleLbl.TextSize=16
-titleLbl.TextXAlignment=Enum.TextXAlignment.Left
-titleLbl.Parent=topbar
+titleLbl.Size=UDim2.new(0,200,1,0);titleLbl.Position=UDim2.new(0,18,0,0)
+titleLbl.Text="ECLIPSE";titleLbl.TextColor3=Color3.fromRGB(240,240,245)
+titleLbl.BackgroundTransparency=1;titleLbl.Font=Enum.Font.GothamBold;titleLbl.TextSize=16
+titleLbl.TextXAlignment=Enum.TextXAlignment.Left;titleLbl.Parent=topbar
 local minBtn=Instance.new("TextButton")
-minBtn.Size=UDim2.new(0,30,0,30)
-minBtn.Position=UDim2.new(1,-76,0,5)
-minBtn.Text="—"
-minBtn.TextColor3=C.textDim
-minBtn.BackgroundTransparency=1
-minBtn.Font=Enum.Font.GothamBold
-minBtn.TextSize=16
-minBtn.Parent=topbar
+minBtn.Size=UDim2.new(0,30,0,30);minBtn.Position=UDim2.new(1,-76,0,5)
+minBtn.Text="—";minBtn.TextColor3=C.textDim;minBtn.BackgroundTransparency=1
+minBtn.Font=Enum.Font.GothamBold;minBtn.TextSize=16;minBtn.Parent=topbar
 local closeBtn=Instance.new("TextButton")
-closeBtn.Size=UDim2.new(0,30,0,30)
-closeBtn.Position=UDim2.new(1,-42,0,5)
-closeBtn.Text="✕"
-closeBtn.TextColor3=C.textDim
-closeBtn.BackgroundTransparency=1
-closeBtn.Font=Enum.Font.GothamBold
-closeBtn.TextSize=14
-closeBtn.Parent=topbar
+closeBtn.Size=UDim2.new(0,30,0,30);closeBtn.Position=UDim2.new(1,-42,0,5)
+closeBtn.Text="✕";closeBtn.TextColor3=C.textDim;closeBtn.BackgroundTransparency=1
+closeBtn.Font=Enum.Font.GothamBold;closeBtn.TextSize=14;closeBtn.Parent=topbar
 local dragging,dragStart,startPos=false,nil,nil
 local function beginDrag(i)
-if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=true;dragStart=i.Position;startPos=main.Position end end
+if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+dragging=true;dragStart=i.Position;startPos=main.Position end end
 local function endDrag(i)
-if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=false end end
-topbar.InputBegan:Connect(beginDrag)
-topbar.InputEnded:Connect(endDrag)
-titleLbl.InputBegan:Connect(beginDrag)
-titleLbl.InputEnded:Connect(endDrag)
+if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+dragging=false end end
+topbar.InputBegan:Connect(beginDrag);topbar.InputEnded:Connect(endDrag)
+titleLbl.InputBegan:Connect(beginDrag);titleLbl.InputEnded:Connect(endDrag)
 uis.InputChanged:Connect(function(i)
-if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then local d=i.Position-dragStart;main.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+d.X,startPos.Y.Scale,startPos.Y.Offset+d.Y) end end)
+if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+local d=i.Position-dragStart
+main.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+d.X,startPos.Y.Scale,startPos.Y.Offset+d.Y) end end)
 local sidebar=Instance.new("Frame")
-sidebar.Size=UDim2.new(0,140,1,-54)
-sidebar.Position=UDim2.new(0,8,0,46)
-sidebar.BackgroundColor3=C.sidebar
-sidebar.BorderSizePixel=0
-sidebar.Parent=main
+sidebar.Size=UDim2.new(0,140,1,-54);sidebar.Position=UDim2.new(0,8,0,46)
+sidebar.BackgroundColor3=C.sidebar;sidebar.BorderSizePixel=0;sidebar.Parent=main
 Instance.new("UICorner",sidebar).CornerRadius=UDim.new(0,6)
 local function makeTabBtn(text,y)
 local b=Instance.new("TextButton")
-b.Size=UDim2.new(1,-16,0,32)
-b.Position=UDim2.new(0,8,0,y)
-b.Text=text
-b.TextColor3=Color3.fromRGB(240,240,245)
-b.BackgroundColor3=C.sidebar
-b.Font=Enum.Font.GothamSemibold
-b.TextSize=11
-b.BorderSizePixel=0
-b.TextXAlignment=Enum.TextXAlignment.Left
-b.Parent=sidebar
+b.Size=UDim2.new(1,-16,0,32);b.Position=UDim2.new(0,8,0,y)
+b.Text=text;b.TextColor3=Color3.fromRGB(240,240,245);b.BackgroundColor3=C.sidebar
+b.Font=Enum.Font.GothamSemibold;b.TextSize=11;b.BorderSizePixel=0
+b.TextXAlignment=Enum.TextXAlignment.Left;b.Parent=sidebar
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
 Instance.new("UIPadding",b).PaddingLeft=UDim.new(0,10)
 return b end
-local tabArmy=makeTabBtn("Армия РП",8)
-tabArmy.BackgroundColor3=C.accentDk
+local tabArmy=makeTabBtn("Армия РП",8);tabArmy.BackgroundColor3=C.accentDk
 local tabTP=makeTabBtn("Телепорты",44)
 local tabAimbot=makeTabBtn("Aimbot",80)
 local tabPvP=makeTabBtn("🔥 ПВП",116)
 local tabSettings=makeTabBtn("Настройки",152)
 local content=Instance.new("Frame")
-content.Size=UDim2.new(1,-156,1,-54)
-content.Position=UDim2.new(0,148,0,46)
-content.BackgroundColor3=C.bg
-content.BorderSizePixel=0
-content.Parent=main
+content.Size=UDim2.new(1,-156,1,-54);content.Position=UDim2.new(0,148,0,46)
+content.BackgroundColor3=C.bg;content.BorderSizePixel=0;content.Parent=main
 Instance.new("UICorner",content).CornerRadius=UDim.new(0,6)
 local function makePage()
 local p=Instance.new("ScrollingFrame")
-p.Size=UDim2.new(1,-16,1,-16)
-p.Position=UDim2.new(0,8,0,8)
-p.BackgroundTransparency=1
-p.BorderSizePixel=0
-p.CanvasSize=UDim2.new(0,0,0,0)
-p.ScrollBarThickness=4
-p.ScrollBarImageColor3=C.accent
-p.Visible=false
-p.Parent=content
+p.Size=UDim2.new(1,-16,1,-16);p.Position=UDim2.new(0,8,0,8)
+p.BackgroundTransparency=1;p.BorderSizePixel=0;p.CanvasSize=UDim2.new(0,0,0,0)
+p.ScrollBarThickness=4;p.ScrollBarImageColor3=C.accent;p.Visible=false;p.Parent=content
 Instance.new("UIListLayout",p).Padding=UDim.new(0,6)
 return p end
-local armyPage=makePage()
-armyPage.Visible=true
-local tpPage=makePage()
-local aimbotPage=makePage()
-local pvpPage=makePage()
-local settingsPage=makePage()
+local armyPage=makePage();armyPage.Visible=true
+local tpPage=makePage();local aimbotPage=makePage()
+local pvpPage=makePage();local settingsPage=makePage()
 local function showTab(n)
 armyPage.Visible=false;tpPage.Visible=false;aimbotPage.Visible=false;pvpPage.Visible=false;settingsPage.Visible=false
 tabArmy.BackgroundColor3=C.sidebar;tabTP.BackgroundColor3=C.sidebar;tabAimbot.BackgroundColor3=C.sidebar;tabPvP.BackgroundColor3=C.sidebar;tabSettings.BackgroundColor3=C.sidebar
@@ -142,9 +94,7 @@ tabTP.MouseButton1Click:Connect(function() showTab("tp") end)
 tabAimbot.MouseButton1Click:Connect(function() showTab("aimbot") end)
 tabPvP.MouseButton1Click:Connect(function() showTab("pvp") end)
 tabSettings.MouseButton1Click:Connect(function() showTab("settings") end)
-local togglesData={}
-local hotkeyRegistry={}
-local waitingHotkeyToggle=nil
+local togglesData={};local hotkeyRegistry={};local waitingHotkeyToggle=nil
 local function keyToShortName(k)
 if not k then return "NONE" end
 local n=tostring(k):gsub("Enum.KeyCode.","")
@@ -157,65 +107,37 @@ if k then b.Text="[ "..keyToShortName(k).." ]";b.TextColor3=C.accent
 else b.Text="[ NONE ]";b.TextColor3=C.badgeText end end
 local function makeToggle(parent,text,hasBadge,onClick)
 local row=Instance.new("Frame")
-row.Size=UDim2.new(1,-12,0,42)
-row.BackgroundColor3=C.row
-row.BorderSizePixel=0
-row.Parent=parent
+row.Size=UDim2.new(1,-12,0,42);row.BackgroundColor3=C.row;row.BorderSizePixel=0;row.Parent=parent
 Instance.new("UICorner",row).CornerRadius=UDim.new(0,6)
 local dot=Instance.new("Frame")
-dot.Size=UDim2.new(0,6,0,6)
-dot.Position=UDim2.new(0,12,0.5,-3)
-dot.BackgroundColor3=C.textDim
-dot.BorderSizePixel=0
-dot.Parent=row
+dot.Size=UDim2.new(0,6,0,6);dot.Position=UDim2.new(0,12,0.5,-3)
+dot.BackgroundColor3=C.textDim;dot.BorderSizePixel=0;dot.Parent=row
 Instance.new("UICorner",dot).CornerRadius=UDim.new(1,0)
 local label=Instance.new("TextLabel")
-label.Size=UDim2.new(0.55,0,1,0)
-label.Position=UDim2.new(0,26,0,0)
-label.Text=text
-label.TextColor3=C.text
-label.BackgroundTransparency=1
-label.Font=Enum.Font.GothamMedium
-label.TextSize=12
-label.TextXAlignment=Enum.TextXAlignment.Left
-label.Parent=row
+label.Size=UDim2.new(0.55,0,1,0);label.Position=UDim2.new(0,26,0,0)
+label.Text=text;label.TextColor3=C.text;label.BackgroundTransparency=1
+label.Font=Enum.Font.GothamMedium;label.TextSize=12
+label.TextXAlignment=Enum.TextXAlignment.Left;label.Parent=row
 local badge=nil
 if hasBadge then
 badge=Instance.new("TextButton")
-badge.Size=UDim2.new(0,88,0,20)
-badge.Position=UDim2.new(1,-138,0.5,-10)
-badge.Text="[ NONE ]"
-badge.TextColor3=C.badgeText
-badge.BackgroundColor3=C.badge
-badge.Font=Enum.Font.GothamMedium
-badge.TextSize=10
-badge.BorderSizePixel=0
-badge.Parent=row
-badge.AutoButtonColor=false
-badge.ZIndex=5
+badge.Size=UDim2.new(0,88,0,20);badge.Position=UDim2.new(1,-138,0.5,-10)
+badge.Text="[ NONE ]";badge.TextColor3=C.badgeText;badge.BackgroundColor3=C.badge
+badge.Font=Enum.Font.GothamMedium;badge.TextSize=10;badge.BorderSizePixel=0
+badge.Parent=row;badge.AutoButtonColor=false;badge.ZIndex=5
 Instance.new("UICorner",badge).CornerRadius=UDim.new(0,4) end
 local tBg=Instance.new("Frame")
-tBg.Size=UDim2.new(0,34,0,18)
-tBg.Position=UDim2.new(1,-46,0.5,-9)
-tBg.BackgroundColor3=C.toggleOff
-tBg.BorderSizePixel=0
-tBg.Parent=row
+tBg.Size=UDim2.new(0,34,0,18);tBg.Position=UDim2.new(1,-46,0.5,-9)
+tBg.BackgroundColor3=C.toggleOff;tBg.BorderSizePixel=0;tBg.Parent=row
 Instance.new("UICorner",tBg).CornerRadius=UDim.new(1,0)
 local knob=Instance.new("Frame")
-knob.Size=UDim2.new(0,14,0,14)
-knob.Position=UDim2.new(0,2,0.5,-7)
-knob.BackgroundColor3=C.knob
-knob.BorderSizePixel=0
-knob.Parent=tBg
+knob.Size=UDim2.new(0,14,0,14);knob.Position=UDim2.new(0,2,0.5,-7)
+knob.BackgroundColor3=C.knob;knob.BorderSizePixel=0;knob.Parent=tBg
 Instance.new("UICorner",knob).CornerRadius=UDim.new(1,0)
 local click=Instance.new("TextButton")
-click.Size=UDim2.new(1,0,1,0)
-click.BackgroundTransparency=1
-click.Text=""
-click.Parent=row
-click.ZIndex=1
-local state=false
-local hotkey=nil
+click.Size=UDim2.new(1,0,1,0);click.BackgroundTransparency=1;click.Text=""
+click.Parent=row;click.ZIndex=1
+local state=false;local hotkey=nil
 local function render()
 if state then tBg.BackgroundColor3=C.accent;knob.Position=UDim2.new(1,-16,0.5,-7);dot.BackgroundColor3=C.accent
 else tBg.BackgroundColor3=C.toggleOff;knob.Position=UDim2.new(0,2,0.5,-7);dot.BackgroundColor3=C.textDim end end
@@ -227,8 +149,7 @@ api.getBadge=function() return badge end
 api.setHotkeyInternal=function(k) hotkey=k end
 api.clearHotkey=function()
 if hotkey and hotkeyRegistry[hotkey]==api then hotkeyRegistry[hotkey]=nil end
-hotkey=nil
-if badge then renderBadge(badge,nil) end end
+hotkey=nil;if badge then renderBadge(badge,nil) end end
 click.MouseButton1Click:Connect(function() state=not state;render();if onClick then onClick(state) end end)
 if badge then
 badge.MouseButton1Click:Connect(function()
@@ -236,9 +157,7 @@ if waitingHotkeyToggle and waitingHotkeyToggle~=api then
 local prev=waitingHotkeyToggle.getBadge()
 if prev then renderBadge(prev,waitingHotkeyToggle.getHotkey()) end end
 if waitingHotkeyToggle==api then waitingHotkeyToggle=nil;renderBadge(badge,hotkey);return end
-waitingHotkeyToggle=api
-badge.Text="[ ... ]"
-badge.TextColor3=Color3.fromRGB(255,200,80) end)
+waitingHotkeyToggle=api;badge.Text="[ ... ]";badge.TextColor3=Color3.fromRGB(255,200,80) end)
 badge.MouseButton2Click:Connect(function()
 if waitingHotkeyToggle==api then waitingHotkeyToggle=nil end
 api.clearHotkey() end) end
@@ -246,61 +165,39 @@ table.insert(togglesData,{api=api,tBg=tBg,dot=dot})
 return api end
 local function makeSlider(parent,label,minVal,maxVal,defaultVal,isFloat,onChange)
 local row=Instance.new("Frame")
-row.Size=UDim2.new(1,-12,0,58)
-row.BackgroundColor3=C.row
-row.BorderSizePixel=0
-row.Parent=parent
+row.Size=UDim2.new(1,-12,0,58);row.BackgroundColor3=C.row
+row.BorderSizePixel=0;row.Parent=parent
 Instance.new("UICorner",row).CornerRadius=UDim.new(0,6)
 local lbl=Instance.new("TextLabel")
-lbl.Size=UDim2.new(0.7,-12,0,18)
-lbl.Position=UDim2.new(0,12,0,4)
-lbl.BackgroundTransparency=1
-lbl.Text=label
-lbl.TextColor3=C.text
-lbl.Font=Enum.Font.GothamMedium
-lbl.TextSize=12
-lbl.TextXAlignment=Enum.TextXAlignment.Left
-lbl.Parent=row
+lbl.Size=UDim2.new(0.7,-12,0,18);lbl.Position=UDim2.new(0,12,0,4)
+lbl.BackgroundTransparency=1;lbl.Text=label;lbl.TextColor3=C.text
+lbl.Font=Enum.Font.GothamMedium;lbl.TextSize=12
+lbl.TextXAlignment=Enum.TextXAlignment.Left;lbl.Parent=row
 local valLbl=Instance.new("TextLabel")
-valLbl.Size=UDim2.new(0.3,-12,0,18)
-valLbl.Position=UDim2.new(0.7,0,0,4)
+valLbl.Size=UDim2.new(0.3,-12,0,18);valLbl.Position=UDim2.new(0.7,0,0,4)
 valLbl.BackgroundTransparency=1
 valLbl.Text=isFloat and string.format("%.2f",defaultVal) or tostring(defaultVal)
-valLbl.TextColor3=C.accent
-valLbl.Font=Enum.Font.GothamBold
-valLbl.TextSize=12
-valLbl.TextXAlignment=Enum.TextXAlignment.Right
-valLbl.Parent=row
+valLbl.TextColor3=C.accent;valLbl.Font=Enum.Font.GothamBold
+valLbl.TextSize=12;valLbl.TextXAlignment=Enum.TextXAlignment.Right;valLbl.Parent=row
 local barBg=Instance.new("Frame")
-barBg.Size=UDim2.new(1,-24,0,6)
-barBg.Position=UDim2.new(0,12,0,34)
-barBg.BackgroundColor3=C.toggleOff
-barBg.BorderSizePixel=0
-barBg.Parent=row
+barBg.Size=UDim2.new(1,-24,0,6);barBg.Position=UDim2.new(0,12,0,34)
+barBg.BackgroundColor3=C.toggleOff;barBg.BorderSizePixel=0;barBg.Parent=row
 Instance.new("UICorner",barBg).CornerRadius=UDim.new(1,0)
 local barFill=Instance.new("Frame")
-barFill.Size=UDim2.new(0,0,1,0)
-barFill.BackgroundColor3=C.accent
-barFill.BorderSizePixel=0
-barFill.Parent=barBg
+barFill.Size=UDim2.new(0,0,1,0);barFill.BackgroundColor3=C.accent
+barFill.BorderSizePixel=0;barFill.Parent=barBg
 Instance.new("UICorner",barFill).CornerRadius=UDim.new(1,0)
 local knob=Instance.new("Frame")
-knob.Size=UDim2.new(0,14,0,14)
-knob.Position=UDim2.new(0,0,0.5,-7)
-knob.BackgroundColor3=C.knob
-knob.BorderSizePixel=0
-knob.ZIndex=2
-knob.Parent=barBg
+knob.Size=UDim2.new(0,14,0,14);knob.Position=UDim2.new(0,0,0.5,-7)
+knob.BackgroundColor3=C.knob;knob.BorderSizePixel=0;knob.ZIndex=2;knob.Parent=barBg
 Instance.new("UICorner",knob).CornerRadius=UDim.new(1,0)
 local value=defaultVal
 local function setValue(v)
 v=math.clamp(v,minVal,maxVal)
 if not isFloat then v=math.floor(v) end
-value=v
-valLbl.Text=isFloat and string.format("%.2f",v) or tostring(v)
+value=v;valLbl.Text=isFloat and string.format("%.2f",v) or tostring(v)
 local pct=(v-minVal)/(maxVal-minVal)
-barFill.Size=UDim2.new(pct,0,1,0)
-knob.Position=UDim2.new(pct,-7,0.5,-7)
+barFill.Size=UDim2.new(pct,0,1,0);knob.Position=UDim2.new(pct,-7,0.5,-7)
 if onChange then onChange(v) end end
 setValue(defaultVal)
 local dragging2=false
@@ -309,62 +206,71 @@ local relX=x-barBg.AbsolutePosition.X
 local pct=math.clamp(relX/barBg.AbsoluteSize.X,0,1)
 setValue(minVal+pct*(maxVal-minVal)) end
 barBg.InputBegan:Connect(function(i)
-if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging2=true;updateFromX(i.Position.X) end end)
+if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+dragging2=true;updateFromX(i.Position.X) end end)
 uis.InputChanged:Connect(function(i)
-if dragging2 and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then updateFromX(i.Position.X) end end)
+if dragging2 and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+updateFromX(i.Position.X) end end)
 uis.InputEnded:Connect(function(i)
-if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging2=false end end)
+if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+dragging2=false end end)
 return {set=setValue,get=function() return value end} end
 local function makeSectionLabel(parent,text)
 local lbl=Instance.new("TextLabel")
-lbl.Size=UDim2.new(1,-12,0,22)
-lbl.BackgroundTransparency=1
-lbl.Text=text
-lbl.TextColor3=C.badgeText
-lbl.Font=Enum.Font.GothamBold
-lbl.TextSize=11
-lbl.TextXAlignment=Enum.TextXAlignment.Left
-lbl.Parent=parent
+lbl.Size=UDim2.new(1,-12,0,22);lbl.BackgroundTransparency=1
+lbl.Text=text;lbl.TextColor3=C.badgeText;lbl.Font=Enum.Font.GothamBold
+lbl.TextSize=11;lbl.TextXAlignment=Enum.TextXAlignment.Left;lbl.Parent=parent
 return lbl end
 local function makeButton(parent,text,color,onClick)
 local b=Instance.new("TextButton")
-b.Size=UDim2.new(1,-12,0,40)
-b.BackgroundColor3=color or C.accentDk
-b.Text=text
-b.TextColor3=C.text
-b.Font=Enum.Font.GothamBold
-b.TextSize=12
-b.BorderSizePixel=0
-b.Parent=parent
+b.Size=UDim2.new(1,-12,0,40);b.BackgroundColor3=color or C.accentDk
+b.Text=text;b.TextColor3=C.text;b.Font=Enum.Font.GothamBold
+b.TextSize=12;b.BorderSizePixel=0;b.Parent=parent
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
 b.MouseButton1Click:Connect(onClick)
 return b end
 local function getHum() local c=player.Character;return c and c:FindFirstChildOfClass("Humanoid") end
 local function getHRP() local c=player.Character;return c and c:FindFirstChild("HumanoidRootPart") end
+local function getFactionColor(p)
+if p.Team and p.Team.TeamColor then return p.Team.TeamColor.Color end
+return Color3.fromRGB(180,180,180) end
 local function showNotif(text,color)
 local n=Instance.new("TextLabel")
-n.Size=UDim2.new(0,500,0,50)
-n.Position=UDim2.new(0.5,-250,0.15,0)
-n.BackgroundColor3=Color3.fromRGB(20,20,30)
-n.BackgroundTransparency=0.15
-n.Text=text
-n.TextColor3=color or C.text
-n.Font=Enum.Font.GothamBold
-n.TextSize=14
-n.BorderSizePixel=0
-n.ZIndex=999
-n.Parent=gui
+n.Size=UDim2.new(0,500,0,50);n.Position=UDim2.new(0.5,-250,0.15,0)
+n.BackgroundColor3=Color3.fromRGB(20,20,30);n.BackgroundTransparency=0.15
+n.Text=text;n.TextColor3=color or C.text;n.Font=Enum.Font.GothamBold
+n.TextSize=14;n.BorderSizePixel=0;n.ZIndex=999;n.Parent=gui
 Instance.new("UICorner",n).CornerRadius=UDim.new(0,8)
+game:GetService("Debris"):AddItem(n,3)
 return n end
+
+-- УНИВЕРСАЛЬНОЕ ПЕРЕТАСКИВАНИЕ ОКОН
+local function makeDraggable(frame, handle)
+if not frame or not handle then return end
+local dragOn, ds, sp = false, nil, nil
+handle.InputBegan:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+dragOn=true; ds=i.Position; sp=frame.Position
+end end)
+handle.InputEnded:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+dragOn=false end end)
+uis.InputChanged:Connect(function(i)
+if dragOn and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+local d=i.Position-ds
+frame.Position=UDim2.new(sp.X.Scale,sp.X.Offset+d.X,sp.Y.Scale,sp.Y.Offset+d.Y)
+end end)
+uis.InputEnded:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+dragOn=false end end)
+end
+
 -- ESP
 local espList,espData,espConn={},{},nil
 local playerConns,statCache={},{}
 local function clearESP()
 for _,o in ipairs(espList) do pcall(function() o:Destroy() end) end
 espList,espData={},{} end
-local function getFactionColor(p)
-if p.Team and p.Team.TeamColor then return p.Team.TeamColor.Color end
-return Color3.fromRGB(200,200,200) end
 local function formatNum(n)
 if not n then return "—" end
 n=tonumber(n) or 0
@@ -373,39 +279,29 @@ if n>=1e3 then return string.format("%.1fK",n/1e3) end
 return tostring(math.floor(n)) end
 local function updateStats()
 for _,d in ipairs(espData) do
-local p=d.plr
-local cache=statCache[p]
+local p=d.plr;local cache=statCache[p]
 if not cache then cache={};statCache[p]=cache end
 local cs={p:FindFirstChild("leaderstats"),p:FindFirstChild("Stats"),p}
 local cash,minutes
 for _,c in ipairs(cs) do
-if c then
-local v=c:FindFirstChild("Cash") or c:FindFirstChild("Деньги") or c:FindFirstChild("Money") or c:FindFirstChild("Баланс")
+if c then local v=c:FindFirstChild("Cash") or c:FindFirstChild("Деньги") or c:FindFirstChild("Money") or c:FindFirstChild("Баланс")
 if v and (v:IsA("IntValue") or v:IsA("NumberValue")) then cash=v.Value;break end end end
 for _,c in ipairs(cs) do
-if c then
-local v=c:FindFirstChild("Minute") or c:FindFirstChild("Minutes") or c:FindFirstChild("Минуты") or c:FindFirstChild("Time")
+if c then local v=c:FindFirstChild("Minute") or c:FindFirstChild("Minutes") or c:FindFirstChild("Минуты") or c:FindFirstChild("Time")
 if v and (v:IsA("IntValue") or v:IsA("NumberValue")) then minutes=v.Value;break end end end
 cache.cash=cash;cache.minutes=minutes
 cache.faction=p.Team and p.Team.Name or nil
 cache.factionColor=getFactionColor(p) end end
 local function createESP(p)
 if p==player then return end
-local ch=p.Character
-if not ch then return end
-local head=ch:FindFirstChild("Head")
-if not head then return end
+local ch=p.Character;if not ch then return end
+local head=ch:FindFirstChild("Head");if not head then return end
 local bb=Instance.new("BillboardGui")
-bb.Size=UDim2.new(0,260,0,68)
-bb.StudsOffset=Vector3.new(0,3.5,0)
-bb.AlwaysOnTop=true
-bb.Parent=head
+bb.Size=UDim2.new(0,260,0,68);bb.StudsOffset=Vector3.new(0,3.5,0)
+bb.AlwaysOnTop=true;bb.Parent=head
 local bg=Instance.new("Frame")
-bg.Size=UDim2.new(1,0,1,0)
-bg.BackgroundColor3=Color3.fromRGB(0,0,0)
-bg.BackgroundTransparency=0.85
-bg.BorderSizePixel=0
-bg.Parent=bb
+bg.Size=UDim2.new(1,0,1,0);bg.BackgroundColor3=Color3.fromRGB(0,0,0)
+bg.BackgroundTransparency=0.85;bg.BorderSizePixel=0;bg.Parent=bb
 Instance.new("UICorner",bg).CornerRadius=UDim.new(0,3)
 local function mt(pos,size,font,txtSize,color,align)
 local t=Instance.new("TextLabel")
@@ -419,26 +315,17 @@ local distL=mt(UDim2.new(0,3,0,18),UDim2.new(0.4,-3,0,13),Enum.Font.GothamBold,1
 local cashL=mt(UDim2.new(0.4,0,0,18),UDim2.new(0.3,-3,0,13),Enum.Font.GothamBold,10,Color3.fromRGB(100,255,100),Enum.TextXAlignment.Center)
 local minL=mt(UDim2.new(0.7,0,0,18),UDim2.new(0.3,-3,0,13),Enum.Font.GothamBold,10,Color3.fromRGB(100,200,255),Enum.TextXAlignment.Right)
 local hpBg=Instance.new("Frame")
-hpBg.Size=UDim2.new(1,-6,0,4)
-hpBg.Position=UDim2.new(0,3,0,34)
-hpBg.BackgroundColor3=Color3.fromRGB(40,15,15)
-hpBg.BackgroundTransparency=0.4
-hpBg.BorderSizePixel=0
-hpBg.Parent=bg
+hpBg.Size=UDim2.new(1,-6,0,4);hpBg.Position=UDim2.new(0,3,0,34)
+hpBg.BackgroundColor3=Color3.fromRGB(40,15,15);hpBg.BackgroundTransparency=0.4
+hpBg.BorderSizePixel=0;hpBg.Parent=bg
 Instance.new("UICorner",hpBg).CornerRadius=UDim.new(1,0)
 local hpF=Instance.new("Frame")
-hpF.Size=UDim2.new(1,0,1,0)
-hpF.BackgroundColor3=Color3.fromRGB(0,200,0)
-hpF.BackgroundTransparency=0.15
-hpF.BorderSizePixel=0
-hpF.Parent=hpBg
+hpF.Size=UDim2.new(1,0,1,0);hpF.BackgroundColor3=Color3.fromRGB(0,200,0)
+hpF.BackgroundTransparency=0.15;hpF.BorderSizePixel=0;hpF.Parent=hpBg
 Instance.new("UICorner",hpF).CornerRadius=UDim.new(1,0)
 local hl=Instance.new("Highlight")
-hl.FillColor=Color3.fromRGB(255,0,0)
-hl.FillTransparency=0.85
-hl.OutlineColor=Color3.fromRGB(255,255,0)
-hl.OutlineTransparency=0.3
-hl.Parent=ch
+hl.FillColor=Color3.fromRGB(255,0,0);hl.FillTransparency=0.85
+hl.OutlineColor=Color3.fromRGB(255,255,0);hl.OutlineTransparency=0.3;hl.Parent=ch
 table.insert(espList,hl)
 return {bb=bb,nameL=nameL,factionL=factionL,distL=distL,hpTextL=hpTextL,cashL=cashL,minL=minL,hpF=hpF,plr=p,hl=hl} end
 local function removeESPFor(p)
@@ -457,8 +344,7 @@ local function hookPlayer(p)
 if p==player or playerConns[p] then return end
 playerConns[p]=true
 p.CharacterAdded:Connect(function() task.wait(0.15);if espConn then refreshPlayerESP(p) end end)
-p.CharacterRemoving:Connect(function() task.wait(0.1);removeESPFor(p) end)
-pcall(function() p:GetPropertyChangedSignal("Team"):Connect(function() if espConn then task.defer(function() refreshPlayerESP(p) end) end end) end) end
+p.CharacterRemoving:Connect(function() task.wait(0.1);removeESPFor(p) end) end
 local function syncESP()
 for _,p in ipairs(game.Players:GetPlayers()) do
 if p~=player then
@@ -522,6 +408,7 @@ task.wait(0.4) end end) end
 local function stopESP()
 if espConn then espConn:Disconnect();espConn=nil end
 clearESP();playerConns={};statCache={} end
+
 -- AIMBOT
 local aimbotOn,aimbotConn=false,nil
 local aimbotFOV,aimbotSmooth=300,0.35
@@ -532,17 +419,12 @@ local aimbotTargetMode,aimbotIgnoreTeammates="Auto",true
 local currentTarget=nil
 local function isTeammate(p)
 if not p then return false end
-local myTeam=player.Team
-return myTeam~=nil and p.Team==myTeam end
+return player.Team~=nil and p.Team==player.Team end
 local function isAimbotActive()
 if aimbotButtonMode=="Always" then return true end
 if aimbotButtonMode=="RMB" then return uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) end
 if aimbotButtonMode=="LMB" then return uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) end
 return false end
-local function getPing(p)
-local ok,r=pcall(function() return p:GetNetworkPing() end)
-if ok and type(r)=="number" and r>0 then return r end
-return 0.05 end
 local function rayVisible(from,to,ign)
 local params=RaycastParams.new()
 params.FilterType=Enum.RaycastFilterType.Exclude
@@ -550,13 +432,11 @@ local filter={}
 if player.Character then table.insert(filter,player.Character) end
 if ign then table.insert(filter,ign) end
 params.FilterDescendantsInstances=filter
-local ray=workspace:Raycast(from,to-from,params)
-return ray==nil end
+return workspace:Raycast(from,to-from,params)==nil end
 local function getAimParts(char)
 local out={}
 if aimbotTargetMode=="Head" then
-local h=char:FindFirstChild("Head")
-if h then table.insert(out,h) end
+local h=char:FindFirstChild("Head");if h then table.insert(out,h) end
 elseif aimbotTargetMode=="Body" then
 local u=char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso") or char:FindFirstChild("HumanoidRootPart")
 if u then table.insert(out,u) end
@@ -572,8 +452,7 @@ if not onScreen then return nil end
 local d2d=(Vector2.new(sp.X,sp.Y)-scrCenter).Magnitude
 if d2d>aimbotFOV then return nil end
 if aimbotVisible and not rayVisible(myPos,part.Position,part.Parent) then return nil end
-local d3d=(myPos-part.Position).Magnitude
-return d2d+d3d*0.05 end
+return d2d+(myPos-part.Position).Magnitude*0.05 end
 local function findTarget()
 local myPos=camera.CFrame.Position
 local scrCenter=Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y/2)
@@ -593,17 +472,14 @@ if t.part.Parent~=t.character then return false end
 if aimbotIgnoreTeammates and isTeammate(t.player) then return false end
 local hum=t.character:FindFirstChildOfClass("Humanoid")
 if not hum or hum.Health<=0 then return false end
-local myPos=camera.CFrame.Position
-local scrCenter=Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y/2)
-local score=scoreTarget(t.part,scrCenter,myPos)
+local score=scoreTarget(t.part,Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y/2),camera.CFrame.Position)
 if not score or score>aimbotFOV*1.5 then return false end
 return true end
 local function predictPos(t)
 if not aimbotPrediction then return t.part.Position end
 local vel=t.part.AssemblyLinearVelocity
 if not vel or vel.Magnitude<1 then return t.part.Position end
-local ping=getPing(t.player)
-return t.part.Position+vel*(ping+0.03) end
+return t.part.Position+vel*0.08 end
 local function startAimbot()
 if aimbotConn then aimbotConn:Disconnect() end
 currentTarget=nil
@@ -615,9 +491,7 @@ local target
 if aimbotSticky and currentTarget and validateTarget(currentTarget) then target=currentTarget
 else target=findTarget();currentTarget=target end
 if target then
-local aimPos=predictPos(target)
-local camPos=camera.CFrame.Position
-local desired=CFrame.new(camPos,aimPos)
+local desired=CFrame.new(camera.CFrame.Position,predictPos(target))
 local alpha=math.clamp(dt/math.max(aimbotSmooth,0.01)*10,0,1)
 camera.CFrame=camera.CFrame:Lerp(desired,alpha) end end) end
 local function stopAimbot()
@@ -626,106 +500,81 @@ currentTarget=nil end
 makeSectionLabel(aimbotPage,"🎯 УПРАВЛЕНИЕ")
 makeToggle(aimbotPage,"Аимбот включён",true,function(on) aimbotOn=on;if on then startAimbot() else stopAimbot() end end)
 local btnModeRow=Instance.new("Frame")
-btnModeRow.Size=UDim2.new(1,-12,0,62)
-btnModeRow.BackgroundColor3=C.row
-btnModeRow.BorderSizePixel=0
-btnModeRow.Parent=aimbotPage
+btnModeRow.Size=UDim2.new(1,-12,0,62);btnModeRow.BackgroundColor3=C.row
+btnModeRow.BorderSizePixel=0;btnModeRow.Parent=aimbotPage
 Instance.new("UICorner",btnModeRow).CornerRadius=UDim.new(0,6)
 local btnModeLbl=Instance.new("TextLabel")
-btnModeLbl.Size=UDim2.new(1,-20,0,18)
-btnModeLbl.Position=UDim2.new(0,12,0,4)
-btnModeLbl.BackgroundTransparency=1
-btnModeLbl.Text="Кнопка активации"
-btnModeLbl.TextColor3=C.text
-btnModeLbl.Font=Enum.Font.GothamMedium
-btnModeLbl.TextSize=12
-btnModeLbl.TextXAlignment=Enum.TextXAlignment.Left
-btnModeLbl.Parent=btnModeRow
+btnModeLbl.Size=UDim2.new(1,-20,0,18);btnModeLbl.Position=UDim2.new(0,12,0,4)
+btnModeLbl.BackgroundTransparency=1;btnModeLbl.Text="Кнопка активации"
+btnModeLbl.TextColor3=C.text;btnModeLbl.Font=Enum.Font.GothamMedium
+btnModeLbl.TextSize=12;btnModeLbl.TextXAlignment=Enum.TextXAlignment.Left;btnModeLbl.Parent=btnModeRow
 local function makeModeBtn(text,x,mode)
 local b=Instance.new("TextButton")
-b.Size=UDim2.new(0.31,-6,0,28)
-b.Position=UDim2.new(x,0,0,28)
-b.Text=text
-b.TextColor3=C.text
+b.Size=UDim2.new(0.31,-6,0,28);b.Position=UDim2.new(x,0,0,28)
+b.Text=text;b.TextColor3=C.text
 b.BackgroundColor3=(aimbotButtonMode==mode) and C.accent or C.badge
-b.Font=Enum.Font.GothamBold
-b.TextSize=11
-b.BorderSizePixel=0
-b.Parent=btnModeRow
+b.Font=Enum.Font.GothamBold;b.TextSize=11;b.BorderSizePixel=0;b.Parent=btnModeRow
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,4)
 return b end
 local btnRMB=makeModeBtn("ПКМ",0.02,"RMB")
 local btnLMB=makeModeBtn("ЛКМ",0.345,"LMB")
 local btnAlways=makeModeBtn("Всегда",0.67,"Always")
-local modeBtns={["RMB"]=btnRMB,["LMB"]=btnLMB,["Always"]=btnAlways}
-local function setMode(m)
-aimbotButtonMode=m
+local modeBtns={RMB=btnRMB,LMB=btnLMB,Always=btnAlways}
+local function setMode(m) aimbotButtonMode=m
 for k,b in pairs(modeBtns) do if k==m then b.BackgroundColor3=C.accent else b.BackgroundColor3=C.badge end end end
 btnRMB.MouseButton1Click:Connect(function() setMode("RMB") end)
 btnLMB.MouseButton1Click:Connect(function() setMode("LMB") end)
 btnAlways.MouseButton1Click:Connect(function() setMode("Always") end)
 makeSectionLabel(aimbotPage,"🎯 ЦЕЛЬ")
-makeToggle(aimbotPage,"Предсказание (упреждение)",true,function(on) aimbotPrediction=on end)
-makeToggle(aimbotPage,"Держать цель (sticky)",true,function(on) aimbotSticky=on;if not on then currentTarget=nil end end)
+makeToggle(aimbotPage,"Предсказание",true,function(on) aimbotPrediction=on end)
+makeToggle(aimbotPage,"Держать цель",true,function(on) aimbotSticky=on;if not on then currentTarget=nil end end)
 local partRow=Instance.new("Frame")
-partRow.Size=UDim2.new(1,-12,0,62)
-partRow.BackgroundColor3=C.row
-partRow.BorderSizePixel=0
-partRow.Parent=aimbotPage
+partRow.Size=UDim2.new(1,-12,0,62);partRow.BackgroundColor3=C.row
+partRow.BorderSizePixel=0;partRow.Parent=aimbotPage
 Instance.new("UICorner",partRow).CornerRadius=UDim.new(0,6)
 local partLbl=Instance.new("TextLabel")
-partLbl.Size=UDim2.new(1,-20,0,18)
-partLbl.Position=UDim2.new(0,12,0,4)
-partLbl.BackgroundTransparency=1
-partLbl.Text="Точка прицеливания"
-partLbl.TextColor3=C.text
-partLbl.Font=Enum.Font.GothamMedium
-partLbl.TextSize=12
-partLbl.TextXAlignment=Enum.TextXAlignment.Left
-partLbl.Parent=partRow
+partLbl.Size=UDim2.new(1,-20,0,18);partLbl.Position=UDim2.new(0,12,0,4)
+partLbl.BackgroundTransparency=1;partLbl.Text="Точка"
+partLbl.TextColor3=C.text;partLbl.Font=Enum.Font.GothamMedium
+partLbl.TextSize=12;partLbl.TextXAlignment=Enum.TextXAlignment.Left;partLbl.Parent=partRow
 local function makePartBtn(text,x,mode)
 local b=Instance.new("TextButton")
-b.Size=UDim2.new(0.31,-6,0,28)
-b.Position=UDim2.new(x,0,0,28)
-b.Text=text
-b.TextColor3=C.text
+b.Size=UDim2.new(0.31,-6,0,28);b.Position=UDim2.new(x,0,0,28)
+b.Text=text;b.TextColor3=C.text
 b.BackgroundColor3=(aimbotTargetMode==mode) and C.accent or C.badge
-b.Font=Enum.Font.GothamBold
-b.TextSize=11
-b.BorderSizePixel=0
-b.Parent=partRow
+b.Font=Enum.Font.GothamBold;b.TextSize=11;b.BorderSizePixel=0;b.Parent=partRow
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,4)
 return b end
 local pBtnAuto=makePartBtn("Авто",0.02,"Auto")
 local pBtnHead=makePartBtn("Голова",0.345,"Head")
 local pBtnBody=makePartBtn("Тело",0.67,"Body")
 local partBtns={Auto=pBtnAuto,Head=pBtnHead,Body=pBtnBody}
-local function setTargetMode(m)
-aimbotTargetMode=m
+local function setTargetMode(m) aimbotTargetMode=m
 for k,b in pairs(partBtns) do if k==m then b.BackgroundColor3=C.accent else b.BackgroundColor3=C.badge end end
 currentTarget=nil end
 pBtnAuto.MouseButton1Click:Connect(function() setTargetMode("Auto") end)
 pBtnHead.MouseButton1Click:Connect(function() setTargetMode("Head") end)
 pBtnBody.MouseButton1Click:Connect(function() setTargetMode("Body") end)
 makeSectionLabel(aimbotPage,"⚙️ ПАРАМЕТРЫ")
-makeSlider(aimbotPage,"FOV (радиус)",50,800,300,false,function(v) aimbotFOV=v end)
+makeSlider(aimbotPage,"FOV",50,800,300,false,function(v) aimbotFOV=v end)
 makeSlider(aimbotPage,"Плавность",0.05,1,0.35,true,function(v) aimbotSmooth=v end)
 makeToggle(aimbotPage,"Только видимые",true,function(on) aimbotVisible=on end)
-makeToggle(aimbotPage,"🎯 Не стрелять по своим",true,function(on) aimbotIgnoreTeammates=on;currentTarget=nil end)
+makeToggle(aimbotPage,"Не стрелять по своим",true,function(on) aimbotIgnoreTeammates=on;currentTarget=nil end)
+
 -- ARMY
 makeToggle(armyPage,"ESP Игроков",true,function(on) if on then startESP() else stopESP() end end)
 makeButton(armyPage,"🔄 Обновить ESP",Color3.fromRGB(50,80,120),function()
-if not espConn then local n=showNotif("⚠ Сначала включи ESP",Color3.fromRGB(255,200,80));game:GetService("Debris"):AddItem(n,3);return end
+if not espConn then showNotif("⚠ Сначала включи ESP",Color3.fromRGB(255,200,80));return end
 syncESP()
-local n=showNotif("✅ ESP обновлён ("..#espData..")",Color3.fromRGB(100,255,100));game:GetService("Debris"):AddItem(n,2) end)
--- ORUZHIE BEZ OTDACHI
+showNotif("✅ ESP обновлён ("..#espData..")",Color3.fromRGB(100,255,100)) end)
 local noRecoilOn=false
 local noRecoilConn=nil
 local recoilMouseDelta=Vector2.new(0,0)
 local lastRecoilCamLook=nil
 uis.InputChanged:Connect(function(i)
-if i.UserInputType==Enum.UserInputType.MouseMovement then recoilMouseDelta=recoilMouseDelta+Vector2.new(i.Delta.X,i.Delta.Y) end end)
-local function killRecoilValues(obj)
+if i.UserInputType==Enum.UserInputType.MouseMovement then
+recoilMouseDelta=recoilMouseDelta+Vector2.new(i.Delta.X,i.Delta.Y) end end)
+local function killRecoil(obj)
 for _,c in ipairs(obj:GetDescendants()) do
 if c:IsA("NumberValue") or c:IsA("IntValue") then
 local n=c.Name:lower()
@@ -733,15 +582,13 @@ if n:find("recoil") or n:find("kick") or n:find("shake") or n:find("spread") or 
 elseif c:IsA("Vector3Value") then
 local n=c.Name:lower()
 if n:find("recoil") or n:find("kick") or n:find("shake") then pcall(function() c.Value=Vector3.new(0,0,0) end) end end end end
-local function scanAllWeapons()
+local function scanWeapons()
 if not player.Character then return end
-for _,t in ipairs(player.Character:GetChildren()) do if t:IsA("Tool") then killRecoilValues(t) end end
+for _,t in ipairs(player.Character:GetChildren()) do if t:IsA("Tool") then killRecoil(t) end end
 local bp=player:FindFirstChild("Backpack")
-if bp then for _,t in ipairs(bp:GetChildren()) do if t:IsA("Tool") then killRecoilValues(t) end end end end
+if bp then for _,t in ipairs(bp:GetChildren()) do if t:IsA("Tool") then killRecoil(t) end end end end
 local function startNoRecoil()
-noRecoilOn=true
-scanAllWeapons()
-lastRecoilCamLook=camera.CFrame.LookVector
+noRecoilOn=true;scanWeapons();lastRecoilCamLook=camera.CFrame.LookVector
 if noRecoilConn then noRecoilConn:Disconnect() end
 noRecoilConn=runService.RenderStepped:Connect(function()
 if not noRecoilOn then return end
@@ -749,68 +596,59 @@ local hum=getHum()
 if hum and hum.CameraOffset.Magnitude>0.001 then hum.CameraOffset=Vector3.new(0,0,0) end
 local currentLook=camera.CFrame.LookVector
 if lastRecoilCamLook then
-local currentPitch=math.asin(math.clamp(currentLook.Y,-1,1))
-local lastPitch=math.asin(math.clamp(lastRecoilCamLook.Y,-1,1))
-local pitchDelta=currentPitch-lastPitch
-local expectedPitchChange=-math.rad(recoilMouseDelta.Y)*0.35
-local unexpectedKick=pitchDelta-expectedPitchChange
-if math.abs(unexpectedKick)>0.001 then camera.CFrame=camera.CFrame*CFrame.Angles(-unexpectedKick,0,0);currentLook=camera.CFrame.LookVector end
-local targetUp=camera.CFrame.Position+camera.CFrame.LookVector*10+Vector3.new(0,0.5,0)
-local upDelta=(targetUp-(camera.CFrame.Position+camera.CFrame.LookVector*10)).Y
-if upDelta>0.05 then camera.CFrame=camera.CFrame*CFrame.Angles(-upDelta*0.15,0,0) end end
-lastRecoilCamLook=currentLook
-recoilMouseDelta=Vector2.new(0,0) end)
-task.spawn(function() while noRecoilOn do scanAllWeapons();task.wait(0.5) end end) end
+local cPitch=math.asin(math.clamp(currentLook.Y,-1,1))
+local lPitch=math.asin(math.clamp(lastRecoilCamLook.Y,-1,1))
+local pDelta=cPitch-lPitch
+local exp=-math.rad(recoilMouseDelta.Y)*0.35
+local unexp=pDelta-exp
+if math.abs(unexp)>0.001 then camera.CFrame=camera.CFrame*CFrame.Angles(-unexp,0,0);currentLook=camera.CFrame.LookVector end
+local tU=camera.CFrame.Position+camera.CFrame.LookVector*10+Vector3.new(0,0.5,0)
+local uD=(tU-(camera.CFrame.Position+camera.CFrame.LookVector*10)).Y
+if uD>0.05 then camera.CFrame=camera.CFrame*CFrame.Angles(-uD*0.15,0,0) end end
+lastRecoilCamLook=currentLook;recoilMouseDelta=Vector2.new(0,0) end)
+task.spawn(function() while noRecoilOn do scanWeapons();task.wait(0.5) end end) end
 local function stopNoRecoil()
 noRecoilOn=false
 if noRecoilConn then noRecoilConn:Disconnect();noRecoilConn=nil end
-local hum=getHum()
-if hum then hum.CameraOffset=Vector3.new(0,0,0) end
+local hum=getHum();if hum then hum.CameraOffset=Vector3.new(0,0,0) end
 lastRecoilCamLook=nil end
-makeToggle(armyPage,"🔫 Оружие без отдачи",true,function(on) if on then startNoRecoil() else stopNoRecoil() end end)
--- FULLBRIGHT
 local fullbrightOn=false
 local fbConn=nil
 local fbSaved=nil
 local fbHiddenAtmos={}
-local function applyFullbright()
+local function applyFB()
 if not fbSaved then
 fbSaved={Brightness=lighting.Brightness,Ambient=lighting.Ambient,OutdoorAmbient=lighting.OutdoorAmbient,FogEnd=lighting.FogEnd,FogStart=lighting.FogStart,FogColor=lighting.FogColor,ClockTime=lighting.ClockTime,GeographicLatitude=lighting.GeographicLatitude,GlobalShadows=lighting.GlobalShadows,ExposureCompensation=lighting.ExposureCompensation,EnvironmentDiffuseScale=lighting.EnvironmentDiffuseScale,EnvironmentSpecularScale=lighting.EnvironmentSpecularScale,ShadowSoftness=lighting.ShadowSoftness} end
-lighting.Brightness=3
-lighting.Ambient=Color3.fromRGB(200,200,200)
+lighting.Brightness=3;lighting.Ambient=Color3.fromRGB(200,200,200)
 lighting.OutdoorAmbient=Color3.fromRGB(200,200,200)
-lighting.FogEnd=1e6
-lighting.FogStart=1e6
-lighting.FogColor=Color3.fromRGB(200,200,200)
-lighting.ClockTime=14
-lighting.GeographicLatitude=0
-lighting.GlobalShadows=false
-lighting.ExposureCompensation=1
-lighting.EnvironmentDiffuseScale=1
-lighting.EnvironmentSpecularScale=1
+lighting.FogEnd=1e6;lighting.FogStart=1e6
+lighting.FogColor=Color3.fromRGB(200,200,200);lighting.ClockTime=14
+lighting.GeographicLatitude=0;lighting.GlobalShadows=false
+lighting.ExposureCompensation=1;lighting.EnvironmentDiffuseScale=1;lighting.EnvironmentSpecularScale=1
 for _,c in ipairs(lighting:GetChildren()) do
 if c:IsA("Atmosphere") and not fbHiddenAtmos[c] then fbHiddenAtmos[c]={parent=c.Parent,name=c.Name};c.Parent=nil end end end
-local function restoreFullbright()
+local function restoreFB()
 if fbSaved then for k,v in pairs(fbSaved) do pcall(function() lighting[k]=v end) end;fbSaved=nil end
 for a,info in pairs(fbHiddenAtmos) do pcall(function() a.Name=info.name;a.Parent=info.parent or lighting end) end
 fbHiddenAtmos={} end
 makeToggle(armyPage,"FullBright",true,function(on)
 fullbrightOn=on
-if on then applyFullbright();if fbConn then fbConn:Disconnect() end;fbConn=runService.Heartbeat:Connect(function() if fullbrightOn then applyFullbright() end end)
-else if fbConn then fbConn:Disconnect();fbConn=nil end;restoreFullbright() end end)
--- PRYZHOK
+if on then applyFB()
+if fbConn then fbConn:Disconnect() end
+fbConn=runService.Heartbeat:Connect(function() if fullbrightOn then applyFB() end end)
+else if fbConn then fbConn:Disconnect();fbConn=nil end;restoreFB() end end)
 local jumpOn=false
 local savedJumpPower=nil
-local function applyJumpBoost()
+local function applyJump()
 local hum=getHum()
-if hum then if savedJumpPower==nil then savedJumpPower=hum.JumpPower end;hum.UseJumpPower=true;hum.JumpPower=85 end end
-local function removeJumpBoost()
+if hum then if savedJumpPower==nil then savedJumpPower=hum.JumpPower end
+hum.UseJumpPower=true;hum.JumpPower=85 end end
+local function removeJump()
 local hum=getHum()
 if hum and savedJumpPower then hum.JumpPower=savedJumpPower end
 savedJumpPower=nil end
-makeToggle(armyPage,"Прыжок+",true,function(on) jumpOn=on;if on then applyJumpBoost() else removeJumpBoost() end end)
-player.CharacterAdded:Connect(function() task.wait(1);if jumpOn then applyJumpBoost() end end)
--- FLY
+makeToggle(armyPage,"Прыжок+",true,function(on) jumpOn=on;if on then applyJump() else removeJump() end end)
+player.CharacterAdded:Connect(function() task.wait(1);if jumpOn then applyJump() end end)
 local flyBV,flyConn,flyOn,flySpeed=nil,nil,false,70
 local function startFly()
 local hrp,hum=getHRP(),getHum()
@@ -819,10 +657,8 @@ flyOn=true
 pcall(function() hrp:SetNetworkOwner(player) end)
 hum.PlatformStand=true
 flyBV=Instance.new("BodyVelocity")
-flyBV.MaxForce=Vector3.new(1e4,1e4,1e4)
-flyBV.P=1250
-flyBV.Velocity=Vector3.new(0,0,0)
-flyBV.Parent=hrp
+flyBV.MaxForce=Vector3.new(1e4,1e4,1e4);flyBV.P=1250
+flyBV.Velocity=Vector3.new(0,0,0);flyBV.Parent=hrp
 flyConn=runService.RenderStepped:Connect(function(dt)
 if not flyOn or not flyBV or not flyBV.Parent or not player.Character then return end
 local cam=camera.CFrame
@@ -842,7 +678,6 @@ if flyConn then flyConn:Disconnect();flyConn=nil end
 local h=getHum();if h then h.PlatformStand=false end end
 makeToggle(armyPage,"Fly",true,function(on) if on then startFly() else stopFly() end end)
 makeSlider(armyPage,"✈️ Скорость Fly",20,250,70,false,function(v) flySpeed=v end)
--- GHOST
 local ghostCamConn,ghostMouseConn=nil,nil
 local ghostCamPos=nil
 local ghostYaw,ghostPitch=0,0
@@ -854,12 +689,9 @@ local function startGhost()
 local hrp,hum=getHRP(),getHum()
 if not hrp or not hum then showNotif("❌ Нет персонажа",Color3.fromRGB(255,100,100));return end
 if specSelected and stopSpectate then stopSpectate() end
-ghostSavedSpeed=hum.WalkSpeed
-ghostSavedJumpPower=hum.JumpPower
+ghostSavedSpeed=hum.WalkSpeed;ghostSavedJumpPower=hum.JumpPower
 for _,p in ipairs(player.Character:GetDescendants()) do if p:IsA("BasePart") then p.Anchored=true end end
-hum.PlatformStand=true
-hum.WalkSpeed=0
-hum.JumpPower=0
+hum.PlatformStand=true;hum.WalkSpeed=0;hum.JumpPower=0
 local look=camera.CFrame.LookVector
 ghostYaw=math.atan2(-look.X,-look.Z)
 ghostPitch=math.asin(math.clamp(look.Y,-1,1))
@@ -871,7 +703,9 @@ ghostSavedMouseBehavior=uis.MouseBehavior
 uis.MouseBehavior=Enum.MouseBehavior.LockCenter
 ghostMouseConn=uis.InputChanged:Connect(function(i)
 if not ghostOn then return end
-if i.UserInputType==Enum.UserInputType.MouseMovement then ghostYaw=ghostYaw-math.rad(i.Delta.X)*GHOST_SENS;ghostPitch=math.clamp(ghostPitch-math.rad(i.Delta.Y)*GHOST_SENS,-math.rad(89),math.rad(89)) end end)
+if i.UserInputType==Enum.UserInputType.MouseMovement then
+ghostYaw=ghostYaw-math.rad(i.Delta.X)*GHOST_SENS
+ghostPitch=math.clamp(ghostPitch-math.rad(i.Delta.Y)*GHOST_SENS,-math.rad(89),math.rad(89)) end end)
 ghostCamConn=runService.RenderStepped:Connect(function(dt)
 if not ghostOn then return end
 if main.Visible then if uis.MouseBehavior~=Enum.MouseBehavior.Default then uis.MouseBehavior=Enum.MouseBehavior.Default end
@@ -890,7 +724,7 @@ if uis:IsKeyDown(Enum.KeyCode.LeftControl) then dir=dir-up end
 if dir.Magnitude>0 then dir=dir.Unit end
 ghostCamPos=ghostCamPos+dir*ghostSpeed*dt
 camera.CFrame=CFrame.new(ghostCamPos)*rotation end)
-local n=showNotif("👻 Ghost ВКЛ",Color3.fromRGB(150,200,255));game:GetService("Debris"):AddItem(n,5) end
+showNotif("👻 Ghost ВКЛ",Color3.fromRGB(150,200,255)) end
 local function stopGhost()
 ghostOn=false
 if ghostCamConn then ghostCamConn:Disconnect();ghostCamConn=nil end
@@ -903,7 +737,6 @@ if player.Character then for _,p in ipairs(player.Character:GetDescendants()) do
 if hum then hum.PlatformStand=false;hum.WalkSpeed=ghostSavedSpeed;hum.JumpPower=ghostSavedJumpPower or 50 end end
 makeToggle(armyPage,"👻 Ghost",true,function(on) if on then ghostOn=true;startGhost() else stopGhost() end end)
 makeSlider(armyPage,"👻 Скорость Ghost",10,300,70,false,function(v) ghostSpeed=v end)
--- NOCLIP
 local ncConn
 local function startNC()
 if ncConn then return end
@@ -915,11 +748,9 @@ if ncConn then ncConn:Disconnect();ncConn=nil end
 local c=player.Character
 if c then for _,p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide=true end end end end
 makeToggle(armyPage,"Noclip",true,function(on) if on then startNC() else stopNC() end end)
--- SPEED
 local defaultSpeed=16
 local function setSpeed(v) local h=getHum();if h then h.WalkSpeed=v end end
-makeToggle(armyPage,"Скорость бега x5",true,function(on) setSpeed(on and 80 or defaultSpeed) end)
--- AVTO MACHINE
+makeToggle(armyPage,"Скорость x5",true,function(on) setSpeed(on and 80 or defaultSpeed) end)
 local vehicleActive=false
 local currentVehSpeed=50
 local vehConn=nil
@@ -937,7 +768,8 @@ if d.Magnitude<0.1 then d=camera.CFrame.LookVector end
 r.AssemblyLinearVelocity=r.AssemblyLinearVelocity:Lerp(d*currentVehSpeed,0.3) end end end end) end
 local function stopVeh() if vehConn then vehConn:Disconnect();vehConn=nil end end
 makeToggle(armyPage,"Авто-скорость машины",true,function(on) vehicleActive=on;if on then startVeh() else stopVeh() end end)
--- SMERT
+
+-- СМЕРТЬ + ТП НАЗАД
 local deathTPActive=false
 local function doDeathTP()
 if deathTPActive then return end
@@ -961,119 +793,34 @@ local newHRP=getHRP()
 if newHRP and savedPos then
 for _=1,3 do newHRP.CFrame=savedPos+Vector3.new(0,3,0);task.wait(0.3) end
 if notif then notif:Destroy() end
-local done=showNotif("✅ Возрождён!",Color3.fromRGB(100,255,100));game:GetService("Debris"):AddItem(done,3)
+showNotif("✅ Возрождён!",Color3.fromRGB(100,255,100))
 else if notif then notif:Destroy() end end
 deathTPActive=false end) end
 makeButton(armyPage,"💀 Смерть + ТП назад (11 сек)",Color3.fromRGB(80,30,30),doDeathTP)
--- KOORDINATY
-local coordsWin,coordsConn,coordsLabel=nil,nil,nil
-local lastCoordsText=""
-local function closeCoordsWin()
-if coordsConn then coordsConn:Disconnect();coordsConn=nil end
-if coordsWin then coordsWin:Destroy();coordsWin=nil end
-coordsLabel=nil end
-local function openCoordsWin()
-closeCoordsWin()
-coordsWin=Instance.new("ScreenGui")
-coordsWin.Name="CoordsWin"
-coordsWin.ResetOnSpawn=false
-coordsWin.Parent=gui.Parent
-local f=Instance.new("Frame")
-f.Size=UDim2.new(0,300,0,200)
-f.Position=UDim2.new(0.5,-150,0.5,-100)
-f.BackgroundColor3=C.bg
-f.BorderSizePixel=0
-f.Active=true
-f.Parent=coordsWin
-Instance.new("UICorner",f).CornerRadius=UDim.new(0,8)
-local s=Instance.new("UIStroke",f);s.Color=C.accentDk;s.Thickness=1
-local title=Instance.new("TextLabel")
-title.Size=UDim2.new(1,0,0,32)
-title.Text="📍 МОИ КООРДИНАТЫ"
-title.TextColor3=Color3.fromRGB(240,240,245)
-title.BackgroundColor3=C.topbar
-title.Font=Enum.Font.GothamBold
-title.TextSize=13
-title.BorderSizePixel=0
-title.Parent=f
-title.Active=true
-Instance.new("UICorner",title).CornerRadius=UDim.new(0,8)
-local xb=Instance.new("TextButton")
-xb.Size=UDim2.new(0,26,0,26)
-xb.Position=UDim2.new(1,-30,0,3)
-xb.Text="✕"
-xb.TextColor3=C.textDim
-xb.BackgroundColor3=C.red
-xb.Font=Enum.Font.GothamBold
-xb.TextSize=14
-xb.BorderSizePixel=0
-xb.ZIndex=10
-xb.Parent=f
-Instance.new("UICorner",xb).CornerRadius=UDim.new(0,5)
-xb.MouseButton1Click:Connect(closeCoordsWin)
-coordsLabel=Instance.new("TextLabel")
-coordsLabel.Size=UDim2.new(0.92,0,0,80)
-coordsLabel.Position=UDim2.new(0.04,0,0.25,0)
-coordsLabel.BackgroundColor3=C.row
-coordsLabel.TextColor3=Color3.fromRGB(150,255,150)
-coordsLabel.Font=Enum.Font.Code
-coordsLabel.TextSize=16
-coordsLabel.Text="X: —\nY: —\nZ: —"
-coordsLabel.BorderSizePixel=0
-coordsLabel.Parent=f
-Instance.new("UICorner",coordsLabel).CornerRadius=UDim.new(0,6)
-local copyBtn=Instance.new("TextButton")
-copyBtn.Size=UDim2.new(0.92,0,0,36)
-copyBtn.Position=UDim2.new(0.04,0,0.75,0)
-copyBtn.Text="📋 Скопировать"
-copyBtn.TextColor3=C.text
-copyBtn.BackgroundColor3=C.accent
-copyBtn.Font=Enum.Font.GothamBold
-copyBtn.TextSize=12
-copyBtn.BorderSizePixel=0
-copyBtn.Parent=f
-Instance.new("UICorner",copyBtn).CornerRadius=UDim.new(0,6)
-copyBtn.MouseButton1Click:Connect(function()
-if lastCoordsText=="" then return end
-if setclipboard then pcall(function() setclipboard(lastCoordsText) end) end
-local n=showNotif("✅ "..lastCoordsText,Color3.fromRGB(100,255,100));game:GetService("Debris"):AddItem(n,2) end)
-coordsConn=runService.RenderStepped:Connect(function()
-local hrp=getHRP()
-if hrp and coordsLabel then
-local p=hrp.Position
-coordsLabel.Text=string.format("X: %.1f\nY: %.1f\nZ: %.1f",p.X,p.Y,p.Z)
-lastCoordsText=string.format("%.1f, %.1f, %.1f",p.X,p.Y,p.Z)
-elseif coordsLabel then coordsLabel.Text="X: —\nY: —\nZ: —";lastCoordsText="" end end) end
-makeButton(armyPage,"📍 Мои координаты (X Y Z)",Color3.fromRGB(60,110,80),openCoordsWin)
--- TP PO KLIKU
+
 local tpClickOn,tpClickConn,tpClickIndicator=false,nil,nil
-local function doTeleportToPoint(targetPos)
-if not targetPos then return end
+local function doTeleportToPoint(pos)
+if not pos then return end
 local char=player.Character
 if not char then return end
 local hrp=char:FindFirstChild("HumanoidRootPart")
 if not hrp then return end
-local finalPos=targetPos+Vector3.new(0,3,0)
-pcall(function() char:PivotTo(CFrame.new(finalPos)) end)
-pcall(function() hrp.CFrame=CFrame.new(finalPos) end)
+local final=pos+Vector3.new(0,3,0)
+pcall(function() char:PivotTo(CFrame.new(final)) end)
+pcall(function() hrp.CFrame=CFrame.new(final) end)
 task.delay(0.05,function()
 local c2=player.Character
-if c2 then local h2=c2:FindFirstChild("HumanoidRootPart");if h2 then pcall(function() h2.CFrame=CFrame.new(finalPos) end) end end end) end
+if c2 then local h2=c2:FindFirstChild("HumanoidRootPart")
+if h2 then pcall(function() h2.CFrame=CFrame.new(final) end) end end end) end
 local function startTpClick()
 tpClickOn=true
 if not tpClickIndicator then
 tpClickIndicator=Instance.new("TextLabel")
-tpClickIndicator.Size=UDim2.new(0,500,0,40)
-tpClickIndicator.Position=UDim2.new(0.5,-250,0,50)
-tpClickIndicator.BackgroundColor3=Color3.fromRGB(20,20,30)
-tpClickIndicator.BackgroundTransparency=0.3
-tpClickIndicator.Text="📍 TP ПО КЛИКУ ВКЛ"
-tpClickIndicator.TextColor3=Color3.fromRGB(130,70,220)
-tpClickIndicator.Font=Enum.Font.GothamBold
-tpClickIndicator.TextSize=14
-tpClickIndicator.BorderSizePixel=0
-tpClickIndicator.ZIndex=999
-tpClickIndicator.Parent=gui
+tpClickIndicator.Size=UDim2.new(0,500,0,40);tpClickIndicator.Position=UDim2.new(0.5,-250,0,50)
+tpClickIndicator.BackgroundColor3=Color3.fromRGB(20,20,30);tpClickIndicator.BackgroundTransparency=0.3
+tpClickIndicator.Text="📍 TP ПО КЛИКУ ВКЛ";tpClickIndicator.TextColor3=C.accent
+tpClickIndicator.Font=Enum.Font.GothamBold;tpClickIndicator.TextSize=14
+tpClickIndicator.BorderSizePixel=0;tpClickIndicator.ZIndex=999;tpClickIndicator.Parent=gui
 Instance.new("UICorner",tpClickIndicator).CornerRadius=UDim.new(0,8) end
 tpClickIndicator.Visible=true
 tpClickConn=uis.InputBegan:Connect(function(i,gpe)
@@ -1081,11 +828,10 @@ if not tpClickOn or gpe then return end
 if i.UserInputType~=Enum.UserInputType.MouseButton1 then return end
 if main.Visible then
 local mp=uis:GetMouseLocation()
-local absp=main.AbsolutePosition
-local abss=main.AbsoluteSize
+local absp=main.AbsolutePosition;local abss=main.AbsoluteSize
 if mp.X>=absp.X and mp.X<=absp.X+abss.X and mp.Y>=absp.Y and mp.Y<=absp.Y+abss.Y then return end end
-local mousePos=uis:GetMouseLocation()
-local ray=camera:ViewportPointToRay(mousePos.X,mousePos.Y)
+local mp=uis:GetMouseLocation()
+local ray=camera:ViewportPointToRay(mp.X,mp.Y)
 local params=RaycastParams.new()
 params.FilterType=Enum.RaycastFilterType.Exclude
 params.FilterDescendantsInstances={player.Character}
@@ -1098,643 +844,366 @@ if tpClickConn then tpClickConn:Disconnect();tpClickConn=nil end
 if tpClickIndicator then tpClickIndicator.Visible=false end end
 makeToggle(armyPage,"📍 TP по клику",true,function(on) if on then startTpClick() else stopTpClick() end end)
 
--- ========== ТЕЛЕПОРТ К ИГРОКУ ==========
-local tpGui, tpRows, tpConn = nil, {}, nil
+-- ТП К ИГРОКУ
+local tpGui,tpRows,tpConn=nil,{},nil
 local function closeTP()
-    if tpConn then tpConn:Disconnect(); tpConn = nil end
-    if tpGui then tpGui:Destroy(); tpGui = nil end
-    tpRows = {}
-end
+if tpConn then tpConn:Disconnect();tpConn=nil end
+if tpGui then tpGui:Destroy();tpGui=nil end
+tpRows={} end
 local function tpTo(plr)
-    if not plr or not plr.Character then return end
-    local t = plr.Character:FindFirstChild("HumanoidRootPart")
-    local my = getHRP()
-    if t and my then
-        my.CFrame = t.CFrame + Vector3.new(0,3,0)
-    end
-end
+if not plr or not plr.Character then return end
+local t=plr.Character:FindFirstChild("HumanoidRootPart")
+local my=getHRP()
+if t and my then my.CFrame=t.CFrame+Vector3.new(0,3,0) end end
 local function openTP()
-    closeTP()
-    tpGui = Instance.new("ScreenGui")
-    tpGui.Name = "TPMenu"
-    tpGui.ResetOnSpawn = false
-    tpGui.Parent = gui.Parent
-    local f = Instance.new("Frame")
-    f.Size = UDim2.new(0,360,0,500)
-    f.Position = UDim2.new(0.5,-180,0.5,-250)
-    f.BackgroundColor3 = C.bg
-    f.BorderSizePixel = 0
-    f.Active = true
-    f.Parent = tpGui
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0,8)
-    local s = Instance.new("UIStroke", f)
-    s.Color = C.accentDk
-    s.Thickness = 1
-    local t = Instance.new("TextLabel")
-    t.Size = UDim2.new(1,0,0,35)
-    t.Text = "ТЕЛЕПОРТ К ИГРОКУ"
-    t.TextColor3 = Color3.fromRGB(240,240,245)
-    t.BackgroundColor3 = C.topbar
-    t.Font = Enum.Font.GothamBold
-    t.TextSize = 13
-    t.BorderSizePixel = 0
-    t.Parent = f
-    t.Active = true
-    Instance.new("UICorner", t).CornerRadius = UDim.new(0,8)
-    local xb = Instance.new("TextButton")
-    xb.Size = UDim2.new(0,28,0,28)
-    xb.Position = UDim2.new(1,-33,0,3)
-    xb.Text = "✕"
-    xb.TextColor3 = C.textDim
-    xb.BackgroundColor3 = C.red
-    xb.Font = Enum.Font.GothamBold
-    xb.TextSize = 14
-    xb.BorderSizePixel = 0
-    xb.ZIndex = 10
-    xb.Parent = f
-    Instance.new("UICorner", xb).CornerRadius = UDim.new(0,5)
-    xb.MouseButton1Click:Connect(closeTP)
-    local searchBox = Instance.new("TextBox")
-    searchBox.Size = UDim2.new(0.92,0,0,32)
-    searchBox.Position = UDim2.new(0.04,0,0.09,0)
-    searchBox.PlaceholderText = "🔍 Поиск..."
-    searchBox.Text = ""
-    searchBox.TextColor3 = C.text
-    searchBox.BackgroundColor3 = C.row
-    searchBox.PlaceholderColor3 = C.textDim
-    searchBox.Font = Enum.Font.GothamMedium
-    searchBox.TextSize = 12
-    searchBox.BorderSizePixel = 0
-    searchBox.ClearTextOnFocus = false
-    searchBox.Parent = f
-    Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0,6)
-    local sb = Instance.new("ScrollingFrame")
-    sb.Size = UDim2.new(0.92,0,0.78,0)
-    sb.Position = UDim2.new(0.04,0,0.19,0)
-    sb.BackgroundTransparency = 1
-    sb.CanvasSize = UDim2.new(0,0,0,0)
-    sb.ScrollBarThickness = 6
-    sb.ScrollBarImageColor3 = C.accent
-    sb.Parent = f
-    Instance.new("UIListLayout", sb).Padding = UDim.new(0,6)
-    tpRows = {}
-    local function updateInfo()
-        if not tpGui then return end
-        local myHRP = getHRP()
-        for _, r in ipairs(tpRows) do
-            if r.btn and r.btn.Parent and r.statusL and r.distL then
-                local p = r.plr
-                if not p or not p.Parent then
-                    r.statusL.Text = "⚫ Отключился"
-                    r.statusL.TextColor3 = Color3.fromRGB(120, 120, 130)
-                    r.distL.Text = "—"
-                    r.distL.TextColor3 = C.textDim
-                else
-                    local char = p.Character
-                    local hum = char and char:FindFirstChildOfClass("Humanoid")
-                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                    if char and hum and hum.Health > 0 then
-                        r.statusL.Text = "🟢 Жив  ❤" .. math.floor(hum.Health)
-                        r.statusL.TextColor3 = Color3.fromRGB(100, 255, 100)
-                        if myHRP and hrp then
-                            local dist = (myHRP.Position - hrp.Position).Magnitude
-                            r.distL.Text = string.format("📏 %.0f м", dist)
-                            if dist < 30 then r.distL.TextColor3 = Color3.fromRGB(255, 80, 80)
-                            elseif dist < 100 then r.distL.TextColor3 = Color3.fromRGB(255, 200, 50)
-                            else r.distL.TextColor3 = Color3.fromRGB(100, 200, 255) end
-                        else r.distL.Text = "📏 — м"; r.distL.TextColor3 = C.textDim end
-                    elseif char and hum and hum.Health <= 0 then
-                        r.statusL.Text = "🔴 Мёртв"
-                        r.statusL.TextColor3 = Color3.fromRGB(255, 80, 80)
-                        r.distL.Text = "📏 — м"; r.distL.TextColor3 = C.textDim
-                    else
-                        r.statusL.Text = "⚫ Нет персонажа"
-                        r.statusL.TextColor3 = Color3.fromRGB(140, 140, 150)
-                        r.distL.Text = "📏 — м"; r.distL.TextColor3 = C.textDim
-                    end
-                end
-            end
-        end
-    end
-    local function refresh(filter)
-        filter = (filter or ""):lower()
-        for _, r in ipairs(tpRows) do pcall(function() r.btn:Destroy() end) end
-        tpRows = {}
-        for _, p in ipairs(game.Players:GetPlayers()) do
-            if p ~= player and (filter == "" or p.Name:lower():find(filter,1,true)) then
-                local b = Instance.new("TextButton")
-                b.Size = UDim2.new(1,-8,0,52); b.Text = ""
-                b.BackgroundColor3 = C.row; b.BorderSizePixel = 0
-                b.AutoButtonColor = false; b.Parent = sb
-                Instance.new("UICorner", b).CornerRadius = UDim.new(0,6)
-                local nameL = Instance.new("TextLabel")
-                nameL.Size = UDim2.new(1, -14, 0, 18); nameL.Position = UDim2.new(0, 10, 0, 4)
-                nameL.BackgroundTransparency = 1; nameL.Text = "👤 " .. p.Name
-                nameL.TextColor3 = Color3.fromRGB(240, 240, 245); nameL.Font = Enum.Font.GothamBold
-                nameL.TextSize = 12; nameL.TextXAlignment = Enum.TextXAlignment.Left
-                nameL.Parent = b
-                local statusL = Instance.new("TextLabel")
-                statusL.Size = UDim2.new(0.55, -10, 0, 14); statusL.Position = UDim2.new(0, 10, 0, 26)
-                statusL.BackgroundTransparency = 1; statusL.Text = "⚫ ..."
-                statusL.TextColor3 = C.textDim; statusL.Font = Enum.Font.GothamSemibold
-                statusL.TextSize = 10; statusL.TextXAlignment = Enum.TextXAlignment.Left
-                statusL.Parent = b
-                local distL = Instance.new("TextLabel")
-                distL.Size = UDim2.new(0.45, -10, 0, 14); distL.Position = UDim2.new(0.55, 0, 0, 26)
-                distL.BackgroundTransparency = 1; distL.Text = "📏 — м"
-                distL.TextColor3 = C.textDim; distL.Font = Enum.Font.GothamBold
-                distL.TextSize = 10; distL.TextXAlignment = Enum.TextXAlignment.Right
-                distL.Parent = b
-                b.MouseButton1Click:Connect(function() tpTo(p); closeTP() end)
-                table.insert(tpRows, {btn=b, plr=p, statusL=statusL, distL=distL})
-            end
-        end
-        task.defer(updateInfo)
-        task.wait(0.05)
-        local h = 0
-        for _, c in ipairs(sb:GetChildren()) do
-            if c:IsA("TextButton") then h = h + c.Size.Y.Offset + 6 end
-        end
-        sb.CanvasSize = UDim2.new(0,0,0,h+20)
-    end
-    tpConn = runService.RenderStepped:Connect(function()
-        if tpGui then updateInfo() end
-    end)
-    searchBox:GetPropertyChangedSignal("Text"):Connect(function() refresh(searchBox.Text) end)
-    refresh("")
-end
-makeToggle(armyPage, "🎯 Телепорт к игроку", false, function(on)
-    if on then openTP() else closeTP() end
-end)
--- ========== /ТЕЛЕПОРТ К ИГРОКУ ==========
+closeTP()
+tpGui=Instance.new("ScreenGui")
+tpGui.Name="TPMenu";tpGui.ResetOnSpawn=false;tpGui.Parent=gui.Parent
+local f=Instance.new("Frame")
+f.Size=UDim2.new(0,360,0,500);f.Position=UDim2.new(0.5,-180,0.5,-250)
+f.BackgroundColor3=C.bg;f.BorderSizePixel=0;f.Active=true;f.Parent=tpGui
+Instance.new("UICorner",f).CornerRadius=UDim.new(0,8)
+local s=Instance.new("UIStroke",f);s.Color=C.accentDk;s.Thickness=1
+local t=Instance.new("TextLabel")
+t.Size=UDim2.new(1,0,0,35);t.Text="🎯 ТП К ИГРОКУ"
+t.TextColor3=Color3.fromRGB(240,240,245);t.BackgroundColor3=C.topbar
+t.Font=Enum.Font.GothamBold;t.TextSize=13;t.BorderSizePixel=0;t.Parent=f;t.Active=true
+Instance.new("UICorner",t).CornerRadius=UDim.new(0,8)
+local xb=Instance.new("TextButton")
+xb.Size=UDim2.new(0,28,0,28);xb.Position=UDim2.new(1,-33,0,3);xb.Text="✕"
+xb.TextColor3=C.textDim;xb.BackgroundColor3=C.red;xb.Font=Enum.Font.GothamBold
+xb.TextSize=14;xb.BorderSizePixel=0;xb.ZIndex=10;xb.Parent=f
+Instance.new("UICorner",xb).CornerRadius=UDim.new(0,5)
+xb.MouseButton1Click:Connect(closeTP)
+makeDraggable(f, t)
+local searchBox=Instance.new("TextBox")
+searchBox.Size=UDim2.new(0.92,0,0,32);searchBox.Position=UDim2.new(0.04,0,0.09,0)
+searchBox.PlaceholderText="🔍 Поиск...";searchBox.Text=""
+searchBox.TextColor3=C.text;searchBox.BackgroundColor3=C.row
+searchBox.PlaceholderColor3=C.textDim;searchBox.Font=Enum.Font.GothamMedium
+searchBox.TextSize=12;searchBox.BorderSizePixel=0;searchBox.ClearTextOnFocus=false;searchBox.Parent=f
+Instance.new("UICorner",searchBox).CornerRadius=UDim.new(0,6)
+local sb=Instance.new("ScrollingFrame")
+sb.Size=UDim2.new(0.92,0,0.78,0);sb.Position=UDim2.new(0.04,0,0.19,0)
+sb.BackgroundTransparency=1;sb.CanvasSize=UDim2.new(0,0,0,0)
+sb.ScrollBarThickness=6;sb.ScrollBarImageColor3=C.accent;sb.Parent=f
+Instance.new("UIListLayout",sb).Padding=UDim.new(0,6)
+tpRows={}
+local function refresh(filter)
+filter=(filter or ""):lower()
+for _,r in ipairs(tpRows) do pcall(function() r.btn:Destroy() end) end
+tpRows={}
+for _,p in ipairs(game.Players:GetPlayers()) do
+if p~=player and (filter=="" or p.Name:lower():find(filter,1,true)) then
+local b=Instance.new("TextButton")
+b.Size=UDim2.new(1,-8,0,52);b.Text="";b.BackgroundColor3=C.row
+b.BorderSizePixel=0;b.AutoButtonColor=false;b.Parent=sb
+Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
+local nameL=Instance.new("TextLabel")
+nameL.Size=UDim2.new(1,-14,0,18);nameL.Position=UDim2.new(0,10,0,4)
+nameL.BackgroundTransparency=1;nameL.Text="👤 "..p.Name
+nameL.TextColor3=Color3.fromRGB(240,240,245);nameL.Font=Enum.Font.GothamBold
+nameL.TextSize=12;nameL.TextXAlignment=Enum.TextXAlignment.Left;nameL.Parent=b
+local statusL=Instance.new("TextLabel")
+statusL.Size=UDim2.new(0.55,-10,0,14);statusL.Position=UDim2.new(0,10,0,26)
+statusL.BackgroundTransparency=1;statusL.Text="🟢 Жив"
+statusL.TextColor3=Color3.fromRGB(100,255,100);statusL.Font=Enum.Font.GothamSemibold
+statusL.TextSize=10;statusL.TextXAlignment=Enum.TextXAlignment.Left;statusL.Parent=b
+local distL=Instance.new("TextLabel")
+distL.Size=UDim2.new(0.45,-10,0,14);distL.Position=UDim2.new(0.55,0,0,26)
+distL.BackgroundTransparency=1;distL.Text="📏 — м"
+distL.TextColor3=C.textDim;distL.Font=Enum.Font.GothamBold
+distL.TextSize=10;distL.TextXAlignment=Enum.TextXAlignment.Right;distL.Parent=b
+b.MouseButton1Click:Connect(function() tpTo(p);closeTP() end)
+table.insert(tpRows,{btn=b,plr=p,statusL=statusL,distL=distL}) end end
+task.wait(0.05)
+local h=0
+for _,c in ipairs(sb:GetChildren()) do if c:IsA("TextButton") then h=h+c.Size.Y.Offset+6 end end
+sb.CanvasSize=UDim2.new(0,0,0,h+20) end
+tpConn=runService.RenderStepped:Connect(function()
+if not tpGui then return end
+local myHRP=getHRP()
+for _,r in ipairs(tpRows) do
+if r.btn.Parent and r.plr and r.plr.Parent then
+local char=r.plr.Character
+local hum=char and char:FindFirstChildOfClass("Humanoid")
+local hrp=char and char:FindFirstChild("HumanoidRootPart")
+if char and hum and hum.Health>0 then
+r.statusL.Text="🟢 ❤"..math.floor(hum.Health);r.statusL.TextColor3=Color3.fromRGB(100,255,100)
+if myHRP and hrp then
+local dist=(myHRP.Position-hrp.Position).Magnitude
+r.distL.Text=string.format("📏%.0fм",dist)
+if dist<30 then r.distL.TextColor3=Color3.fromRGB(255,80,80)
+elseif dist<100 then r.distL.TextColor3=Color3.fromRGB(255,200,50)
+else r.distL.TextColor3=Color3.fromRGB(100,200,255) end end
+elseif char and hum and hum.Health<=0 then
+r.statusL.Text="🔴 Мёртв";r.statusL.TextColor3=Color3.fromRGB(255,80,80)
+r.distL.Text="📏 — м";r.distL.TextColor3=C.textDim
+else r.statusL.Text="⚫ Нет персонажа";r.statusL.TextColor3=C.textDim end end end end)
+searchBox:GetPropertyChangedSignal("Text"):Connect(function() refresh(searchBox.Text) end)
+refresh("") end
+makeToggle(armyPage,"🎯 ТП к игроку",false,function(on) if on then openTP() else closeTP() end end)
 
--- ========== МОЙ РЮКЗАК ==========
-local myBagGui, myBagRows = nil, {}
-local function closeMyBagWindow()
-    if myBagGui then myBagGui:Destroy(); myBagGui = nil end
-    myBagRows = {}
-end
-local function getMyItems()
-    local items = {}
-    if player.Character then
-        for _, t in ipairs(player.Character:GetChildren()) do
-            if t:IsA("Tool") then table.insert(items, {tool = t, equipped = true}) end
-        end
-    end
-    local bp = player:FindFirstChild("Backpack")
-    if bp then
-        for _, t in ipairs(bp:GetChildren()) do
-            if t:IsA("Tool") then table.insert(items, {tool = t, equipped = false}) end
-        end
-    end
-    return items
-end
-local function openMyBagWindow()
-    closeMyBagWindow()
-    myBagGui = Instance.new("ScreenGui")
-    myBagGui.Name = "MyBag"; myBagGui.ResetOnSpawn = false
-    myBagGui.Parent = gui.Parent
-    local f = Instance.new("Frame")
-    f.Size = UDim2.new(0, 340, 0, 480); f.Position = UDim2.new(0.5, -170, 0.5, -240)
-    f.BackgroundColor3 = C.bg; f.BorderSizePixel = 0; f.Active = true; f.Parent = myBagGui
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
-    local s = Instance.new("UIStroke", f); s.Color = C.accentDk; s.Thickness = 1
-    local t = Instance.new("TextLabel")
-    t.Size = UDim2.new(1, 0, 0, 35); t.Text = "🎒 МОЙ РЮКЗАК"
-    t.TextColor3 = Color3.fromRGB(240,240,245); t.BackgroundColor3 = C.topbar
-    t.Font = Enum.Font.GothamBold; t.TextSize = 13; t.BorderSizePixel = 0; t.Parent = f; t.Active = true
-    Instance.new("UICorner", t).CornerRadius = UDim.new(0, 8)
-    local xb = Instance.new("TextButton")
-    xb.Size = UDim2.new(0, 28, 0, 28); xb.Position = UDim2.new(1, -33, 0, 3); xb.Text = "✕"
-    xb.TextColor3 = C.textDim; xb.BackgroundColor3 = C.red; xb.Font = Enum.Font.GothamBold
-    xb.TextSize = 14; xb.BorderSizePixel = 0; xb.ZIndex = 10; xb.Parent = f
-    Instance.new("UICorner", xb).CornerRadius = UDim.new(0, 5)
-    xb.MouseButton1Click:Connect(closeMyBagWindow)
-    local refreshBtn = Instance.new("TextButton")
-    refreshBtn.Size = UDim2.new(0, 90, 0, 22); refreshBtn.Position = UDim2.new(1, -94, 0.1, 0)
-    refreshBtn.Text = "🔄 Обновить"; refreshBtn.TextColor3 = C.text
-    refreshBtn.BackgroundColor3 = C.accentDk; refreshBtn.Font = Enum.Font.GothamBold
-    refreshBtn.TextSize = 10; refreshBtn.BorderSizePixel = 0; refreshBtn.Parent = f
-    Instance.new("UICorner", refreshBtn).CornerRadius = UDim.new(0, 4)
-    local sb = Instance.new("ScrollingFrame")
-    sb.Size = UDim2.new(0.92, 0, 0.82, 0); sb.Position = UDim2.new(0.04, 0, 0.14, 0)
-    sb.BackgroundTransparency = 1; sb.CanvasSize = UDim2.new(0,0,0,0)
-    sb.ScrollBarThickness = 6; sb.ScrollBarImageColor3 = C.accent; sb.Parent = f
-    Instance.new("UIListLayout", sb).Padding = UDim.new(0,6)
-    local function refresh()
-        for _, r in ipairs(myBagRows) do pcall(function() r:Destroy() end) end
-        myBagRows = {}
-        local items = getMyItems()
-        for _, data in ipairs(items) do
-            local b = Instance.new("TextButton")
-            b.Size = UDim2.new(1, -8, 0, 34)
-            b.Text = (data.equipped and "🔫 " or "📦 ") .. data.tool.Name
-            b.TextColor3 = data.equipped and Color3.fromRGB(255, 200, 50) or Color3.fromRGB(220, 230, 250)
-            b.BackgroundColor3 = data.equipped and Color3.fromRGB(50, 45, 70) or C.row
-            b.Font = Enum.Font.GothamBold; b.TextSize = 11; b.BorderSizePixel = 0
-            b.TextXAlignment = Enum.TextXAlignment.Left; b.AutoButtonColor = false; b.Parent = sb
-            local pad = Instance.new("UIPadding", b); pad.PaddingLeft = UDim.new(0, 8)
-            Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
-            b.MouseButton1Click:Connect(function()
-                local tool = data.tool
-                if not tool or not tool.Parent then return end
-                local hum = getHum()
-                if data.equipped then
-                    local bp2 = player:FindFirstChild("Backpack")
-                    if bp2 then tool.Parent = bp2 end
-                else
-                    if player.Character then
-                        tool.Parent = player.Character
-                        if hum then hum:EquipTool(tool) end
-                    end
-                end
-                task.wait(0.15); refresh()
-            end)
-            table.insert(myBagRows, b)
-        end
-        task.wait(0.05)
-        local h = 0
-        for _, c in ipairs(sb:GetChildren()) do
-            if c:IsA("TextButton") then h = h + c.Size.Y.Offset + 6 end
-        end
-        sb.CanvasSize = UDim2.new(0,0,0,h+20)
-    end
-    refreshBtn.MouseButton1Click:Connect(refresh)
-    refresh()
-end
-makeToggle(armyPage, "🎒 Мой рюкзак", false, function(on)
-    if on then openMyBagWindow() else closeMyBagWindow() end
-end)
--- ========== /МОЙ РЮКЗАК ==========
-
--- ========== ИНВЕНТАРЬ ДРУГОГО ИГРОКА ==========
-local pInvPicker = nil
-local function closePlayerInvPicker()
-    if pInvPicker then pInvPicker:Destroy(); pInvPicker = nil end
-end
-local pInvWin, pInvRows = nil, {}
-local function closePlayerInvWin()
-    if pInvWin then pInvWin:Destroy(); pInvWin = nil end
-    pInvRows = {}
-end
-local function getPlayerItems(plr)
-    local items = {}
-    if not plr then return items end
-    if plr.Character then
-        for _, t in ipairs(plr.Character:GetChildren()) do
-            if t:IsA("Tool") then table.insert(items, {tool = t, equipped = true}) end
-        end
-    end
-    local bp = plr:FindFirstChild("Backpack")
-    if bp then
-        for _, t in ipairs(bp:GetChildren()) do
-            if t:IsA("Tool") then table.insert(items, {tool = t, equipped = false}) end
-        end
-    end
-    return items
-end
-local function openPlayerInventoryWin(plr)
-    closePlayerInvWin()
-    if not plr then return end
-    pInvWin = Instance.new("ScreenGui")
-    pInvWin.Name = "PlayerBag"; pInvWin.ResetOnSpawn = false
-    pInvWin.Parent = gui.Parent
-    local f = Instance.new("Frame")
-    f.Size = UDim2.new(0, 360, 0, 500); f.Position = UDim2.new(0.5, -180, 0.5, -250)
-    f.BackgroundColor3 = C.bg; f.BorderSizePixel = 0; f.Active = true; f.Parent = pInvWin
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
-    local s = Instance.new("UIStroke", f); s.Color = C.accentDk; s.Thickness = 1
-    local t = Instance.new("TextLabel")
-    t.Size = UDim2.new(1, 0, 0, 35); t.Text = "🎒 ИНВЕНТАРЬ: " .. plr.Name
-    t.TextColor3 = Color3.fromRGB(240,240,245); t.BackgroundColor3 = C.topbar
-    t.Font = Enum.Font.GothamBold; t.TextSize = 13; t.BorderSizePixel = 0; t.Parent = f; t.Active = true
-    Instance.new("UICorner", t).CornerRadius = UDim.new(0, 8)
-    local xb = Instance.new("TextButton")
-    xb.Size = UDim2.new(0, 28, 0, 28); xb.Position = UDim2.new(1, -33, 0, 3); xb.Text = "✕"
-    xb.TextColor3 = C.textDim; xb.BackgroundColor3 = C.red; xb.Font = Enum.Font.GothamBold
-    xb.TextSize = 14; xb.BorderSizePixel = 0; xb.ZIndex = 10; xb.Parent = f
-    Instance.new("UICorner", xb).CornerRadius = UDim.new(0, 5)
-    xb.MouseButton1Click:Connect(closePlayerInvWin)
-    local refreshBtn = Instance.new("TextButton")
-    refreshBtn.Size = UDim2.new(0, 90, 0, 22); refreshBtn.Position = UDim2.new(1, -94, 0.09, 0)
-    refreshBtn.Text = "🔄 Обновить"; refreshBtn.TextColor3 = C.text
-    refreshBtn.BackgroundColor3 = C.accentDk; refreshBtn.Font = Enum.Font.GothamBold
-    refreshBtn.TextSize = 10; refreshBtn.BorderSizePixel = 0; refreshBtn.Parent = f
-    Instance.new("UICorner", refreshBtn).CornerRadius = UDim.new(0, 4)
-    local sb = Instance.new("ScrollingFrame")
-    sb.Size = UDim2.new(0.92, 0, 0.78, 0); sb.Position = UDim2.new(0.04, 0, 0.14, 0)
-    sb.BackgroundTransparency = 1; sb.CanvasSize = UDim2.new(0,0,0,0)
-    sb.ScrollBarThickness = 6; sb.ScrollBarImageColor3 = C.accent; sb.Parent = f
-    Instance.new("UIListLayout", sb).Padding = UDim.new(0,6)
-    local function refresh()
-        for _, r in ipairs(pInvRows) do pcall(function() r:Destroy() end) end
-        pInvRows = {}
-        local items = getPlayerItems(plr)
-        if #items == 0 then
-            local empty = Instance.new("TextLabel")
-            empty.Size = UDim2.new(1, -8, 0, 30); empty.BackgroundTransparency = 1
-            empty.Text = "— инвентарь пуст —"; empty.TextColor3 = C.textDim
-            empty.Font = Enum.Font.GothamMedium; empty.TextSize = 11; empty.Parent = sb
-            table.insert(pInvRows, empty)
-        else
-            for _, data in ipairs(items) do
-                local b = Instance.new("TextButton")
-                b.Size = UDim2.new(1, -8, 0, 34)
-                b.Text = (data.equipped and "🔫 " or "📦 ") .. data.tool.Name
-                b.TextColor3 = data.equipped and Color3.fromRGB(255, 200, 50) or Color3.fromRGB(220, 230, 250)
-                b.BackgroundColor3 = data.equipped and Color3.fromRGB(50, 45, 70) or C.row
-                b.Font = Enum.Font.GothamBold; b.TextSize = 11; b.BorderSizePixel = 0
-                b.TextXAlignment = Enum.TextXAlignment.Left; b.AutoButtonColor = false; b.Parent = sb
-                local pad = Instance.new("UIPadding", b); pad.PaddingLeft = UDim.new(0, 8)
-                Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
-                table.insert(pInvRows, b)
-            end
-        end
-        task.wait(0.05)
-        local h = 0
-        for _, c in ipairs(sb:GetChildren()) do
-            if c:IsA("TextButton") or c:IsA("TextLabel") then h = h + c.Size.Y.Offset + 6 end
-        end
-        sb.CanvasSize = UDim2.new(0,0,0,h+20)
-    end
-    refreshBtn.MouseButton1Click:Connect(refresh)
-    refresh()
-end
-local function openPlayerInvPicker()
-    closePlayerInvPicker()
-    pInvPicker = Instance.new("ScreenGui")
-    pInvPicker.Name = "PlayerPicker"; pInvPicker.ResetOnSpawn = false
-    pInvPicker.Parent = gui.Parent
-    local f = Instance.new("Frame")
-    f.Size = UDim2.new(0, 320, 0, 480); f.Position = UDim2.new(0.5, -160, 0.5, -240)
-    f.BackgroundColor3 = C.bg; f.BorderSizePixel = 0; f.Active = true; f.Parent = pInvPicker
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
-    local s = Instance.new("UIStroke", f); s.Color = C.accentDk; s.Thickness = 1
-    local t = Instance.new("TextLabel")
-    t.Size = UDim2.new(1, 0, 0, 35); t.Text = "🎒 ВЫБЕРИ ИГРОКА"
-    t.TextColor3 = Color3.fromRGB(240,240,245); t.BackgroundColor3 = C.topbar
-    t.Font = Enum.Font.GothamBold; t.TextSize = 13; t.BorderSizePixel = 0; t.Parent = f; t.Active = true
-    Instance.new("UICorner", t).CornerRadius = UDim.new(0, 8)
-    local xb = Instance.new("TextButton")
-    xb.Size = UDim2.new(0, 28, 0, 28); xb.Position = UDim2.new(1, -33, 0, 3); xb.Text = "✕"
-    xb.TextColor3 = C.textDim; xb.BackgroundColor3 = C.red; xb.Font = Enum.Font.GothamBold
-    xb.TextSize = 14; xb.BorderSizePixel = 0; xb.ZIndex = 10; xb.Parent = f
-    Instance.new("UICorner", xb).CornerRadius = UDim.new(0, 5)
-    xb.MouseButton1Click:Connect(closePlayerInvPicker)
-    local searchBox = Instance.new("TextBox")
-    searchBox.Size = UDim2.new(0.92, 0, 0, 32); searchBox.Position = UDim2.new(0.04, 0, 0.09, 0)
-    searchBox.PlaceholderText = "🔍 Поиск игрока..."; searchBox.Text = ""
-    searchBox.TextColor3 = C.text; searchBox.BackgroundColor3 = C.row
-    searchBox.PlaceholderColor3 = C.textDim; searchBox.Font = Enum.Font.GothamMedium
-    searchBox.TextSize = 12; searchBox.BorderSizePixel = 0; searchBox.ClearTextOnFocus = false
-    searchBox.Parent = f
-    Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 6)
-    local sb = Instance.new("ScrollingFrame")
-    sb.Size = UDim2.new(0.92, 0, 0.82, 0); sb.Position = UDim2.new(0.04, 0, 0.15, 0)
-    sb.BackgroundTransparency = 1; sb.CanvasSize = UDim2.new(0,0,0,0)
-    sb.ScrollBarThickness = 6; sb.ScrollBarImageColor3 = C.accent; sb.Parent = f
-    Instance.new("UIListLayout", sb).Padding = UDim.new(0, 6)
-    local rows = {}
-    local function refresh(filter)
-        filter = (filter or ""):lower()
-        for _, r in ipairs(rows) do pcall(function() r:Destroy() end) end
-        rows = {}
-        for _, p in ipairs(game.Players:GetPlayers()) do
-            if p ~= player and (filter == "" or p.Name:lower():find(filter, 1, true)) then
-                local b = Instance.new("TextButton")
-                b.Size = UDim2.new(1, -8, 0, 44); b.Text = "👤 " .. p.Name
-                b.TextColor3 = C.text; b.BackgroundColor3 = C.row
-                b.Font = Enum.Font.GothamBold; b.TextSize = 12; b.BorderSizePixel = 0
-                b.TextXAlignment = Enum.TextXAlignment.Left; b.AutoButtonColor = false; b.Parent = sb
-                local pad = Instance.new("UIPadding", b); pad.PaddingLeft = UDim.new(0, 10)
-                Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
-                b.MouseButton1Click:Connect(function()
-                    closePlayerInvPicker()
-                    openPlayerInventoryWin(p)
-                end)
-                table.insert(rows, b)
-            end
-        end
-        task.wait(0.05)
-        local h = 0
-        for _, c in ipairs(sb:GetChildren()) do
-            if c:IsA("TextButton") then h = h + c.Size.Y.Offset + 6 end
-        end
-        sb.CanvasSize = UDim2.new(0,0,0,h+20)
-    end
-    searchBox:GetPropertyChangedSignal("Text"):Connect(function() refresh(searchBox.Text) end)
-    refresh("")
-end
-makeToggle(armyPage, "🎒 Инвентарь игрока", false, function(on)
-    if on then
-        openPlayerInvPicker()
-    else
-        closePlayerInvPicker()
-        closePlayerInvWin()
-    end
-end)
--- ========== /ИНВЕНТАРЬ ДРУГОГО ИГРОКА ==========
-
--- ========== СПЕКТАТОР ==========
+-- СПЕКТАТОР
 local specGui,specRows=nil,{}
 local specOriginalSubject,specOriginalType=nil,nil
-local function restoreMovement()
-    local h=getHum()
-    if h then
-        pcall(function()
-            h.WalkSpeed=16; h.JumpPower=50
-            h.UseJumpPower=true; h.PlatformStand=false
-        end)
-    end
-end
+local function restoreMove()
+local h=getHum()
+if h then pcall(function() h.WalkSpeed=16;h.JumpPower=50;h.UseJumpPower=true;h.PlatformStand=false end) end end
 stopSpectate=function()
-    if specOriginalSubject then
-        pcall(function() camera.CameraSubject=specOriginalSubject end)
-    elseif player.Character then
-        local h=player.Character:FindFirstChildOfClass("Humanoid")
-        if h then camera.CameraSubject=h end
-    end
-    if specOriginalType then
-        pcall(function() camera.CameraType=specOriginalType end)
-    end
-    restoreMovement()
-    task.delay(0.1,restoreMovement)
-    task.delay(0.3,restoreMovement)
-    specSelected=nil
-end
+if specOriginalSubject then pcall(function() camera.CameraSubject=specOriginalSubject end)
+elseif player.Character then
+local h=player.Character:FindFirstChildOfClass("Humanoid")
+if h then camera.CameraSubject=h end end
+if specOriginalType then pcall(function() camera.CameraType=specOriginalType end) end
+restoreMove();task.delay(0.1,restoreMove);task.delay(0.3,restoreMove)
+specSelected=nil end
 local function startSpectate(plr)
-    if not plr or not plr.Character then return end
-    local hum=plr.Character:FindFirstChildOfClass("Humanoid")
-    if not hum then return end
-    if not specOriginalSubject then
-        specOriginalSubject=camera.CameraSubject
-        specOriginalType=camera.CameraType
-    end
-    local myHum=getHum()
-    if myHum then
-        myHum.WalkSpeed=0; myHum.JumpPower=0
-    end
-    camera.CameraSubject=hum
-    camera.CameraType=Enum.CameraType.Custom
-    specSelected=plr
-end
-local function closeSpecWindow()
-    if stopSpectate then stopSpectate() end
-    specOriginalSubject=nil; specOriginalType=nil
-    if specGui then specGui:Destroy(); specGui=nil end
-    specRows={}
-end
-local function openSpecWindow()
-    closeSpecWindow()
-    specGui=Instance.new("ScreenGui")
-    specGui.Name="SpectateMenu"; specGui.ResetOnSpawn=false
-    specGui.Parent=gui.Parent
-    local f=Instance.new("Frame")
-    f.Size=UDim2.new(0,320,0,640); f.Position=UDim2.new(0.5,-160,0.5,-320)
-    f.BackgroundColor3=C.bg; f.BorderSizePixel=0; f.Active=true; f.Parent=specGui
-    Instance.new("UICorner",f).CornerRadius=UDim.new(0,8)
-    local s=Instance.new("UIStroke",f); s.Color=C.accentDk; s.Thickness=1
-    local title=Instance.new("TextLabel")
-    title.Size=UDim2.new(1,0,0,35); title.Text="👁️ СПЕКТАТОР"
-    title.TextColor3=Color3.fromRGB(240,240,245); title.BackgroundColor3=C.topbar
-    title.Font=Enum.Font.GothamBold; title.TextSize=13; title.BorderSizePixel=0
-    title.Parent=f; title.Active=true
-    Instance.new("UICorner",title).CornerRadius=UDim.new(0,8)
-    local xb=Instance.new("TextButton")
-    xb.Size=UDim2.new(0,28,0,28); xb.Position=UDim2.new(1,-33,0,3); xb.Text="✕"
-    xb.TextColor3=C.textDim; xb.BackgroundColor3=C.red; xb.Font=Enum.Font.GothamBold
-    xb.TextSize=14; xb.BorderSizePixel=0; xb.ZIndex=10; xb.Parent=f
-    Instance.new("UICorner",xb).CornerRadius=UDim.new(0,5)
-    xb.MouseButton1Click:Connect(closeSpecWindow)
-    local searchBox=Instance.new("TextBox")
-    searchBox.Size=UDim2.new(0.92,0,0,30); searchBox.Position=UDim2.new(0.04,0,0.10,0)
-    searchBox.PlaceholderText="Поиск игрока..."; searchBox.Text=""
-    searchBox.TextColor3=C.text; searchBox.BackgroundColor3=C.row
-    searchBox.PlaceholderColor3=C.textDim; searchBox.Font=Enum.Font.GothamMedium
-    searchBox.TextSize=12; searchBox.BorderSizePixel=0; searchBox.ClearTextOnFocus=false
-    searchBox.Parent=f
-    Instance.new("UICorner",searchBox).CornerRadius=UDim.new(0,6)
-    local meBtn=Instance.new("TextButton")
-    meBtn.Size=UDim2.new(0.92,0,0,30); meBtn.Position=UDim2.new(0.04,0,0.155,0)
-    meBtn.Text="🔄 ВЕРНУТЬСЯ К СЕБЕ"; meBtn.TextColor3=C.text
-    meBtn.BackgroundColor3=Color3.fromRGB(100,180,100); meBtn.Font=Enum.Font.GothamBold
-    meBtn.TextSize=11; meBtn.BorderSizePixel=0; meBtn.Parent=f
-    Instance.new("UICorner",meBtn).CornerRadius=UDim.new(0,5)
-    local watchingLbl=Instance.new("TextLabel")
-    watchingLbl.Size=UDim2.new(0.92,0,0,18); watchingLbl.Position=UDim2.new(0.04,0,0.21,0)
-    watchingLbl.BackgroundTransparency=1; watchingLbl.Text="Смотрю за: —"
-    watchingLbl.TextColor3=Color3.fromRGB(180,180,200); watchingLbl.Font=Enum.Font.GothamBold
-    watchingLbl.TextSize=11; watchingLbl.TextXAlignment=Enum.TextXAlignment.Left; watchingLbl.Parent=f
-    meBtn.MouseButton1Click:Connect(function()
-        if stopSpectate then stopSpectate() end
-        watchingLbl.Text="Смотрю за: —"
-        watchingLbl.TextColor3=Color3.fromRGB(100,255,100)
-    end)
-    local sb=Instance.new("ScrollingFrame")
-    sb.Size=UDim2.new(0.92,0,0,350); sb.Position=UDim2.new(0.04,0,0.25,0)
-    sb.BackgroundTransparency=1; sb.CanvasSize=UDim2.new(0,0,0,0)
-    sb.ScrollBarThickness=6; sb.ScrollBarImageColor3=C.accent; sb.Parent=f
-    Instance.new("UIListLayout",sb).Padding=UDim.new(0,6)
-    local function refreshList(filter)
-        filter=(filter or ""):lower()
-        for _,r in ipairs(specRows) do pcall(function() r:Destroy() end) end
-        specRows={}
-        for _,p in ipairs(game.Players:GetPlayers()) do
-            if p~=player and (filter=="" or p.Name:lower():find(filter,1,true)) then
-                local b=Instance.new("TextButton")
-                b.Size=UDim2.new(1,-8,0,40); b.Text=""
-                b.BackgroundColor3=specSelected==p and Color3.fromRGB(45,35,70) or C.row
-                b.BorderSizePixel=0; b.AutoButtonColor=false; b.Parent=sb
-                Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
-                local nl=Instance.new("TextLabel")
-                nl.Size=UDim2.new(1,-10,0,18); nl.Position=UDim2.new(0,8,0,3)
-                nl.Text="👤 "..p.Name; nl.TextColor3=Color3.fromRGB(240,240,245)
-                nl.BackgroundTransparency=1; nl.Font=Enum.Font.GothamBold
-                nl.TextSize=12; nl.TextXAlignment=Enum.TextXAlignment.Left; nl.Parent=b
-                local sl=Instance.new("TextLabel")
-                sl.Size=UDim2.new(1,-10,0,14); sl.Position=UDim2.new(0,8,0,21)
-                sl.Text=(p.Character and "🟢 В игре" or "🔴 Мёртв")
-                sl.TextColor3=Color3.fromRGB(150,200,150); sl.BackgroundTransparency=1
-                sl.Font=Enum.Font.GothamSemibold; sl.TextSize=10
-                sl.TextXAlignment=Enum.TextXAlignment.Left; sl.Parent=b
-                b.MouseButton1Click:Connect(function()
-                    startSpectate(p)
-                    watchingLbl.Text="Смотрю за: "..p.Name
-                    watchingLbl.TextColor3=Color3.fromRGB(100,255,100)
-                    refreshList(searchBox.Text)
-                end)
-                table.insert(specRows,b)
-            end
-        end
-        task.wait(0.05)
-        local h=0
-        for _,c in ipairs(sb:GetChildren()) do
-            if c:IsA("TextButton") then h=h+c.Size.Y.Offset+6 end
-        end
-        sb.CanvasSize=UDim2.new(0,0,0,h+20)
-    end
-    searchBox:GetPropertyChangedSignal("Text"):Connect(function() refreshList(searchBox.Text) end)
-    refreshList("")
-end
-makeToggle(armyPage,"👁️ Спектатор",false,function(on)
-    if on then openSpecWindow() else closeSpecWindow() end
-end)
--- ========== /СПЕКТАТОР ==========
+if not plr or not plr.Character then return end
+local hum=plr.Character:FindFirstChildOfClass("Humanoid")
+if not hum then return end
+if not specOriginalSubject then
+specOriginalSubject=camera.CameraSubject
+specOriginalType=camera.CameraType end
+local myHum=getHum()
+if myHum then myHum.WalkSpeed=0;myHum.JumpPower=0 end
+camera.CameraSubject=hum
+camera.CameraType=Enum.CameraType.Custom
+specSelected=plr end
+local function closeSpecWin()
+if stopSpectate then stopSpectate() end
+specOriginalSubject=nil;specOriginalType=nil
+if specGui then specGui:Destroy();specGui=nil end
+specRows={} end
+local function openSpecWin()
+closeSpecWin()
+specGui=Instance.new("ScreenGui")
+specGui.Name="SpectateMenu";specGui.ResetOnSpawn=false;specGui.Parent=gui.Parent
+local f=Instance.new("Frame")
+f.Size=UDim2.new(0,340,0,700);f.Position=UDim2.new(0.5,-170,0.5,-350)
+f.BackgroundColor3=C.bg;f.BorderSizePixel=0;f.Active=true;f.Parent=specGui
+Instance.new("UICorner",f).CornerRadius=UDim.new(0,8)
+local s=Instance.new("UIStroke",f);s.Color=C.accentDk;s.Thickness=1
+local title=Instance.new("TextLabel")
+title.Size=UDim2.new(1,0,0,35);title.Text="👁️ СПЕКТАТОР (тяни за шапку)"
+title.TextColor3=Color3.fromRGB(240,240,245);title.BackgroundColor3=C.topbar
+title.Font=Enum.Font.GothamBold;title.TextSize=13;title.BorderSizePixel=0;title.Parent=f;title.Active=true
+Instance.new("UICorner",title).CornerRadius=UDim.new(0,8)
+local xb=Instance.new("TextButton")
+xb.Size=UDim2.new(0,28,0,28);xb.Position=UDim2.new(1,-33,0,3);xb.Text="✕"
+xb.TextColor3=C.textDim;xb.BackgroundColor3=C.red;xb.Font=Enum.Font.GothamBold
+xb.TextSize=14;xb.BorderSizePixel=0;xb.ZIndex=10;xb.Parent=f
+Instance.new("UICorner",xb).CornerRadius=UDim.new(0,5)
+xb.MouseButton1Click:Connect(closeSpecWin)
+makeDraggable(f, title)
 
--- ========== PVP ==========
+local myFactionLbl=Instance.new("TextLabel")
+myFactionLbl.Size=UDim2.new(0.92,0,0,22);myFactionLbl.Position=UDim2.new(0.04,0,0.055,0)
+myFactionLbl.BackgroundTransparency=1
+myFactionLbl.Text="👤 Ваша фракция: —"
+myFactionLbl.TextColor3=Color3.fromRGB(255,200,50)
+myFactionLbl.Font=Enum.Font.GothamBold
+myFactionLbl.TextSize=12
+myFactionLbl.TextXAlignment=Enum.TextXAlignment.Left
+myFactionLbl.Parent=f
+
+local meBtn=Instance.new("TextButton")
+meBtn.Size=UDim2.new(0.92,0,0,28);meBtn.Position=UDim2.new(0.04,0,0.105,0)
+meBtn.Text="🔄 ВЕРНУТЬСЯ К СЕБЕ";meBtn.TextColor3=C.text
+meBtn.BackgroundColor3=Color3.fromRGB(100,180,100);meBtn.Font=Enum.Font.GothamBold
+meBtn.TextSize=11;meBtn.BorderSizePixel=0;meBtn.Parent=f
+Instance.new("UICorner",meBtn).CornerRadius=UDim.new(0,5)
+meBtn.MouseButton1Click:Connect(function() if stopSpectate then stopSpectate() end end)
+
+local sb=Instance.new("ScrollingFrame")
+sb.Size=UDim2.new(0.92,0,0,360);sb.Position=UDim2.new(0.04,0,0.16,0)
+sb.BackgroundTransparency=1;sb.CanvasSize=UDim2.new(0,0,0,0)
+sb.ScrollBarThickness=6;sb.ScrollBarImageColor3=C.accent;sb.Parent=f
+Instance.new("UIListLayout",sb).Padding=UDim.new(0,6)
+
+local facSectionLbl=Instance.new("TextLabel")
+facSectionLbl.Size=UDim2.new(0.92,0,0,20);facSectionLbl.Position=UDim2.new(0.04,0,0.685,0)
+facSectionLbl.BackgroundTransparency=1
+facSectionLbl.Text="🎖 СОСТОЯЩИЕ В ВАШЕЙ ФРАКЦИИ"
+facSectionLbl.TextColor3=C.badgeText
+facSectionLbl.Font=Enum.Font.GothamBold
+facSectionLbl.TextSize=11
+facSectionLbl.TextXAlignment=Enum.TextXAlignment.Left
+facSectionLbl.Parent=f
+
+local facCountLbl=Instance.new("TextLabel")
+facCountLbl.Size=UDim2.new(0.92,0,0,16);facCountLbl.Position=UDim2.new(0.04,0,0.715,0)
+facCountLbl.BackgroundTransparency=1
+facCountLbl.Text="🎖 —: 0 чел."
+facCountLbl.TextColor3=Color3.fromRGB(255,200,50)
+facCountLbl.Font=Enum.Font.GothamBold
+facCountLbl.TextSize=11
+facCountLbl.TextXAlignment=Enum.TextXAlignment.Left
+facCountLbl.Parent=f
+
+local facSb=Instance.new("ScrollingFrame")
+facSb.Size=UDim2.new(0.92,0,0,135);facSb.Position=UDim2.new(0.04,0,0.76,0)
+facSb.BackgroundTransparency=1;facSb.CanvasSize=UDim2.new(0,0,0,0)
+facSb.ScrollBarThickness=4;facSb.ScrollBarImageColor3=C.accent;facSb.Parent=f
+Instance.new("UIListLayout",facSb).Padding=UDim.new(0,4)
+
+local facRows={}
+
+local function refreshFacSection()
+for _,r in ipairs(facRows) do pcall(function() r:Destroy() end) end
+facRows={}
+if not player.Team then
+facCountLbl.Text="🎖 Вы без фракции"
+facCountLbl.TextColor3=Color3.fromRGB(140,140,150)
+local empty=Instance.new("TextLabel")
+empty.Size=UDim2.new(1,-8,0,30);empty.BackgroundTransparency=1
+empty.Text="— нет фракции —"
+empty.TextColor3=C.textDim;empty.Font=Enum.Font.GothamMedium
+empty.TextSize=11;empty.Parent=facSb
+table.insert(facRows,empty)
+facSb.CanvasSize=UDim2.new(0,0,0,40)
+return end
+local myTeam=player.Team
+local col=getFactionColor(player)
+local mates={}
+for _,p in ipairs(game.Players:GetPlayers()) do
+if p~=player and p.Team==myTeam then table.insert(mates,p) end end
+facCountLbl.Text="🎖 "..myTeam.Name..": "..#mates.." чел."
+facCountLbl.TextColor3=col
+if #mates==0 then
+local empty=Instance.new("TextLabel")
+empty.Size=UDim2.new(1,-8,0,30);empty.BackgroundTransparency=1
+empty.Text="— в вашей фракции больше никого —"
+empty.TextColor3=C.textDim;empty.Font=Enum.Font.GothamMedium
+empty.TextSize=11;empty.Parent=facSb
+table.insert(facRows,empty)
+else
+for _,p in ipairs(mates) do
+local b=Instance.new("TextButton")
+b.Size=UDim2.new(1,-8,0,30);b.Text=""
+b.BackgroundColor3=specSelected==p and Color3.fromRGB(45,35,70) or C.row
+b.BorderSizePixel=0;b.AutoButtonColor=false;b.Parent=facSb
+Instance.new("UICorner",b).CornerRadius=UDim.new(0,5)
+local nl=Instance.new("TextLabel")
+nl.Size=UDim2.new(1,-10,0,14);nl.Position=UDim2.new(0,8,0,2)
+nl.Text="👤 "..p.Name
+nl.TextColor3=Color3.fromRGB(240,240,245)
+nl.BackgroundTransparency=1;nl.Font=Enum.Font.GothamBold
+nl.TextSize=11;nl.TextXAlignment=Enum.TextXAlignment.Left;nl.Parent=b
+local sl=Instance.new("TextLabel")
+sl.Size=UDim2.new(1,-10,0,12);sl.Position=UDim2.new(0,8,0,16)
+local h=p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+if h and h.Health>0 then
+sl.Text="🟢 "..math.floor(h.Health).." HP"
+sl.TextColor3=Color3.fromRGB(150,200,150)
+else
+sl.Text="🔴 Мёртв"
+sl.TextColor3=Color3.fromRGB(200,120,120) end
+sl.BackgroundTransparency=1;sl.Font=Enum.Font.GothamSemibold
+sl.TextSize=9;sl.TextXAlignment=Enum.TextXAlignment.Left;sl.Parent=b
+b.MouseButton1Click:Connect(function()
+startSpectate(p);refreshFacSection() end)
+table.insert(facRows,b) end end
+task.wait(0.05)
+local h=0
+for _,c in ipairs(facSb:GetChildren()) do if c:IsA("TextButton") or c:IsA("TextLabel") then h=h+c.Size.Y.Offset+4 end end
+facSb.CanvasSize=UDim2.new(0,0,0,h+15) end
+
+local function refreshList()
+for _,r in ipairs(specRows) do pcall(function() r:Destroy() end) end
+specRows={}
+if player.Team then
+local col=getFactionColor(player)
+myFactionLbl.Text="👤 Ваша фракция: "..player.Team.Name
+myFactionLbl.TextColor3=col
+else
+myFactionLbl.Text="👤 Ваша фракция: без фракции"
+myFactionLbl.TextColor3=Color3.fromRGB(140,140,150) end
+for _,p in ipairs(game.Players:GetPlayers()) do
+if p~=player then
+local b=Instance.new("TextButton")
+b.Size=UDim2.new(1,-8,0,44);b.Text=""
+b.BackgroundColor3=specSelected==p and Color3.fromRGB(45,35,70) or C.row
+b.BorderSizePixel=0;b.AutoButtonColor=false;b.Parent=sb
+Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
+local nl=Instance.new("TextLabel")
+nl.Size=UDim2.new(1,-10,0,18);nl.Position=UDim2.new(0,8,0,3)
+nl.Text="👤 "..p.Name
+nl.TextColor3=Color3.fromRGB(240,240,245)
+nl.BackgroundTransparency=1;nl.Font=Enum.Font.GothamBold
+nl.TextSize=12;nl.TextXAlignment=Enum.TextXAlignment.Left;nl.Parent=b
+local fac=Instance.new("TextLabel")
+fac.Size=UDim2.new(0.55,-10,0,14);fac.Position=UDim2.new(0,8,0,22)
+local factionName=p.Team and p.Team.Name or "Без фракции"
+local factionColor=getFactionColor(p)
+fac.Text="🎖 "..factionName
+fac.TextColor3=factionColor
+fac.BackgroundTransparency=1;fac.Font=Enum.Font.GothamSemibold
+fac.TextSize=10;fac.TextXAlignment=Enum.TextXAlignment.Left
+fac.Parent=b
+local sl=Instance.new("TextLabel")
+sl.Size=UDim2.new(0.45,-10,0,14);sl.Position=UDim2.new(0.55,0,0,22)
+local h=p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+if h and h.Health>0 then
+sl.Text="🟢 В игре"
+sl.TextColor3=Color3.fromRGB(150,200,150)
+else
+sl.Text="🔴 Мёртв"
+sl.TextColor3=Color3.fromRGB(200,120,120) end
+sl.BackgroundTransparency=1;sl.Font=Enum.Font.GothamSemibold
+sl.TextSize=10;sl.TextXAlignment=Enum.TextXAlignment.Right
+sl.Parent=b
+b.MouseButton1Click:Connect(function()
+startSpectate(p);refreshList();refreshFacSection() end)
+table.insert(specRows,b) end end
+task.wait(0.05)
+local h=0
+for _,c in ipairs(sb:GetChildren()) do if c:IsA("TextButton") then h=h+c.Size.Y.Offset+6 end end
+sb.CanvasSize=UDim2.new(0,0,0,h+20) end
+
+refreshList()
+refreshFacSection()
+task.spawn(function()
+while specGui do task.wait(1); if specGui then refreshList();refreshFacSection() end end
+end) end
+makeToggle(armyPage,"👁️ Спектатор",false,function(on) if on then openSpecWin() else closeSpecWin() end end)
+
+-- ПВП
 makeSectionLabel(pvpPage,"🔫 ОРУЖИЕ")
-local soundReplaceOn = false
-local soundReplaceConn = nil
-local NEW_SHOOT_ID = "rbxassetid://109502137778920"
-local function replaceGunSounds(tool)
-    for _, s in ipairs(tool:GetDescendants()) do
-        if s:IsA("Sound") then
-            local n = s.Name:lower()
-            if n:find("shoot") or n:find("fire") or n:find("shot") or n:find("gun") or n:find("muzzle") or n:find("bang") then
-                pcall(function()
-                    if s.SoundId ~= NEW_SHOOT_ID then
-                        s.SoundId = NEW_SHOOT_ID
-                        s.Volume = 2
-                    end
-                end)
-            end
-        end
-    end
-end
-local function scanGunSounds()
-    local ch = player.Character
-    if ch then for _, t in ipairs(ch:GetChildren()) do
-        if t:IsA("Tool") then replaceGunSounds(t) end
-    end end
-    local bp = player:FindFirstChild("Backpack")
-    if bp then for _, t in ipairs(bp:GetChildren()) do
-        if t:IsA("Tool") then replaceGunSounds(t) end
-    end end
-end
-makeToggle(pvpPage, "🔊 Звук выстрела (свой ID)", true, function(on)
-    soundReplaceOn = on
-    if on then
-        scanGunSounds()
-        if soundReplaceConn then soundReplaceConn:Disconnect() end
-        soundReplaceConn = runService.Heartbeat:Connect(function()
-            if not soundReplaceOn then return end
-            scanGunSounds()
-        end)
-        showNotif("🔊 Звуки выстрела заменены", C.accent)
-    else
-        if soundReplaceConn then soundReplaceConn:Disconnect(); soundReplaceConn = nil end
-        showNotif("🔊 Звуки выстрела выкл", Color3.fromRGB(255, 200, 80))
-    end
-end)
+local soundReplaceOn=false
+local soundReplaceConn=nil
+local NEW_SHOOT_ID="rbxassetid://109502137778920"
+local function replaceSounds(tool)
+for _,s in ipairs(tool:GetDescendants()) do
+if s:IsA("Sound") then
+local n=s.Name:lower()
+if n:find("shoot") or n:find("fire") or n:find("shot") or n:find("gun") or n:find("muzzle") or n:find("bang") then
+pcall(function()
+if s.SoundId~=NEW_SHOOT_ID then s.SoundId=NEW_SHOOT_ID;s.Volume=2 end end) end end end end
+local function scanSounds()
+local ch=player.Character
+if ch then for _,t in ipairs(ch:GetChildren()) do if t:IsA("Tool") then replaceSounds(t) end end end
+local bp=player:FindFirstChild("Backpack")
+if bp then for _,t in ipairs(bp:GetChildren()) do if t:IsA("Tool") then replaceSounds(t) end end end end
+makeToggle(pvpPage,"🔊 Свой звук выстрела",true,function(on)
+soundReplaceOn=on
+if on then scanSounds()
+if soundReplaceConn then soundReplaceConn:Disconnect() end
+soundReplaceConn=runService.Heartbeat:Connect(function() if soundReplaceOn then scanSounds() end end)
+showNotif("🔊 Звуки заменены",C.accent)
+else if soundReplaceConn then soundReplaceConn:Disconnect();soundReplaceConn=nil end
+showNotif("🔊 Звуки выкл",Color3.fromRGB(255,200,80)) end end)
+
+makeToggle(pvpPage,"🔫 Оружие без отдачи",true,function(on) if on then startNoRecoil() else stopNoRecoil() end end)
+
 local noWeaponRecoilOn,weaponRecoilConn=false,nil
-makeToggle(pvpPage,"🎯 Убрать отдачу у оружия",true,function(on)
+makeToggle(pvpPage,"🎯 Убрать отдачу",true,function(on)
 noWeaponRecoilOn=on
 if on then
 if weaponRecoilConn then weaponRecoilConn:Disconnect() end
 weaponRecoilConn=runService.Heartbeat:Connect(function()
 if not noWeaponRecoilOn then return end
-local ch=player.Character
-if not ch then return end
+local ch=player.Character;if not ch then return end
 for _,tool in ipairs(ch:GetChildren()) do
 if tool:IsA("Tool") then
 for _,obj in ipairs(tool:GetDescendants()) do
@@ -1743,14 +1212,13 @@ local n=obj.Name:lower()
 if n:find("recoil") or n:find("kick") or n:find("spread") then
 if obj.Value~=0 then obj.Value=0 end end end end end end end)
 else if weaponRecoilConn then weaponRecoilConn:Disconnect();weaponRecoilConn=nil end end end)
--- ========== /PVP ==========
 
 -- TELEPORTY
 local function teleportTo(x,y,z,label)
 local hrp=getHRP()
-if not hrp then local n=showNotif("❌ Нет персонажа",Color3.fromRGB(255,100,100));game:GetService("Debris"):AddItem(n,3);return end
+if not hrp then showNotif("❌ Нет персонажа",Color3.fromRGB(255,100,100));return end
 hrp.CFrame=CFrame.new(Vector3.new(x,y,z))
-local n=showNotif("📍 ТП: "..(label or "точка"),Color3.fromRGB(100,255,100));game:GetService("Debris"):AddItem(n,3) end
+showNotif("📍 ТП: "..(label or "точка"),Color3.fromRGB(100,255,100)) end
 makeSectionLabel(tpPage,"🏛 ГОС. СТРУКТУРЫ")
 makeButton(tpPage,"🪖 Армия",Color3.fromRGB(70,100,60),function() teleportTo(256.9,4.2,83.3,"Армия") end)
 makeButton(tpPage,"👮 МВД",Color3.fromRGB(60,80,130),function() teleportTo(1861.1,5.0,-61.0,"МВД") end)
@@ -1758,7 +1226,7 @@ makeButton(tpPage,"🕵️ ФСБ",Color3.fromRGB(90,60,60),function() teleportT
 makeButton(tpPage,"🏢 КБ",Color3.fromRGB(70,70,90),function() teleportTo(805.1,5.0,-902.6,"КБ") end)
 makeButton(tpPage,"⚖️ Прокуратура",Color3.fromRGB(80,90,120),function() teleportTo(2585.4,1.1,-1025.0,"Прокуратура") end)
 makeSectionLabel(tpPage,"🛒 ТОРГОВЦЫ")
-makeButton(tpPage,"🔫 Торговец оружием",Color3.fromRGB(110,80,40),function() teleportTo(840.5,41.0,-118.7,"Торговец") end)
+makeButton(tpPage,"🔫 Торговец",Color3.fromRGB(110,80,40),function() teleportTo(840.5,41.0,-118.7,"Торговец") end)
 makeSectionLabel(tpPage,"⚔️ НЕЛЕГАЛЬНЫЕ")
 makeButton(tpPage,"🎯 Наём",Color3.fromRGB(130,60,60),function() teleportTo(1543.9,3.0,770.3,"Наём") end)
 makeButton(tpPage,"💼 Брокеры",Color3.fromRGB(100,70,130),function() teleportTo(1661.7,25.0,-1937.1,"Брокеры") end)
@@ -1768,158 +1236,19 @@ makeButton(tpPage,"🌪️ ШТОРМ",Color3.fromRGB(70,90,120),function() tele
 -- SETTINGS
 local function makeSettingRow(text)
 local row=Instance.new("Frame")
-row.Size=UDim2.new(1,-12,0,42)
-row.BackgroundColor3=C.row
-row.BorderSizePixel=0
-row.Parent=settingsPage
+row.Size=UDim2.new(1,-12,0,42);row.BackgroundColor3=C.row
+row.BorderSizePixel=0;row.Parent=settingsPage
 Instance.new("UICorner",row).CornerRadius=UDim.new(0,6)
 local label=Instance.new("TextLabel")
-label.Size=UDim2.new(0.55,0,1,0)
-label.Position=UDim2.new(0,26,0,0)
-label.Text=text
-label.TextColor3=C.text
-label.BackgroundTransparency=1
-label.Font=Enum.Font.GothamMedium
-label.TextSize=12
-label.TextXAlignment=Enum.TextXAlignment.Left
-label.Parent=row
+label.Size=UDim2.new(0.55,0,1,0);label.Position=UDim2.new(0,26,0,0)
+label.Text=text;label.TextColor3=C.text;label.BackgroundTransparency=1
+label.Font=Enum.Font.GothamMedium;label.TextSize=12
+label.TextXAlignment=Enum.TextXAlignment.Left;label.Parent=row
 return row end
-makeSectionLabel(settingsPage,"🔍 СКАНЕР ПЛЕЙСА")
-local scanWin,scanRows,scanLastFound=nil,{},{}
-local function closeScanWin()
-if scanWin then scanWin:Destroy();scanWin=nil end
-scanRows={} end
-local function scanPlace()
-local found={}
-local roots={{name="ReplicatedStorage",obj=game:GetService("ReplicatedStorage")},{name="ReplicatedFirst",obj=game:GetService("ReplicatedFirst")},{name="StarterGui",obj=game:GetService("StarterGui")},{name="StarterPack",obj=game:GetService("StarterPack")},{name="Workspace",obj=workspace}}
-local okSS,ss=pcall(function() return game:GetService("ServerStorage") end)
-if okSS and ss then table.insert(roots,{name="ServerStorage",obj=ss}) end
-for _,root in ipairs(roots) do
-local ok,descendants=pcall(function() return root.obj:GetDescendants() end)
-if ok and descendants then
-for _,obj in ipairs(descendants) do
-local cls=obj.ClassName
-if cls=="RemoteEvent" or cls=="RemoteFunction" or cls=="BindableEvent" or cls=="BindableFunction" or cls=="UnreliableRemoteEvent" then table.insert(found,{obj=obj,cls=cls,root=root.name}) end end end end
-table.sort(found,function(a,b) if a.cls==b.cls then return a.obj.Name<b.obj.Name end;return a.cls<b.cls end)
-return found end
-local function buildAllPathsText()
-if #scanLastFound==0 then return nil end
-local lines={"===== СКАНЕР ПЛЕЙСА =====","Всего найдено: "..#scanLastFound,"====================="}
-local lastCls=nil
-for _,it in ipairs(scanLastFound) do
-if it.cls~=lastCls then lastCls=it.cls;table.insert(lines,"");table.insert(lines,"--- "..it.cls.." ---") end
-table.insert(lines,"["..it.root.."] "..it.obj:GetFullName()) end
-return table.concat(lines,"\n") end
-local function openScanWin()
-closeScanWin()
-scanWin=Instance.new("ScreenGui")
-scanWin.Name="PlaceScanner"; scanWin.ResetOnSpawn=false
-scanWin.Parent=gui.Parent
-local f=Instance.new("Frame")
-f.Size=UDim2.new(0,500,0,580); f.Position=UDim2.new(0.5,-250,0.5,-290)
-f.BackgroundColor3=C.bg; f.BorderSizePixel=0; f.Active=true; f.Parent=scanWin
-Instance.new("UICorner",f).CornerRadius=UDim.new(0,8)
-local s=Instance.new("UIStroke",f);s.Color=C.accentDk;s.Thickness=1
-local t=Instance.new("TextLabel")
-t.Size=UDim2.new(1,0,0,35); t.Text="🔍 СКАНЕР ПЛЕЙСА"
-t.TextColor3=Color3.fromRGB(240,240,245); t.BackgroundColor3=C.topbar
-t.Font=Enum.Font.GothamBold; t.TextSize=13; t.BorderSizePixel=0; t.Parent=f; t.Active=true
-Instance.new("UICorner",t).CornerRadius=UDim.new(0,8)
-local xb=Instance.new("TextButton")
-xb.Size=UDim2.new(0,28,0,28); xb.Position=UDim2.new(1,-33,0,3); xb.Text="✕"
-xb.TextColor3=C.textDim; xb.BackgroundColor3=C.red; xb.Font=Enum.Font.GothamBold
-xb.TextSize=14; xb.BorderSizePixel=0; xb.ZIndex=10; xb.Parent=f
-Instance.new("UICorner",xb).CornerRadius=UDim.new(0,5)
-xb.MouseButton1Click:Connect(closeScanWin)
-local counters=Instance.new("TextLabel")
-counters.Size=UDim2.new(0.92,0,0,16); counters.Position=UDim2.new(0.04,0,0.09,0)
-counters.BackgroundTransparency=1; counters.Text=""
-counters.TextColor3=C.text; counters.Font=Enum.Font.GothamBold
-counters.TextSize=11; counters.TextXAlignment=Enum.TextXAlignment.Left; counters.Parent=f
-local rescan=Instance.new("TextButton")
-rescan.Size=UDim2.new(0,120,0,26); rescan.Position=UDim2.new(1,-260,0.062,0)
-rescan.Text="🔄 Пересканировать"; rescan.TextColor3=C.text
-rescan.BackgroundColor3=C.accentDk; rescan.Font=Enum.Font.GothamBold
-rescan.TextSize=10; rescan.BorderSizePixel=0; rescan.ZIndex=5; rescan.Parent=f
-Instance.new("UICorner",rescan).CornerRadius=UDim.new(0,4)
-local copyAll=Instance.new("TextButton")
-copyAll.Size=UDim2.new(0,130,0,26); copyAll.Position=UDim2.new(1,-136,0.062,0)
-copyAll.Text="📋 Скопировать всё"; copyAll.TextColor3=Color3.fromRGB(255,255,255)
-copyAll.BackgroundColor3=Color3.fromRGB(60,130,90); copyAll.Font=Enum.Font.GothamBold
-copyAll.TextSize=10; copyAll.BorderSizePixel=0; copyAll.ZIndex=5; copyAll.Parent=f
-Instance.new("UICorner",copyAll).CornerRadius=UDim.new(0,4)
-local sb=Instance.new("ScrollingFrame")
-sb.Size=UDim2.new(0.92,0,0.83,0); sb.Position=UDim2.new(0.04,0,0.14,0)
-sb.BackgroundTransparency=1; sb.CanvasSize=UDim2.new(0,0,0,0)
-sb.ScrollBarThickness=6; sb.ScrollBarImageColor3=C.accent; sb.Parent=f
-Instance.new("UIListLayout",sb).Padding=UDim.new(0,4)
-local function clearRows()
-for _,r in ipairs(scanRows) do pcall(function() r:Destroy() end) end
-scanRows={} end
-local function doScan()
-clearRows()
-local found=scanPlace()
-scanLastFound=found
-local byClass={}
-for _,it in ipairs(found) do byClass[it.cls]=(byClass[it.cls] or 0)+1 end
-local summary={}
-for cls,cnt in pairs(byClass) do table.insert(summary,cls..": "..cnt) end
-table.sort(summary)
-counters.Text="Найдено: "..#found..(#summary>0 and ("  ("..table.concat(summary,", ")..")") or "")
-if #found==0 then
-local empty=Instance.new("TextLabel")
-empty.Size=UDim2.new(1,-8,0,30); empty.BackgroundTransparency=1
-empty.Text="— ничего не найдено —"; empty.TextColor3=C.textDim
-empty.Font=Enum.Font.GothamMedium; empty.TextSize=11; empty.Parent=sb
-table.insert(scanRows,empty)
-else
-for _,it in ipairs(found) do
-local row=Instance.new("Frame")
-row.Size=UDim2.new(1,-8,0,40); row.BackgroundColor3=C.row
-row.BorderSizePixel=0; row.Parent=sb
-Instance.new("UICorner",row).CornerRadius=UDim.new(0,5)
-local nameL=Instance.new("TextLabel")
-nameL.Size=UDim2.new(1,-80,0,18); nameL.Position=UDim2.new(0,8,0,3)
-nameL.BackgroundTransparency=1; nameL.Text="📡 ["..it.cls.."] "..it.obj.Name
-nameL.TextColor3=Color3.fromRGB(240,240,245); nameL.Font=Enum.Font.GothamBold
-nameL.TextSize=11; nameL.TextXAlignment=Enum.TextXAlignment.Left; nameL.Parent=row
-local pathL=Instance.new("TextLabel")
-pathL.Size=UDim2.new(1,-80,0,14); pathL.Position=UDim2.new(0,8,0,21)
-pathL.BackgroundTransparency=1; pathL.Text="📁 "..it.obj:GetFullName()
-pathL.TextColor3=C.textDim; pathL.Font=Enum.Font.GothamMedium
-pathL.TextSize=10; pathL.TextXAlignment=Enum.TextXAlignment.Left; pathL.Parent=row
-table.insert(scanRows,row) end end
-task.wait(0.05)
-local h=0
-for _,c in ipairs(sb:GetChildren()) do if c:IsA("TextButton") or c:IsA("TextLabel") or c:IsA("Frame") then h=h+c.Size.Y.Offset+4 end end
-sb.CanvasSize=UDim2.new(0,0,0,h+20) end
-copyAll.MouseButton1Click:Connect(function()
-local text=buildAllPathsText()
-if not text then local n=showNotif("❌ Нечего копировать",Color3.fromRGB(255,100,100));game:GetService("Debris"):AddItem(n,2);return end
-if setclipboard then
-local ok=pcall(function() setclipboard(text) end)
-local n=showNotif(ok and ("✅ Скопировано "..#scanLastFound.." объектов") or "❌ Не удалось",ok and Color3.fromRGB(100,255,100) or Color3.fromRGB(255,100,100))
-game:GetService("Debris"):AddItem(n,3)
-else print(text) end end)
-rescan.MouseButton1Click:Connect(doScan)
-doScan() end
-makeButton(settingsPage,"🔍 Что тут есть (сканировать)",Color3.fromRGB(60,90,130),openScanWin)
-makeButton(settingsPage,"📋 Скопировать всё (быстро)",Color3.fromRGB(50,110,70),function()
-scanLastFound=scanPlace()
-local text=buildAllPathsText()
-if not text then local n=showNotif("❌ Нечего копировать",Color3.fromRGB(255,100,100));game:GetService("Debris"):AddItem(n,2);return end
-if setclipboard then
-local ok=pcall(function() setclipboard(text) end)
-local n=showNotif(ok and ("✅ Скопировано "..#scanLastFound.." объектов") or "❌ Не удалось",ok and Color3.fromRGB(100,255,100) or Color3.fromRGB(255,100,100))
-game:GetService("Debris"):AddItem(n,3)
-else print(text) end end)
--- CVET
 makeSectionLabel(settingsPage,"🎨 ЦВЕТ АКЦЕНТА")
 local colorsRow=Instance.new("Frame")
-colorsRow.Size=UDim2.new(1,-12,0,46)
-colorsRow.BackgroundColor3=C.row
-colorsRow.BorderSizePixel=0
-colorsRow.Parent=settingsPage
+colorsRow.Size=UDim2.new(1,-12,0,46);colorsRow.BackgroundColor3=C.row
+colorsRow.BorderSizePixel=0;colorsRow.Parent=settingsPage
 Instance.new("UICorner",colorsRow).CornerRadius=UDim.new(0,6)
 local presets={Color3.fromRGB(130,70,220),Color3.fromRGB(60,120,220),Color3.fromRGB(60,180,100),Color3.fromRGB(200,50,60),Color3.fromRGB(230,140,40),Color3.fromRGB(220,80,180)}
 local function applyAccent(newColor)
@@ -1936,54 +1265,31 @@ for _,td in ipairs(togglesData) do
 if td.api.get() and td.tBg and td.dot then td.tBg.BackgroundColor3=C.accent;td.dot.BackgroundColor3=C.accent end end end
 for i,col in ipairs(presets) do
 local cBtn=Instance.new("TextButton")
-cBtn.Size=UDim2.new(0,30,0,30)
-cBtn.Position=UDim2.new(0,8+(i-1)*36,0.5,-15)
-cBtn.Text=""
-cBtn.BackgroundColor3=col
-cBtn.BorderSizePixel=0
-cBtn.Parent=colorsRow
+cBtn.Size=UDim2.new(0,30,0,30);cBtn.Position=UDim2.new(0,8+(i-1)*36,0.5,-15)
+cBtn.Text="";cBtn.BackgroundColor3=col;cBtn.BorderSizePixel=0;cBtn.Parent=colorsRow
 Instance.new("UICorner",cBtn).CornerRadius=UDim.new(1,0)
-local stroke=Instance.new("UIStroke",cBtn)
-stroke.Color=Color3.fromRGB(60,60,70)
-stroke.Thickness=1
+local stroke=Instance.new("UIStroke",cBtn);stroke.Color=Color3.fromRGB(60,60,70);stroke.Thickness=1
 cBtn.MouseButton1Click:Connect(function() applyAccent(col) end) end
--- RAZMER OKNA
+
 makeSectionLabel(settingsPage,"📐 РАЗМЕР ОКНА")
 local sizeRow = makeSettingRow("Ширина / Высота")
 local wBox = Instance.new("TextBox")
-wBox.Size = UDim2.new(0,46,0,26)
-wBox.Position = UDim2.new(1,-170,0.5,-13)
-wBox.Text = "540"
-wBox.TextColor3 = C.text
-wBox.BackgroundColor3 = C.badge
-wBox.Font = Enum.Font.GothamSemibold
-wBox.TextSize = 12
-wBox.BorderSizePixel = 0
-wBox.ClearTextOnFocus = false
-wBox.Parent = sizeRow
+wBox.Size = UDim2.new(0,46,0,26);wBox.Position = UDim2.new(1,-170,0.5,-13)
+wBox.Text = "540";wBox.TextColor3 = C.text;wBox.BackgroundColor3 = C.badge
+wBox.Font = Enum.Font.GothamSemibold;wBox.TextSize = 12;wBox.BorderSizePixel = 0
+wBox.ClearTextOnFocus = false;wBox.Parent = sizeRow
 Instance.new("UICorner", wBox).CornerRadius = UDim.new(0,4)
 local hBox = Instance.new("TextBox")
-hBox.Size = UDim2.new(0,46,0,26)
-hBox.Position = UDim2.new(1,-118,0.5,-13)
-hBox.Text = "460"
-hBox.TextColor3 = C.text
-hBox.BackgroundColor3 = C.badge
-hBox.Font = Enum.Font.GothamSemibold
-hBox.TextSize = 12
-hBox.BorderSizePixel = 0
-hBox.ClearTextOnFocus = false
-hBox.Parent = sizeRow
+hBox.Size = UDim2.new(0,46,0,26);hBox.Position = UDim2.new(1,-118,0.5,-13)
+hBox.Text = "460";hBox.TextColor3 = C.text;hBox.BackgroundColor3 = C.badge
+hBox.Font = Enum.Font.GothamSemibold;hBox.TextSize = 12;hBox.BorderSizePixel = 0
+hBox.ClearTextOnFocus = false;hBox.Parent = sizeRow
 Instance.new("UICorner", hBox).CornerRadius = UDim.new(0,4)
 local applySizeBtn = Instance.new("TextButton")
-applySizeBtn.Size = UDim2.new(0,60,0,26)
-applySizeBtn.Position = UDim2.new(1,-66,0.5,-13)
-applySizeBtn.Text = "OK"
-applySizeBtn.TextColor3 = C.text
-applySizeBtn.BackgroundColor3 = C.accentDk
-applySizeBtn.Font = Enum.Font.GothamBold
-applySizeBtn.TextSize = 12
-applySizeBtn.BorderSizePixel = 0
-applySizeBtn.Parent = sizeRow
+applySizeBtn.Size = UDim2.new(0,60,0,26);applySizeBtn.Position = UDim2.new(1,-66,0.5,-13)
+applySizeBtn.Text = "OK";applySizeBtn.TextColor3 = C.text
+applySizeBtn.BackgroundColor3 = C.accentDk;applySizeBtn.Font = Enum.Font.GothamBold
+applySizeBtn.TextSize = 12;applySizeBtn.BorderSizePixel = 0;applySizeBtn.Parent = sizeRow
 Instance.new("UICorner", applySizeBtn).CornerRadius = UDim.new(0,4)
 applySizeBtn.MouseButton1Click:Connect(function()
     local w = tonumber(wBox.Text)
@@ -1996,40 +1302,36 @@ applySizeBtn.MouseButton1Click:Connect(function()
         hBox.Text = tostring(h)
     end
 end)
--- KEY
-makeSectionLabel(settingsPage,"⌨️ КНОПКА ОТКРЫТИЯ МЕНЮ")
+
+makeSectionLabel(settingsPage,"⌨️ КНОПКА МЕНЮ")
 local keyRow=makeSettingRow("Текущая клавиша")
 local keyShow=Instance.new("TextLabel")
-keyShow.Size=UDim2.new(0,80,0,26)
-keyShow.Position=UDim2.new(1,-168,0.5,-13)
-keyShow.Text="F4"
-keyShow.TextColor3=C.badgeText
-keyShow.BackgroundColor3=C.badge
-keyShow.Font=Enum.Font.GothamBold
-keyShow.TextSize=11
-keyShow.BorderSizePixel=0
-keyShow.Parent=keyRow
+keyShow.Size=UDim2.new(0,80,0,26);keyShow.Position=UDim2.new(1,-168,0.5,-13)
+keyShow.Text="F4";keyShow.TextColor3=C.badgeText;keyShow.BackgroundColor3=C.badge
+keyShow.Font=Enum.Font.GothamBold;keyShow.TextSize=11;keyShow.BorderSizePixel=0;keyShow.Parent=keyRow
 Instance.new("UICorner",keyShow).CornerRadius=UDim.new(0,4)
 local assignKeyBtn=Instance.new("TextButton")
-assignKeyBtn.Size=UDim2.new(0,90,0,26)
-assignKeyBtn.Position=UDim2.new(1,-80,0.5,-13)
-assignKeyBtn.Text="Назначить"
-assignKeyBtn.TextColor3=C.text
-assignKeyBtn.BackgroundColor3=C.accentDk
-assignKeyBtn.Font=Enum.Font.GothamBold
-assignKeyBtn.TextSize=11
-assignKeyBtn.BorderSizePixel=0
-assignKeyBtn.Parent=keyRow
+assignKeyBtn.Size=UDim2.new(0,90,0,26);assignKeyBtn.Position=UDim2.new(1,-80,0.5,-13)
+assignKeyBtn.Text="Назначить";assignKeyBtn.TextColor3=C.text
+assignKeyBtn.BackgroundColor3=C.accentDk;assignKeyBtn.Font=Enum.Font.GothamBold
+assignKeyBtn.TextSize=11;assignKeyBtn.BorderSizePixel=0;assignKeyBtn.Parent=keyRow
 Instance.new("UICorner",assignKeyBtn).CornerRadius=UDim.new(0,4)
-assignKeyBtn.MouseButton1Click:Connect(function() waitingForMenuKey=true;assignKeyBtn.Text="Жми клавишу...";assignKeyBtn.BackgroundColor3=C.green end)
+assignKeyBtn.MouseButton1Click:Connect(function()
+waitingForMenuKey=true;assignKeyBtn.Text="Жми..." end)
 setMenuKeyDisplay=function(k) keyShow.Text=tostring(k):gsub("Enum.KeyCode.","") end
 uis.InputBegan:Connect(function(i,gpe)
 if gpe then return end
 if i.UserInputType~=Enum.UserInputType.Keyboard then return end
 if i.KeyCode==Enum.KeyCode.Unknown then return end
-if waitingForMenuKey then toggleKey=i.KeyCode;waitingForMenuKey=false;if setMenuKeyDisplay then setMenuKeyDisplay(i.KeyCode) end;assignKeyBtn.Text="Назначить";assignKeyBtn.BackgroundColor3=C.accentDk;return end
+if waitingForMenuKey then
+toggleKey=i.KeyCode;waitingForMenuKey=false
+if setMenuKeyDisplay then setMenuKeyDisplay(i.KeyCode) end
+assignKeyBtn.Text="Назначить";return end
 if waitingHotkeyToggle then
-if i.KeyCode==Enum.KeyCode.Escape then local badge=waitingHotkeyToggle.getBadge();if badge then renderBadge(badge,waitingHotkeyToggle.getHotkey()) end;waitingHotkeyToggle=nil;return end
+if i.KeyCode==Enum.KeyCode.Escape then
+local badge=waitingHotkeyToggle.getBadge()
+if badge then renderBadge(badge,waitingHotkeyToggle.getHotkey()) end
+waitingHotkeyToggle=nil;return end
 local oldKey=waitingHotkeyToggle.getHotkey()
 if oldKey and hotkeyRegistry[oldKey]==waitingHotkeyToggle then hotkeyRegistry[oldKey]=nil end
 local conflicting=hotkeyRegistry[i.KeyCode]
@@ -2038,8 +1340,7 @@ waitingHotkeyToggle.setHotkeyInternal(i.KeyCode)
 hotkeyRegistry[i.KeyCode]=waitingHotkeyToggle
 local badge=waitingHotkeyToggle.getBadge()
 if badge then renderBadge(badge,i.KeyCode) end
-waitingHotkeyToggle=nil
-return end
+waitingHotkeyToggle=nil;return end
 if uis:GetFocusedTextBox() then return end
 local api=hotkeyRegistry[i.KeyCode]
 if api then api.set(not api.get()) end end)
@@ -2052,21 +1353,24 @@ task.spawn(function()
 task.wait(0.1)
 for _,page in ipairs({armyPage,tpPage,aimbotPage,pvpPage,settingsPage}) do
 local h=0
-for _,c in ipairs(page:GetChildren()) do if c:IsA("Frame") or c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then h=h+c.Size.Y.Offset+6 end end
+for _,c in ipairs(page:GetChildren()) do
+if c:IsA("Frame") or c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
+h=h+c.Size.Y.Offset+6 end end
 page.CanvasSize=UDim2.new(0,0,0,h+20) end end)
 local minimized=false
 local origSize=main.Size
 minBtn.MouseButton1Click:Connect(function()
 minimized=not minimized
-if minimized then origSize=main.Size;sidebar.Visible=false;content.Visible=false;main.Size=UDim2.new(0,540,0,40)
+if minimized then
+origSize=main.Size;sidebar.Visible=false;content.Visible=false
+main.Size=UDim2.new(0,540,0,40)
 else sidebar.Visible=true;content.Visible=true;main.Size=origSize end end)
 closeBtn.MouseButton1Click:Connect(function()
 stopESP();stopAimbot();stopFly();stopGhost();stopNC();stopVeh();stopNoRecoil();stopTpClick()
-closeCoordsWin();closeScanWin();closeSpecWindow();closeTP()
-closeMyBagWindow();closePlayerInvPicker();closePlayerInvWin()
+closeSpecWin();closeTP()
 if fbConn then fbConn:Disconnect();fbConn=nil end
 if soundReplaceConn then soundReplaceConn:Disconnect();soundReplaceConn=nil end
-fullbrightOn=false;restoreFullbright()
+fullbrightOn=false;restoreFB()
 setSpeed(defaultSpeed);jumpOn=false
 gui:Destroy() end)
-print("✅ Eclipse Menu ПОЛНЫЙ загружен. F4 — меню.")
+print("✅ Eclipse Menu загружен. F4 — меню.")
