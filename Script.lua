@@ -1,4 +1,4 @@
---[[ ECLIPSE-STYLE MENU — версия без GunMod + Мои координаты + Телепорты + Ghost с вращением камеры + Точный Aimbot + Шторм + Не стрелять по своим + Усиленный FullBright ]]
+--[[ ECLIPSE-STYLE MENU — Fly анти-кик + JumpPower + Хоткеи на тогглах + ESP автообновление + FullBright 2.0 + Точный Aimbot + Ghost + Шторм + Игнор своих ]]
 
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
@@ -131,6 +131,30 @@ tabSettings.MouseButton1Click:Connect(function() showTab("settings") end)
 
 local togglesData = {}
 
+-- ═══ HOTKEY SYSTEM ═══
+local hotkeyRegistry = {}
+local waitingHotkeyToggle = nil
+
+local function keyToShortName(keyCode)
+    if not keyCode then return "NONE" end
+    local name = tostring(keyCode):gsub("Enum.KeyCode.","")
+    name = name:gsub("^Left","L"):gsub("^Right","R")
+    name = name:gsub("Control","Ctrl")
+    if #name > 8 then name = name:sub(1,7).."…" end
+    return name
+end
+
+local function renderBadge(badge, keyCode)
+    if not badge then return end
+    if keyCode then
+        badge.Text = "[ " .. keyToShortName(keyCode) .. " ]"
+        badge.TextColor3 = C.accent
+    else
+        badge.Text = "[ NONE ]"
+        badge.TextColor3 = C.badgeText
+    end
+end
+
 local function makeToggle(parent, text, hasBadge, onClick)
     local row = Instance.new("Frame")
     row.Size = UDim2.new(1, -12, 0, 42); row.BackgroundColor3 = C.row
@@ -145,14 +169,18 @@ local function makeToggle(parent, text, hasBadge, onClick)
     label.Text = text; label.TextColor3 = C.text; label.BackgroundTransparency = 1
     label.Font = Enum.Font.GothamMedium; label.TextSize = 12
     label.TextXAlignment = Enum.TextXAlignment.Left; label.Parent = row
+
+    local badge = nil
     if hasBadge then
-        local badge = Instance.new("TextLabel")
-        badge.Size = UDim2.new(0, 62, 0, 20); badge.Position = UDim2.new(1, -122, 0.5, -10)
+        badge = Instance.new("TextButton")
+        badge.Size = UDim2.new(0, 88, 0, 20); badge.Position = UDim2.new(1, -138, 0.5, -10)
         badge.Text = "[ NONE ]"; badge.TextColor3 = C.badgeText
         badge.BackgroundColor3 = C.badge; badge.Font = Enum.Font.GothamMedium
         badge.TextSize = 10; badge.BorderSizePixel = 0; badge.Parent = row
+        badge.AutoButtonColor = false; badge.ZIndex = 5
         Instance.new("UICorner", badge).CornerRadius = UDim.new(0, 4)
     end
+
     local tBg = Instance.new("Frame")
     tBg.Size = UDim2.new(0, 34, 0, 18); tBg.Position = UDim2.new(1, -46, 0.5, -9)
     tBg.BackgroundColor3 = C.toggleOff; tBg.BorderSizePixel = 0; tBg.Parent = row
@@ -161,10 +189,14 @@ local function makeToggle(parent, text, hasBadge, onClick)
     knob.Size = UDim2.new(0, 14, 0, 14); knob.Position = UDim2.new(0, 2, 0.5, -7)
     knob.BackgroundColor3 = C.knob; knob.BorderSizePixel = 0; knob.Parent = tBg
     Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
+
     local click = Instance.new("TextButton")
     click.Size = UDim2.new(1, 0, 1, 0); click.BackgroundTransparency = 1
-    click.Text = ""; click.Parent = row
+    click.Text = ""; click.Parent = row; click.ZIndex = 1
+
     local state = false
+    local hotkey = nil
+
     local function render()
         if state then
             tBg.BackgroundColor3 = C.accent; knob.Position = UDim2.new(1, -16, 0.5, -7)
@@ -174,11 +206,44 @@ local function makeToggle(parent, text, hasBadge, onClick)
             dot.BackgroundColor3 = C.textDim
         end
     end
-    local api = {set = function(v) state = v; render(); if onClick then onClick(state) end end,
-                 get = function() return state end}
+
+    local api = {}
+    api.set = function(v) state = v; render(); if onClick then onClick(state) end end
+    api.get = function() return state end
+    api.getHotkey = function() return hotkey end
+    api.getBadge = function() return badge end
+    api.setHotkeyInternal = function(k) hotkey = k end
+    api.clearHotkey = function()
+        if hotkey and hotkeyRegistry[hotkey] == api then hotkeyRegistry[hotkey] = nil end
+        hotkey = nil
+        if badge then renderBadge(badge, nil) end
+    end
+
     click.MouseButton1Click:Connect(function()
         state = not state; render(); if onClick then onClick(state) end
     end)
+
+    if badge then
+        badge.MouseButton1Click:Connect(function()
+            if waitingHotkeyToggle and waitingHotkeyToggle ~= api then
+                local prevBadge = waitingHotkeyToggle.getBadge()
+                if prevBadge then renderBadge(prevBadge, waitingHotkeyToggle.getHotkey()) end
+            end
+            if waitingHotkeyToggle == api then
+                waitingHotkeyToggle = nil
+                renderBadge(badge, hotkey)
+                return
+            end
+            waitingHotkeyToggle = api
+            badge.Text = "[ ... ]"
+            badge.TextColor3 = Color3.fromRGB(255, 200, 80)
+        end)
+        badge.MouseButton2Click:Connect(function()
+            if waitingHotkeyToggle == api then waitingHotkeyToggle = nil end
+            api.clearHotkey()
+        end)
+    end
+
     table.insert(togglesData, {api = api, tBg = tBg, dot = dot})
     return api
 end
@@ -282,7 +347,7 @@ local function showNotif(text, color)
     return notif
 end
 
--- ═══ ESP ═══
+-- ═══ ESP (с автообновлением) ═══
 local espList, espData, espConn = {}, {}, nil
 local playerConns = {}
 local function clearESP()
@@ -361,24 +426,72 @@ local function createESP(plr)
     table.insert(espList, hl)
     return {bb = bb, nameL = nameL, factionL = factionL, distL = distL, hpTextL = hpTextL, cashL = cashL, minL = minL, hpF = hpF, plr = plr}
 end
+local function removeESPFor(plr)
+    statCache[plr] = nil
+    for i = #espData, 1, -1 do
+        if espData[i].plr == plr then
+            pcall(function() espData[i].bb:Destroy() end)
+            table.remove(espData, i)
+        end
+    end
+end
 local function refreshPlayerESP(plr)
     if plr == player or not plr.Character then return end
-    for i = #espData, 1, -1 do if espData[i].plr == plr then pcall(function() espData[i].bb:Destroy() end); table.remove(espData, i) end end
+    removeESPFor(plr)
     local d = createESP(plr)
     if d then table.insert(espList, d.bb); table.insert(espData, d) end
-end
-local function removePlayerESP(plr)
-    statCache[plr] = nil
-    for i = #espData, 1, -1 do if espData[i].plr == plr then pcall(function() espData[i].bb:Destroy() end); table.remove(espData, i) end end
 end
 local function hookPlayer(plr)
     if plr == player or playerConns[plr] then return end
     playerConns[plr] = true
-    plr.CharacterAdded:Connect(function() task.wait(0.5); if espConn then refreshPlayerESP(plr) end end)
-    plr.CharacterRemoving:Connect(function() task.wait(0.1); removePlayerESP(plr) end)
+    plr.CharacterAdded:Connect(function()
+        task.wait(0.4)
+        if espConn then refreshPlayerESP(plr) end
+    end)
+    plr.CharacterRemoving:Connect(function()
+        task.wait(0.1)
+        removeESPFor(plr)
+    end)
+    pcall(function()
+        plr:GetPropertyChangedSignal("Team"):Connect(function()
+            if espConn then task.defer(function() refreshPlayerESP(plr) end) end
+        end)
+    end)
 end
+
+local function syncESP()
+    for _, p in ipairs(game.Players:GetPlayers()) do
+        if p ~= player then
+            hookPlayer(p)
+            local hasChar = p.Character and p.Character:FindFirstChild("Head")
+            local hasESP = false
+            for _, d in ipairs(espData) do
+                if d.plr == p and d.bb.Parent then
+                    if d.bb.Parent == p.Character:FindFirstChild("Head") then
+                        hasESP = true
+                    end
+                    break
+                end
+            end
+            if hasChar and not hasESP then
+                refreshPlayerESP(p)
+            elseif not hasChar then
+                removeESPFor(p)
+            end
+        end
+    end
+    for i = #espData, 1, -1 do
+        local d = espData[i]
+        if not d.plr or not d.plr.Parent or not game.Players:FindFirstChild(d.plr.Name) then
+            pcall(function() d.bb:Destroy() end)
+            table.remove(espData, i)
+        end
+    end
+end
+
 game.Players.PlayerAdded:Connect(function(plr) hookPlayer(plr); task.wait(1); if espConn then refreshPlayerESP(plr) end end)
-game.Players.PlayerRemoving:Connect(function(plr) playerConns[plr] = nil; removePlayerESP(plr) end)
+game.Players.PlayerRemoving:Connect(function(plr) playerConns[plr] = nil; removeESPFor(plr) end)
+
 local function startESP()
     clearESP()
     for _, p in ipairs(game.Players:GetPlayers()) do
@@ -411,6 +524,12 @@ local function startESP()
                     else d.hpF.BackgroundColor3 = Color3.fromRGB(255,0,0); d.hpTextL.TextColor3 = Color3.fromRGB(255,80,80) end
                 end
             end
+        end
+    end)
+    task.spawn(function()
+        while espConn do
+            syncESP()
+            task.wait(1.5)
         end
     end)
     task.spawn(function()
@@ -449,8 +568,8 @@ local aimbotVisible = true
 local aimbotButtonMode = "RMB"
 local aimbotPrediction = true
 local aimbotSticky = true
-local aimbotTargetMode = "Auto" -- "Auto" | "Head" | "Body"
-local aimbotIgnoreTeammates = true -- не стрелять по своей фракции
+local aimbotTargetMode = "Auto"
+local aimbotIgnoreTeammates = true
 local currentTarget = nil
 
 local function isTeammate(plr)
@@ -670,8 +789,17 @@ end)
 
 -- ═══ ARMY TAB ═══
 makeToggle(armyPage, "ESP Игроков", true, function(on) if on then startESP() else stopESP() end end)
+makeButton(armyPage, "🔄 Обновить ESP", Color3.fromRGB(50, 80, 120), function()
+    if not espConn then
+        local n = showNotif("⚠ Сначала включи ESP", Color3.fromRGB(255,200,80))
+        game:GetService("Debris"):AddItem(n, 3); return
+    end
+    syncESP()
+    local n = showNotif("✅ ESP обновлён (" .. #espData .. " игроков)", Color3.fromRGB(100,255,100))
+    game:GetService("Debris"):AddItem(n, 2)
+end)
 
--- ═══ FULLBRIGHT (усиленный) ═══
+-- ═══ FULLBRIGHT ═══
 local fullbrightOn = false
 local fbConn = nil
 local fbSaved = nil
@@ -707,7 +835,6 @@ local function applyFullbright()
     lighting.ExposureCompensation = 1
     lighting.EnvironmentDiffuseScale = 1
     lighting.EnvironmentSpecularScale = 1
-    -- Скрыть атмосферу (она часто перебивает яркость)
     for _, c in ipairs(lighting:GetChildren()) do
         if c:IsA("Atmosphere") and not fbHiddenAtmos[c] then
             fbHiddenAtmos[c] = { parent = c.Parent, name = c.Name }
@@ -723,7 +850,6 @@ local function restoreFullbright()
         end
         fbSaved = nil
     end
-    -- Вернуть атмосферу
     for atmos, info in pairs(fbHiddenAtmos) do
         pcall(function()
             atmos.Name = info.name
@@ -747,30 +873,68 @@ makeToggle(armyPage, "FullBright", true, function(on)
     end
 end)
 
+-- 🦘 ПРЫЖОК+ (через JumpPower — анти-кик)
 local jumpOn = false
-uis.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-    if jumpOn and input.KeyCode == Enum.KeyCode.Space then
-        local hrp = getHRP()
-        if hrp then
-            local bv = Instance.new("BodyVelocity")
-            bv.MaxForce = Vector3.new(0, 1e5, 0); bv.Velocity = Vector3.new(0, 60, 0)
-            bv.Parent = hrp; game:GetService("Debris"):AddItem(bv, 0.15)
-        end
-    end
-end)
-makeToggle(armyPage, "Прыжок+", true, function(on) jumpOn = on end)
+local savedJumpPower = nil
 
-local flyBV, flyConn
+local function applyJumpBoost()
+    local hum = getHum()
+    if hum then
+        if savedJumpPower == nil then savedJumpPower = hum.JumpPower end
+        hum.UseJumpPower = true
+        hum.JumpPower = 85
+    end
+end
+
+local function removeJumpBoost()
+    local hum = getHum()
+    if hum and savedJumpPower then
+        hum.JumpPower = savedJumpPower
+    end
+    savedJumpPower = nil
+end
+
+makeToggle(armyPage, "Прыжок+", true, function(on)
+    jumpOn = on
+    if on then applyJumpBoost() else removeJumpBoost() end
+end)
+
+player.CharacterAdded:Connect(function()
+    task.wait(1)
+    if jumpOn then applyJumpBoost() end
+end)
+
+-- ✈️ FLY (анти-кик + слайдер скорости)
+local flyBV, flyConn = nil, nil
+local flyOn = false
+local flySpeed = 70
+
+local function setNetworkOwner()
+    local hrp = getHRP()
+    if hrp then
+        pcall(function() hrp:SetNetworkOwner(player) end)
+    end
+end
+
 local function startFly()
     local hrp, hum = getHRP(), getHum()
     if not hrp or not hum then return end
+    flyOn = true
+    setNetworkOwner()
     hum.PlatformStand = true
+
     flyBV = Instance.new("BodyVelocity")
-    flyBV.MaxForce = Vector3.new(1e5,1e5,1e5); flyBV.Velocity = Vector3.new(0,0,0); flyBV.Parent = hrp
-    flyConn = runService.RenderStepped:Connect(function()
-        if not flyBV or not flyBV.Parent then return end
-        local cam = camera.CFrame; local dir = Vector3.new()
+    flyBV.Name = "EclipseFly"
+    flyBV.MaxForce = Vector3.new(1e4, 1e4, 1e4)
+    flyBV.P = 1250
+    flyBV.Velocity = Vector3.new(0, 0, 0)
+    flyBV.Parent = hrp
+
+    flyConn = runService.RenderStepped:Connect(function(dt)
+        if not flyOn or not flyBV or not flyBV.Parent then return end
+        if not player.Character then return end
+        local cam = camera.CFrame
+        local dir = Vector3.new()
         if uis:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.LookVector end
         if uis:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.LookVector end
         if uis:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.RightVector end
@@ -778,17 +942,22 @@ local function startFly()
         if uis:IsKeyDown(Enum.KeyCode.Space) then dir = dir + cam.UpVector end
         if uis:IsKeyDown(Enum.KeyCode.LeftControl) then dir = dir - cam.UpVector end
         if dir.Magnitude > 0 then dir = dir.Unit end
-        flyBV.Velocity = dir * 70
+        local targetVel = dir * flySpeed
+        flyBV.Velocity = flyBV.Velocity:Lerp(targetVel, math.clamp(dt * 12, 0, 1))
     end)
 end
+
 local function stopFly()
+    flyOn = false
     if flyBV then flyBV:Destroy(); flyBV = nil end
     if flyConn then flyConn:Disconnect(); flyConn = nil end
     local h = getHum(); if h then h.PlatformStand = false end
 end
-makeToggle(armyPage, "Fly", true, function(on) if on then startFly() else stopFly() end end)
 
--- 👻 GHOST с вращением камеры + слайдер скорости
+makeToggle(armyPage, "Fly", true, function(on) if on then startFly() else stopFly() end end)
+makeSlider(armyPage, "✈️ Скорость Fly", 20, 250, 70, false, function(v) flySpeed = v end)
+
+-- 👻 GHOST
 local ghostOn = false
 local ghostCamConn = nil
 local ghostMouseConn = nil
@@ -2190,6 +2359,40 @@ uis.InputBegan:Connect(function(input, gpe)
     if input.KeyCode == toggleKey then main.Visible = not main.Visible end
 end)
 
+-- ═══ ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ХОТКЕЕВ ТОГГЛОВ ═══
+uis.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    if input.KeyCode == Enum.KeyCode.Unknown then return end
+
+    if waitingHotkeyToggle then
+        if input.KeyCode == Enum.KeyCode.Escape then
+            local badge = waitingHotkeyToggle.getBadge()
+            if badge then renderBadge(badge, waitingHotkeyToggle.getHotkey()) end
+            waitingHotkeyToggle = nil
+            return
+        end
+        local oldKey = waitingHotkeyToggle.getHotkey()
+        if oldKey and hotkeyRegistry[oldKey] == waitingHotkeyToggle then
+            hotkeyRegistry[oldKey] = nil
+        end
+        local conflicting = hotkeyRegistry[input.KeyCode]
+        if conflicting and conflicting ~= waitingHotkeyToggle then
+            conflicting.clearHotkey()
+        end
+        waitingHotkeyToggle.setHotkeyInternal(input.KeyCode)
+        hotkeyRegistry[input.KeyCode] = waitingHotkeyToggle
+        local badge = waitingHotkeyToggle.getBadge()
+        if badge then renderBadge(badge, input.KeyCode) end
+        waitingHotkeyToggle = nil
+        return
+    end
+
+    if uis:GetFocusedTextBox() then return end
+    local api = hotkeyRegistry[input.KeyCode]
+    if api then api.set(not api.get()) end
+end)
+
 task.spawn(function()
     task.wait(0.1)
     for _, page in ipairs({armyPage, tpPage, aimbotPage, settingsPage}) do
@@ -2221,7 +2424,6 @@ closeBtn.MouseButton1Click:Connect(function()
     closeTP(); closeMyBagWindow(); closeSpecWindow()
     closePlayerInvPicker(); closePlayerInvWin(); closeScanWin()
     closeCoordsWin()
-    -- отключить FullBright и вернуть свет
     if fbConn then fbConn:Disconnect(); fbConn = nil end
     fullbrightOn = false
     restoreFullbright()
@@ -2230,5 +2432,6 @@ closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
-print("✅ Eclipse Menu + Ghost + Точный Aimbot + Шторм + Игнор своих + FullBright 2.0 загружен.")
+print("✅ Eclipse Menu + Fly анти-кик + JumpPower + Хоткеи + ESP авто + Aimbot + Ghost + FullBright 2.0 загружен.")
 print("⌨️ RightShift — открыть/закрыть меню.")
+print("🎯 ЛКМ по [ NONE ] — назначить клавишу, ПКМ — сбросить.")
