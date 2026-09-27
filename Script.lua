@@ -1,4 +1,4 @@
---[[ ECLIPSE-STYLE MENU — версия без GunMod + Мои координаты + Телепорты + Ghost с вращением камеры + Точный Aimbot ]]
+--[[ ECLIPSE-STYLE MENU — версия без GunMod + Мои координаты + Телепорты + Ghost с вращением камеры + Точный Aimbot + Шторм + Не стрелять по своим ]]
 
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
@@ -450,7 +450,14 @@ local aimbotButtonMode = "RMB"
 local aimbotPrediction = true
 local aimbotSticky = true
 local aimbotTargetMode = "Auto" -- "Auto" | "Head" | "Body"
+local aimbotIgnoreTeammates = true -- не стрелять по своей фракции
 local currentTarget = nil
+
+local function isTeammate(plr)
+    if not plr then return false end
+    local myTeam = player.Team
+    return myTeam ~= nil and plr.Team == myTeam
+end
 
 local function isAimbotActive()
     if aimbotButtonMode == "Always" then return true end
@@ -508,7 +515,8 @@ local function findTarget()
     local scrCenter = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)
     local best, bestScore = nil, math.huge
     for _, plr in ipairs(game.Players:GetPlayers()) do
-        if plr ~= player and plr.Character then
+        if plr ~= player and plr.Character
+           and not (aimbotIgnoreTeammates and isTeammate(plr)) then
             local hum = plr.Character:FindFirstChildOfClass("Humanoid")
             if hum and hum.Health > 0 then
                 for _, part in ipairs(getAimParts(plr.Character)) do
@@ -528,6 +536,7 @@ local function validateTarget(t)
     if not t or not t.player or not t.player.Parent then return false end
     if not t.character or not t.character.Parent then return false end
     if t.part.Parent ~= t.character then return false end
+    if aimbotIgnoreTeammates and isTeammate(t.player) then return false end
     local hum = t.character:FindFirstChildOfClass("Humanoid")
     if not hum or hum.Health <= 0 then return false end
     local myPos = camera.CFrame.Position
@@ -656,6 +665,10 @@ makeSectionLabel(aimbotPage, "⚙️ ПАРАМЕТРЫ")
 makeSlider(aimbotPage, "FOV (радиус)", 50, 800, 300, false, function(v) aimbotFOV = v end)
 makeSlider(aimbotPage, "Плавность", 0.05, 1, 0.35, true, function(v) aimbotSmooth = v end)
 makeToggle(aimbotPage, "Только видимые", true, function(on) aimbotVisible = on end)
+makeToggle(aimbotPage, "🎯 Не стрелять по своим (фракция)", true, function(on)
+    aimbotIgnoreTeammates = on
+    currentTarget = nil -- сбросить цель, чтобы не залипал на своём
+end)
 
 -- ═══ ARMY TAB ═══
 makeToggle(armyPage, "ESP Игроков", true, function(on) if on then startESP() else stopESP() end end)
@@ -2158,5 +2171,5 @@ closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
-print("✅ Eclipse Menu + Ghost + Точный Aimbot + Шторм загружен.")
+print("✅ Eclipse Menu + Ghost + Точный Aimbot + Шторм + Не стрелять по своим загружен.")
 print("⌨️ RightShift — открыть/закрыть меню.")
