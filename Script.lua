@@ -1,4 +1,4 @@
---[[ ECLIPSE-STYLE MENU — версия без GunMod + Мои координаты + Телепорты + Ghost с вращением камеры + Точный Aimbot + Шторм + Не стрелять по своим ]]
+--[[ ECLIPSE-STYLE MENU — версия без GunMod + Мои координаты + Телепорты + Ghost с вращением камеры + Точный Aimbot + Шторм + Не стрелять по своим + Усиленный FullBright ]]
 
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
@@ -480,7 +480,7 @@ local function rayVisible(from, to, ignoreChar)
     if ignoreChar then table.insert(filter, ignoreChar) end
     params.FilterDescendantsInstances = filter
     local ray = workspace:Raycast(from, to - from, params)
-    return ray == nil -- ничего не задели => видно
+    return ray == nil
 end
 
 local function getAimParts(char)
@@ -491,7 +491,7 @@ local function getAimParts(char)
     elseif aimbotTargetMode == "Body" then
         local u = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso") or char:FindFirstChild("HumanoidRootPart")
         if u then table.insert(out, u) end
-    else -- Auto
+    else
         local h = char:FindFirstChild("Head")
         local u = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso") or char:FindFirstChild("HumanoidRootPart")
         if h then table.insert(out, h) end
@@ -551,7 +551,7 @@ local function predictPos(target)
     local vel = target.part.AssemblyLinearVelocity
     if not vel or vel.Magnitude < 1 then return target.part.Position end
     local ping = getPing(target.player)
-    local lead = ping + 0.03 -- пинг + небольшой запас на "время пули"
+    local lead = ping + 0.03
     return target.part.Position + vel * lead
 end
 
@@ -575,8 +575,6 @@ local function startAimbot()
             local aimPos = predictPos(target)
             local camPos = camera.CFrame.Position
             local desired = CFrame.new(camPos, aimPos)
-            -- Фрейм-независимая плавность:
-            -- smooth=0.05 → мгновенно, smooth=1 → медленно
             local alpha = math.clamp(dt / math.max(aimbotSmooth, 0.01) * 10, 0, 1)
             camera.CFrame = camera.CFrame:Lerp(desired, alpha)
         end
@@ -667,17 +665,85 @@ makeSlider(aimbotPage, "Плавность", 0.05, 1, 0.35, true, function(v) ai
 makeToggle(aimbotPage, "Только видимые", true, function(on) aimbotVisible = on end)
 makeToggle(aimbotPage, "🎯 Не стрелять по своим (фракция)", true, function(on)
     aimbotIgnoreTeammates = on
-    currentTarget = nil -- сбросить цель, чтобы не залипал на своём
+    currentTarget = nil
 end)
 
 -- ═══ ARMY TAB ═══
 makeToggle(armyPage, "ESP Игроков", true, function(on) if on then startESP() else stopESP() end end)
+
+-- ═══ FULLBRIGHT (усиленный) ═══
+local fullbrightOn = false
+local fbConn = nil
+local fbSaved = nil
+local fbHiddenAtmos = {}
+
+local function applyFullbright()
+    if not fbSaved then
+        fbSaved = {
+            Brightness = lighting.Brightness,
+            Ambient = lighting.Ambient,
+            OutdoorAmbient = lighting.OutdoorAmbient,
+            FogEnd = lighting.FogEnd,
+            FogStart = lighting.FogStart,
+            FogColor = lighting.FogColor,
+            ClockTime = lighting.ClockTime,
+            GeographicLatitude = lighting.GeographicLatitude,
+            GlobalShadows = lighting.GlobalShadows,
+            ExposureCompensation = lighting.ExposureCompensation,
+            EnvironmentDiffuseScale = lighting.EnvironmentDiffuseScale,
+            EnvironmentSpecularScale = lighting.EnvironmentSpecularScale,
+            ShadowSoftness = lighting.ShadowSoftness,
+        }
+    end
+    lighting.Brightness = 3
+    lighting.Ambient = Color3.fromRGB(200,200,200)
+    lighting.OutdoorAmbient = Color3.fromRGB(200,200,200)
+    lighting.FogEnd = 1e6
+    lighting.FogStart = 1e6
+    lighting.FogColor = Color3.fromRGB(200,200,200)
+    lighting.ClockTime = 14
+    lighting.GeographicLatitude = 0
+    lighting.GlobalShadows = false
+    lighting.ExposureCompensation = 1
+    lighting.EnvironmentDiffuseScale = 1
+    lighting.EnvironmentSpecularScale = 1
+    -- Скрыть атмосферу (она часто перебивает яркость)
+    for _, c in ipairs(lighting:GetChildren()) do
+        if c:IsA("Atmosphere") and not fbHiddenAtmos[c] then
+            fbHiddenAtmos[c] = { parent = c.Parent, name = c.Name }
+            c.Parent = nil
+        end
+    end
+end
+
+local function restoreFullbright()
+    if fbSaved then
+        for k, v in pairs(fbSaved) do
+            pcall(function() lighting[k] = v end)
+        end
+        fbSaved = nil
+    end
+    -- Вернуть атмосферу
+    for atmos, info in pairs(fbHiddenAtmos) do
+        pcall(function()
+            atmos.Name = info.name
+            atmos.Parent = info.parent or lighting
+        end)
+    end
+    fbHiddenAtmos = {}
+end
+
 makeToggle(armyPage, "FullBright", true, function(on)
+    fullbrightOn = on
     if on then
-        lighting.Brightness = 3; lighting.Ambient = Color3.fromRGB(200,200,200)
-        lighting.OutdoorAmbient = Color3.fromRGB(200,200,200); lighting.FogEnd = 1e6; lighting.GlobalShadows = false
+        applyFullbright()
+        if fbConn then fbConn:Disconnect() end
+        fbConn = runService.Heartbeat:Connect(function()
+            if fullbrightOn then applyFullbright() end
+        end)
     else
-        lighting.Brightness = 1; lighting.Ambient = Color3.fromRGB(70,70,70); lighting.OutdoorAmbient = Color3.fromRGB(70,70,70)
+        if fbConn then fbConn:Disconnect(); fbConn = nil end
+        restoreFullbright()
     end
 end)
 
@@ -743,26 +809,21 @@ local function startGhost()
         return
     end
     ghostSavedSpeed = hum.WalkSpeed
-    -- Замораживаем тело
     for _, p in ipairs(player.Character:GetDescendants()) do
         if p:IsA("BasePart") then p.Anchored = true end
     end
     hum.PlatformStand = true
     hum.WalkSpeed = 0
     hum.JumpPower = 0
-    -- Запоминаем ориентацию камеры
     local look = camera.CFrame.LookVector
     ghostYaw = math.atan2(-look.X, -look.Z)
     ghostPitch = math.asin(math.clamp(look.Y, -1, 1))
     ghostCamPos = camera.CFrame.Position
-    -- Отцепляем камеру
     ghostSavedCamType = camera.CameraType
     camera.CameraType = Enum.CameraType.Scriptable
     camera.CameraSubject = nil
-    -- Фиксируем мышь
     ghostSavedMouseBehavior = uis.MouseBehavior
     uis.MouseBehavior = Enum.MouseBehavior.LockCenter
-    -- Читаем движение мыши для поворота
     ghostMouseConn = uis.InputChanged:Connect(function(input)
         if not ghostOn then return end
         if input.UserInputType == Enum.UserInputType.MouseMovement then
@@ -770,10 +831,8 @@ local function startGhost()
             ghostPitch = math.clamp(ghostPitch - math.rad(input.Delta.Y) * GHOST_SENS, -math.rad(89), math.rad(89))
         end
     end)
-    -- Обработчик полёта
     ghostCamConn = runService.RenderStepped:Connect(function(dt)
         if not ghostOn then return end
-        -- Авто-разблокировка мыши при открытом меню
         if main.Visible then
             if uis.MouseBehavior ~= Enum.MouseBehavior.Default then
                 uis.MouseBehavior = Enum.MouseBehavior.Default
@@ -783,7 +842,6 @@ local function startGhost()
                 uis.MouseBehavior = Enum.MouseBehavior.LockCenter
             end
         end
-        -- CFrame из yaw/pitch
         local rotation = CFrame.fromEulerAnglesYXZ(ghostPitch, ghostYaw, 0)
         local look = rotation.LookVector
         local right = rotation.RightVector
@@ -807,17 +865,14 @@ local function stopGhost()
     ghostOn = false
     if ghostCamConn then ghostCamConn:Disconnect(); ghostCamConn = nil end
     if ghostMouseConn then ghostMouseConn:Disconnect(); ghostMouseConn = nil end
-    -- Возврат мыши
     if ghostSavedMouseBehavior then
         uis.MouseBehavior = ghostSavedMouseBehavior
     end
-    -- Возврат камеры
     if ghostSavedCamType then
         camera.CameraType = ghostSavedCamType
     end
     local hum = getHum()
     if hum then camera.CameraSubject = hum end
-    -- Разморозка тела
     if player.Character then
         for _, p in ipairs(player.Character:GetDescendants()) do
             if p:IsA("BasePart") then p.Anchored = false end
@@ -2166,10 +2221,14 @@ closeBtn.MouseButton1Click:Connect(function()
     closeTP(); closeMyBagWindow(); closeSpecWindow()
     closePlayerInvPicker(); closePlayerInvWin(); closeScanWin()
     closeCoordsWin()
+    -- отключить FullBright и вернуть свет
+    if fbConn then fbConn:Disconnect(); fbConn = nil end
+    fullbrightOn = false
+    restoreFullbright()
     setSpeed(defaultSpeed)
     jumpOn = false
     gui:Destroy()
 end)
 
-print("✅ Eclipse Menu + Ghost + Точный Aimbot + Шторм + Не стрелять по своим загружен.")
+print("✅ Eclipse Menu + Ghost + Точный Aimbot + Шторм + Игнор своих + FullBright 2.0 загружен.")
 print("⌨️ RightShift — открыть/закрыть меню.")
