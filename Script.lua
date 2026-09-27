@@ -1,4 +1,4 @@
---[[ ECLIPSE-STYLE MENU — Fly анти-кик + JumpPower + Хоткеи на тогглах + ESP автообновление + FullBright 2.0 + Точный Aimbot + Ghost + Шторм + Игнор своих ]]
+--[[ ECLIPSE-STYLE MENU — TP дистанция/статус + Fly анти-кик + JumpPower + Хоткеи + ESP авто + Aimbot + Ghost + FullBright 2.0 ]]
 
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
@@ -873,7 +873,7 @@ makeToggle(armyPage, "FullBright", true, function(on)
     end
 end)
 
--- 🦘 ПРЫЖОК+ (через JumpPower — анти-кик)
+-- 🦘 ПРЫЖОК+
 local jumpOn = false
 local savedJumpPower = nil
 
@@ -2157,9 +2157,10 @@ local function openSpecWindow()
 end
 makeToggle(armyPage, "👁️ Спектатор", false, function(on) if on then openSpecWindow() else closeSpecWindow() end end)
 
--- TP ОКНО
-local tpGui, tpRows = nil, {}
+-- TP ОКНО (с дистанцией и статусом)
+local tpGui, tpRows, tpConn = nil, {}, nil
 local function closeTP()
+    if tpConn then tpConn:Disconnect(); tpConn = nil end
     if tpGui then tpGui:Destroy(); tpGui = nil end
     tpRows = {}
 end
@@ -2173,7 +2174,7 @@ local function openTP()
     tpGui = Instance.new("ScreenGui")
     tpGui.Name = "TPMenu"; tpGui.ResetOnSpawn = false; tpGui.Parent = gui.Parent
     local f = Instance.new("Frame")
-    f.Size = UDim2.new(0,320,0,480); f.Position = UDim2.new(0.5,-160,0.5,-240)
+    f.Size = UDim2.new(0,360,0,500); f.Position = UDim2.new(0.5,-180,0.5,-250)
     f.BackgroundColor3 = C.bg; f.BorderSizePixel = 0; f.Active = true; f.Parent = tpGui
     Instance.new("UICorner", f).CornerRadius = UDim.new(0,8)
     local s = Instance.new("UIStroke", f); s.Color = C.accentDk; s.Thickness = 1
@@ -2217,6 +2218,51 @@ local function openTP()
     sb.ScrollBarThickness = 6; sb.ScrollBarImageColor3 = C.accent; sb.Parent = f
     Instance.new("UIListLayout", sb).Padding = UDim.new(0,6)
     tpRows = {}
+
+    local function updateInfo()
+        if not tpGui then return end
+        local myHRP = getHRP()
+        for _, r in ipairs(tpRows) do
+            if r.btn and r.btn.Parent and r.statusL and r.distL then
+                local p = r.plr
+                if not p or not p.Parent then
+                    r.statusL.Text = "⚫ Отключился"
+                    r.statusL.TextColor3 = Color3.fromRGB(120, 120, 130)
+                    r.distL.Text = "—"
+                    r.distL.TextColor3 = C.textDim
+                else
+                    local char = p.Character
+                    local hum = char and char:FindFirstChildOfClass("Humanoid")
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    if char and hum and hum.Health > 0 then
+                        r.statusL.Text = "🟢 Жив  ❤" .. math.floor(hum.Health)
+                        r.statusL.TextColor3 = Color3.fromRGB(100, 255, 100)
+                        if myHRP and hrp then
+                            local dist = (myHRP.Position - hrp.Position).Magnitude
+                            r.distL.Text = string.format("📏 %.0f м", dist)
+                            if dist < 30 then r.distL.TextColor3 = Color3.fromRGB(255, 80, 80)
+                            elseif dist < 100 then r.distL.TextColor3 = Color3.fromRGB(255, 200, 50)
+                            else r.distL.TextColor3 = Color3.fromRGB(100, 200, 255) end
+                        else
+                            r.distL.Text = "📏 — м"
+                            r.distL.TextColor3 = C.textDim
+                        end
+                    elseif char and hum and hum.Health <= 0 then
+                        r.statusL.Text = "🔴 Мёртв"
+                        r.statusL.TextColor3 = Color3.fromRGB(255, 80, 80)
+                        r.distL.Text = "📏 — м"
+                        r.distL.TextColor3 = C.textDim
+                    else
+                        r.statusL.Text = "⚫ Нет персонажа"
+                        r.statusL.TextColor3 = Color3.fromRGB(140, 140, 150)
+                        r.distL.Text = "📏 — м"
+                        r.distL.TextColor3 = C.textDim
+                    end
+                end
+            end
+        end
+    end
+
     local function refresh(filter)
         filter = (filter or ""):lower()
         for _, r in ipairs(tpRows) do pcall(function() r.btn:Destroy() end) end
@@ -2224,22 +2270,53 @@ local function openTP()
         for _, p in ipairs(game.Players:GetPlayers()) do
             if p ~= player and (filter == "" or p.Name:lower():find(filter,1,true)) then
                 local b = Instance.new("TextButton")
-                b.Size = UDim2.new(1,-8,0,44); b.Text = "👤 " .. p.Name
+                b.Size = UDim2.new(1,-8,0,52); b.Text = ""
                 b.TextColor3 = C.text; b.BackgroundColor3 = C.row
                 b.Font = Enum.Font.GothamBold; b.TextSize = 12
-                b.BorderSizePixel = 0; b.TextXAlignment = Enum.TextXAlignment.Left; b.AutoButtonColor = false
+                b.BorderSizePixel = 0; b.AutoButtonColor = false
                 b.Parent = sb
-                local pad = Instance.new("UIPadding", b); pad.PaddingLeft = UDim.new(0, 10)
                 Instance.new("UICorner", b).CornerRadius = UDim.new(0,6)
+
+                local nameL = Instance.new("TextLabel")
+                nameL.Size = UDim2.new(1, -14, 0, 18); nameL.Position = UDim2.new(0, 10, 0, 4)
+                nameL.BackgroundTransparency = 1
+                nameL.Text = "👤 " .. p.Name
+                nameL.TextColor3 = Color3.fromRGB(240, 240, 245)
+                nameL.Font = Enum.Font.GothamBold; nameL.TextSize = 12
+                nameL.TextXAlignment = Enum.TextXAlignment.Left; nameL.Parent = b
+
+                local statusL = Instance.new("TextLabel")
+                statusL.Size = UDim2.new(0.55, -10, 0, 14); statusL.Position = UDim2.new(0, 10, 0, 26)
+                statusL.BackgroundTransparency = 1
+                statusL.Text = "⚫ ..."
+                statusL.TextColor3 = C.textDim
+                statusL.Font = Enum.Font.GothamSemibold; statusL.TextSize = 10
+                statusL.TextXAlignment = Enum.TextXAlignment.Left; statusL.Parent = b
+
+                local distL = Instance.new("TextLabel")
+                distL.Size = UDim2.new(0.45, -10, 0, 14); distL.Position = UDim2.new(0.55, 0, 0, 26)
+                distL.BackgroundTransparency = 1
+                distL.Text = "📏 — м"
+                distL.TextColor3 = C.textDim
+                distL.Font = Enum.Font.GothamBold; distL.TextSize = 10
+                distL.TextXAlignment = Enum.TextXAlignment.Right; distL.Parent = b
+
                 b.MouseButton1Click:Connect(function() tpTo(p); closeTP() end)
-                table.insert(tpRows, {btn=b, plr=p})
+                table.insert(tpRows, {btn=b, plr=p, statusL=statusL, distL=distL})
             end
         end
+        task.defer(updateInfo)
         task.wait(0.05)
         local h = 0
         for _, c in ipairs(sb:GetChildren()) do if c:IsA("TextButton") then h = h + c.Size.Y.Offset + 6 end end
         sb.CanvasSize = UDim2.new(0,0,0,h+20)
     end
+
+    tpConn = runService.RenderStepped:Connect(function()
+        if not tpGui then return end
+        updateInfo()
+    end)
+
     searchBox:GetPropertyChangedSignal("Text"):Connect(function() refresh(searchBox.Text) end)
     refresh("")
 end
@@ -2432,6 +2509,6 @@ closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
-print("✅ Eclipse Menu + Fly анти-кик + JumpPower + Хоткеи + ESP авто + Aimbot + Ghost + FullBright 2.0 загружен.")
+print("✅ Eclipse Menu + TP дистанция/статус + Fly анти-кик + JumpPower + Хоткеи + ESP авто + Aimbot + Ghost + FullBright 2.0 загружен.")
 print("⌨️ RightShift — открыть/закрыть меню.")
 print("🎯 ЛКМ по [ NONE ] — назначить клавишу, ПКМ — сбросить.")
