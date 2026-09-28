@@ -34,7 +34,7 @@ minBtn.Text="—";minBtn.TextColor3=C.textDim;minBtn.BackgroundTransparency=1
 minBtn.Font=Enum.Font.GothamBold;minBtn.TextSize=16;minBtn.Parent=topbar
 local closeBtn=Instance.new("TextButton")
 closeBtn.Size=UDim2.new(0,30,0,30);closeBtn.Position=UDim2.new(1,-42,0,5)
-closeBtn.Text="X";closeBtn.TextColor3=C.textDim;closeBtn.BackgroundTransparency=1
+closeBtn.Text="✕";closeBtn.TextColor3=C.textDim;closeBtn.BackgroundTransparency=1
 closeBtn.Font=Enum.Font.GothamBold;closeBtn.TextSize=14;closeBtn.Parent=topbar
 local dragging,dragStart,startPos=false,nil,nil
 local function beginDrag(i)
@@ -65,7 +65,7 @@ return b end
 local tabArmy=makeTabBtn("Армия РП",8);tabArmy.BackgroundColor3=C.accentDk
 local tabTP=makeTabBtn("Телепорты",44)
 local tabAimbot=makeTabBtn("Aimbot",80)
-local tabPvP=makeTabBtn("ПВП",116)
+local tabPvP=makeTabBtn("🔥 ПВП",116)
 local tabSettings=makeTabBtn("Настройки",152)
 local content=Instance.new("Frame")
 content.Size=UDim2.new(1,-156,1,-54);content.Position=UDim2.new(0,148,0,46)
@@ -99,7 +99,7 @@ local function keyToShortName(k)
 if not k then return "NONE" end
 local n=tostring(k):gsub("Enum.KeyCode.","")
 n=n:gsub("^Left","L"):gsub("^Right","R"):gsub("Control","Ctrl")
-if #n>8 then n=n:sub(1,7).."..." end
+if #n>8 then n=n:sub(1,7).."…" end
 return n end
 local function renderBadge(b,k)
 if not b then return end
@@ -244,6 +244,7 @@ Instance.new("UICorner",n).CornerRadius=UDim.new(0,8)
 game:GetService("Debris"):AddItem(n,3)
 return n end
 
+-- УНИВЕРСАЛЬНОЕ ПЕРЕТАСКИВАНИЕ ОКОН
 local function makeDraggable(frame, handle)
 if not frame or not handle then return end
 local dragOn, ds, sp = false, nil, nil
@@ -378,16 +379,16 @@ if char and d.bb.Parent then
 local theirHRP=char:FindFirstChild("HumanoidRootPart")
 if myHRP and theirHRP then
 local dist=(myHRP.Position-theirHRP.Position).Magnitude
-d.distL.Text=string.format("%.0fm",dist)
+d.distL.Text=string.format("📍%.0fм",dist)
 if dist<30 then d.distL.TextColor3=Color3.fromRGB(255,80,80)
 elseif dist<100 then d.distL.TextColor3=Color3.fromRGB(255,200,50)
 else d.distL.TextColor3=Color3.fromRGB(100,200,255) end
-else d.distL.Text="-" end
+else d.distL.Text="📍—" end
 local hum=char:FindFirstChildOfClass("Humanoid")
 if hum then
 local pct=math.clamp(hum.Health/hum.MaxHealth,0,1)
 d.hpF.Size=UDim2.new(pct,0,1,0)
-d.hpTextL.Text=string.format("%d HP",math.floor(hum.Health))
+d.hpTextL.Text=string.format("❤%d",math.floor(hum.Health))
 if pct>0.6 then d.hpF.BackgroundColor3=Color3.fromRGB(0,200,0);d.hpTextL.TextColor3=Color3.fromRGB(100,255,100)
 elseif pct>0.3 then d.hpF.BackgroundColor3=Color3.fromRGB(255,200,0);d.hpTextL.TextColor3=Color3.fromRGB(255,200,50)
 else d.hpF.BackgroundColor3=Color3.fromRGB(255,0,0);d.hpTextL.TextColor3=Color3.fromRGB(255,80,80) end end end end end)
@@ -400,9 +401,9 @@ local cache=statCache[d.plr]
 if cache and d.bb.Parent then
 d.nameL.Text=d.plr.Name
 if cache.faction and cache.faction~="" then d.factionL.Text="| "..cache.faction;d.factionL.TextColor3=cache.factionColor
-else d.factionL.Text="| No faction";d.factionL.TextColor3=Color3.fromRGB(140,140,140) end
-d.cashL.Text="$"..formatNum(cache.cash)
-d.minL.Text="T"..formatNum(cache.minutes) end end
+else d.factionL.Text="| Без фракции";d.factionL.TextColor3=Color3.fromRGB(140,140,140) end
+d.cashL.Text="💰"..formatNum(cache.cash)
+d.minL.Text="⏱"..formatNum(cache.minutes) end end
 task.wait(0.4) end end) end
 local function stopESP()
 if espConn then espConn:Disconnect();espConn=nil end
@@ -496,7 +497,7 @@ camera.CFrame=camera.CFrame:Lerp(desired,alpha) end end) end
 local function stopAimbot()
 if aimbotConn then aimbotConn:Disconnect();aimbotConn=nil end
 currentTarget=nil end
-makeSectionLabel(aimbotPage,"AIMBOT")
+makeSectionLabel(aimbotPage,"🎯 УПРАВЛЕНИЕ")
 makeToggle(aimbotPage,"Аимбот включён",true,function(on) aimbotOn=on;if on then startAimbot() else stopAimbot() end end)
 local btnModeRow=Instance.new("Frame")
 btnModeRow.Size=UDim2.new(1,-12,0,62);btnModeRow.BackgroundColor3=C.row
@@ -524,7 +525,7 @@ for k,b in pairs(modeBtns) do if k==m then b.BackgroundColor3=C.accent else b.Ba
 btnRMB.MouseButton1Click:Connect(function() setMode("RMB") end)
 btnLMB.MouseButton1Click:Connect(function() setMode("LMB") end)
 btnAlways.MouseButton1Click:Connect(function() setMode("Always") end)
-makeSectionLabel(aimbotPage,"ЦЕЛЬ")
+makeSectionLabel(aimbotPage,"🎯 ЦЕЛЬ")
 makeToggle(aimbotPage,"Предсказание",true,function(on) aimbotPrediction=on end)
 makeToggle(aimbotPage,"Держать цель",true,function(on) aimbotSticky=on;if not on then currentTarget=nil end end)
 local partRow=Instance.new("Frame")
@@ -554,7 +555,7 @@ currentTarget=nil end
 pBtnAuto.MouseButton1Click:Connect(function() setTargetMode("Auto") end)
 pBtnHead.MouseButton1Click:Connect(function() setTargetMode("Head") end)
 pBtnBody.MouseButton1Click:Connect(function() setTargetMode("Body") end)
-makeSectionLabel(aimbotPage,"ПАРАМЕТРЫ")
+makeSectionLabel(aimbotPage,"⚙️ ПАРАМЕТРЫ")
 makeSlider(aimbotPage,"FOV",50,800,300,false,function(v) aimbotFOV=v end)
 makeSlider(aimbotPage,"Плавность",0.05,1,0.35,true,function(v) aimbotSmooth=v end)
 makeToggle(aimbotPage,"Только видимые",true,function(on) aimbotVisible=on end)
@@ -562,10 +563,10 @@ makeToggle(aimbotPage,"Не стрелять по своим",true,function(on) 
 
 -- ARMY
 makeToggle(armyPage,"ESP Игроков",true,function(on) if on then startESP() else stopESP() end end)
-makeButton(armyPage,"Обновить ESP",Color3.fromRGB(50,80,120),function()
-if not espConn then showNotif("Сначала включи ESP",Color3.fromRGB(255,200,80));return end
+makeButton(armyPage,"🔄 Обновить ESP",Color3.fromRGB(50,80,120),function()
+if not espConn then showNotif("⚠ Сначала включи ESP",Color3.fromRGB(255,200,80));return end
 syncESP()
-showNotif("ESP обновлён ("..#espData..")",Color3.fromRGB(100,255,100)) end)
+showNotif("✅ ESP обновлён ("..#espData..")",Color3.fromRGB(100,255,100)) end)
 local noRecoilOn=false
 local noRecoilConn=nil
 local recoilMouseDelta=Vector2.new(0,0)
@@ -676,7 +677,7 @@ if flyBV then flyBV:Destroy();flyBV=nil end
 if flyConn then flyConn:Disconnect();flyConn=nil end
 local h=getHum();if h then h.PlatformStand=false end end
 makeToggle(armyPage,"Fly",true,function(on) if on then startFly() else stopFly() end end)
-makeSlider(armyPage,"Скорость Fly",20,250,70,false,function(v) flySpeed=v end)
+makeSlider(armyPage,"✈️ Скорость Fly",20,250,70,false,function(v) flySpeed=v end)
 local ghostCamConn,ghostMouseConn=nil,nil
 local ghostCamPos=nil
 local ghostYaw,ghostPitch=0,0
@@ -686,7 +687,7 @@ local ghostSavedJumpPower=nil
 local GHOST_SENS=0.25
 local function startGhost()
 local hrp,hum=getHRP(),getHum()
-if not hrp or not hum then showNotif("Нет персонажа",Color3.fromRGB(255,100,100));return end
+if not hrp or not hum then showNotif("❌ Нет персонажа",Color3.fromRGB(255,100,100));return end
 if specSelected and stopSpectate then stopSpectate() end
 ghostSavedSpeed=hum.WalkSpeed;ghostSavedJumpPower=hum.JumpPower
 for _,p in ipairs(player.Character:GetDescendants()) do if p:IsA("BasePart") then p.Anchored=true end end
@@ -723,7 +724,7 @@ if uis:IsKeyDown(Enum.KeyCode.LeftControl) then dir=dir-up end
 if dir.Magnitude>0 then dir=dir.Unit end
 ghostCamPos=ghostCamPos+dir*ghostSpeed*dt
 camera.CFrame=CFrame.new(ghostCamPos)*rotation end)
-showNotif("Ghost ВКЛ",Color3.fromRGB(150,200,255)) end
+showNotif("👻 Ghost ВКЛ",Color3.fromRGB(150,200,255)) end
 local function stopGhost()
 ghostOn=false
 if ghostCamConn then ghostCamConn:Disconnect();ghostCamConn=nil end
@@ -734,8 +735,8 @@ local hum=getHum()
 if hum then camera.CameraSubject=hum end
 if player.Character then for _,p in ipairs(player.Character:GetDescendants()) do if p:IsA("BasePart") then p.Anchored=false end end end
 if hum then hum.PlatformStand=false;hum.WalkSpeed=ghostSavedSpeed;hum.JumpPower=ghostSavedJumpPower or 50 end end
-makeToggle(armyPage,"Ghost",true,function(on) if on then ghostOn=true;startGhost() else stopGhost() end end)
-makeSlider(armyPage,"Скорость Ghost",10,300,70,false,function(v) ghostSpeed=v end)
+makeToggle(armyPage,"👻 Ghost",true,function(on) if on then ghostOn=true;startGhost() else stopGhost() end end)
+makeSlider(armyPage,"👻 Скорость Ghost",10,300,70,false,function(v) ghostSpeed=v end)
 local ncConn
 local function startNC()
 if ncConn then return end
@@ -751,11 +752,12 @@ local defaultSpeed=16
 local function setSpeed(v) local h=getHum();if h then h.WalkSpeed=v end end
 makeToggle(armyPage,"Скорость x5",true,function(on) setSpeed(on and 80 or defaultSpeed) end)
 
--- АВТО-СКОРОСТЬ МАШИНЫ
+-- АВТО-СКОРОСТЬ МАШИНЫ (плавный разгон по W)
 local vehicleActive = false
 local currentVehSpeed = 80
 local vehConn = nil
 local currentVehVel = 0
+
 local function getVehModel()
 local h = getHum()
 if not h then return nil end
@@ -768,6 +770,7 @@ model = model.Parent
 end
 return model
 end
+
 local function getVehPart(veh)
 if not veh then return nil end
 if veh.PrimaryPart then return veh.PrimaryPart end
@@ -778,6 +781,7 @@ end
 end
 return nil
 end
+
 local function startVeh()
 if vehConn then vehConn:Disconnect() end
 currentVehVel = 0
@@ -809,15 +813,17 @@ end)
 end
 end)
 end
+
 local function stopVeh()
 if vehConn then vehConn:Disconnect(); vehConn = nil end
 currentVehVel = 0
 end
-makeToggle(armyPage,"Авто-скорость машины",true,function(on)
+
+makeToggle(armyPage,"🚗 Авто-скорость машины",true,function(on)
 vehicleActive = on
 if on then startVeh() else stopVeh() end
 end)
-makeSlider(armyPage,"Скорость машины",20,300,80,false,function(v) currentVehSpeed = v end)
+makeSlider(armyPage,"🚗 Скорость машины",20,300,80,false,function(v) currentVehSpeed = v end)
 
 -- СМЕРТЬ + ТП НАЗАД
 local deathTPActive=false
@@ -825,9 +831,9 @@ local function doDeathTP()
 if deathTPActive then return end
 deathTPActive=true
 local hrp=getHRP()
-if not hrp then showNotif("Нет позиции",Color3.fromRGB(255,100,100));deathTPActive=false;return end
+if not hrp then showNotif("❌ Нет позиции",Color3.fromRGB(255,100,100));deathTPActive=false;return end
 local savedPos=hrp.CFrame
-local notif=showNotif("Умираю... Возрождение через 11 сек",Color3.fromRGB(255,100,100))
+local notif=showNotif("💀 Умираю... Возрождение через 11 сек",Color3.fromRGB(255,100,100))
 local respawned=false
 local respawnConn=player.CharacterAdded:Connect(function() respawned=true end)
 local hum=getHum()
@@ -843,10 +849,10 @@ local newHRP=getHRP()
 if newHRP and savedPos then
 for _=1,3 do newHRP.CFrame=savedPos+Vector3.new(0,3,0);task.wait(0.3) end
 if notif then notif:Destroy() end
-showNotif("Возрождён!",Color3.fromRGB(100,255,100))
+showNotif("✅ Возрождён!",Color3.fromRGB(100,255,100))
 else if notif then notif:Destroy() end end
 deathTPActive=false end) end
-makeButton(armyPage,"Смерть + ТП назад (11 сек)",Color3.fromRGB(80,30,30),doDeathTP)
+makeButton(armyPage,"💀 Смерть + ТП назад (11 сек)",Color3.fromRGB(80,30,30),doDeathTP)
 
 local tpClickOn,tpClickConn,tpClickIndicator=false,nil,nil
 local function doTeleportToPoint(pos)
@@ -868,7 +874,7 @@ if not tpClickIndicator then
 tpClickIndicator=Instance.new("TextLabel")
 tpClickIndicator.Size=UDim2.new(0,500,0,40);tpClickIndicator.Position=UDim2.new(0.5,-250,0,50)
 tpClickIndicator.BackgroundColor3=Color3.fromRGB(20,20,30);tpClickIndicator.BackgroundTransparency=0.3
-tpClickIndicator.Text="TP ПО КЛИКУ ВКЛ";tpClickIndicator.TextColor3=C.accent
+tpClickIndicator.Text="📍 TP ПО КЛИКУ ВКЛ";tpClickIndicator.TextColor3=C.accent
 tpClickIndicator.Font=Enum.Font.GothamBold;tpClickIndicator.TextSize=14
 tpClickIndicator.BorderSizePixel=0;tpClickIndicator.ZIndex=999;tpClickIndicator.Parent=gui
 Instance.new("UICorner",tpClickIndicator).CornerRadius=UDim.new(0,8) end
@@ -892,7 +898,7 @@ local function stopTpClick()
 tpClickOn=false
 if tpClickConn then tpClickConn:Disconnect();tpClickConn=nil end
 if tpClickIndicator then tpClickIndicator.Visible=false end end
-makeToggle(armyPage,"TP по клику",true,function(on) if on then startTpClick() else stopTpClick() end end)
+makeToggle(armyPage,"📍 TP по клику",true,function(on) if on then startTpClick() else stopTpClick() end end)
 
 -- ТП К ИГРОКУ
 local tpGui,tpRows,tpConn=nil,{},nil
@@ -915,12 +921,12 @@ f.BackgroundColor3=C.bg;f.BorderSizePixel=0;f.Active=true;f.Parent=tpGui
 Instance.new("UICorner",f).CornerRadius=UDim.new(0,8)
 local s=Instance.new("UIStroke",f);s.Color=C.accentDk;s.Thickness=1
 local t=Instance.new("TextLabel")
-t.Size=UDim2.new(1,0,0,35);t.Text="ТП К ИГРОКУ"
+t.Size=UDim2.new(1,0,0,35);t.Text="🎯 ТП К ИГРОКУ"
 t.TextColor3=Color3.fromRGB(240,240,245);t.BackgroundColor3=C.topbar
 t.Font=Enum.Font.GothamBold;t.TextSize=13;t.BorderSizePixel=0;t.Parent=f;t.Active=true
 Instance.new("UICorner",t).CornerRadius=UDim.new(0,8)
 local xb=Instance.new("TextButton")
-xb.Size=UDim2.new(0,28,0,28);xb.Position=UDim2.new(1,-33,0,3);xb.Text="X"
+xb.Size=UDim2.new(0,28,0,28);xb.Position=UDim2.new(1,-33,0,3);xb.Text="✕"
 xb.TextColor3=C.textDim;xb.BackgroundColor3=C.red;xb.Font=Enum.Font.GothamBold
 xb.TextSize=14;xb.BorderSizePixel=0;xb.ZIndex=10;xb.Parent=f
 Instance.new("UICorner",xb).CornerRadius=UDim.new(0,5)
@@ -928,7 +934,7 @@ xb.MouseButton1Click:Connect(closeTP)
 makeDraggable(f, t)
 local searchBox=Instance.new("TextBox")
 searchBox.Size=UDim2.new(0.92,0,0,32);searchBox.Position=UDim2.new(0.04,0,0.09,0)
-searchBox.PlaceholderText="Поиск...";searchBox.Text=""
+searchBox.PlaceholderText="🔍 Поиск...";searchBox.Text=""
 searchBox.TextColor3=C.text;searchBox.BackgroundColor3=C.row
 searchBox.PlaceholderColor3=C.textDim;searchBox.Font=Enum.Font.GothamMedium
 searchBox.TextSize=12;searchBox.BorderSizePixel=0;searchBox.ClearTextOnFocus=false;searchBox.Parent=f
@@ -951,17 +957,17 @@ b.BorderSizePixel=0;b.AutoButtonColor=false;b.Parent=sb
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
 local nameL=Instance.new("TextLabel")
 nameL.Size=UDim2.new(1,-14,0,18);nameL.Position=UDim2.new(0,10,0,4)
-nameL.BackgroundTransparency=1;nameL.Text=p.Name
+nameL.BackgroundTransparency=1;nameL.Text="👤 "..p.Name
 nameL.TextColor3=Color3.fromRGB(240,240,245);nameL.Font=Enum.Font.GothamBold
 nameL.TextSize=12;nameL.TextXAlignment=Enum.TextXAlignment.Left;nameL.Parent=b
 local statusL=Instance.new("TextLabel")
 statusL.Size=UDim2.new(0.55,-10,0,14);statusL.Position=UDim2.new(0,10,0,26)
-statusL.BackgroundTransparency=1;statusL.Text="Жив"
+statusL.BackgroundTransparency=1;statusL.Text="🟢 Жив"
 statusL.TextColor3=Color3.fromRGB(100,255,100);statusL.Font=Enum.Font.GothamSemibold
 statusL.TextSize=10;statusL.TextXAlignment=Enum.TextXAlignment.Left;statusL.Parent=b
 local distL=Instance.new("TextLabel")
 distL.Size=UDim2.new(0.45,-10,0,14);distL.Position=UDim2.new(0.55,0,0,26)
-distL.BackgroundTransparency=1;distL.Text="- м"
+distL.BackgroundTransparency=1;distL.Text="📏 — м"
 distL.TextColor3=C.textDim;distL.Font=Enum.Font.GothamBold
 distL.TextSize=10;distL.TextXAlignment=Enum.TextXAlignment.Right;distL.Parent=b
 b.MouseButton1Click:Connect(function() tpTo(p);closeTP() end)
@@ -979,20 +985,20 @@ local char=r.plr.Character
 local hum=char and char:FindFirstChildOfClass("Humanoid")
 local hrp=char and char:FindFirstChild("HumanoidRootPart")
 if char and hum and hum.Health>0 then
-r.statusL.Text="HP "..math.floor(hum.Health);r.statusL.TextColor3=Color3.fromRGB(100,255,100)
+r.statusL.Text="🟢 ❤"..math.floor(hum.Health);r.statusL.TextColor3=Color3.fromRGB(100,255,100)
 if myHRP and hrp then
 local dist=(myHRP.Position-hrp.Position).Magnitude
-r.distL.Text=string.format("%.0fm",dist)
+r.distL.Text=string.format("📏%.0fм",dist)
 if dist<30 then r.distL.TextColor3=Color3.fromRGB(255,80,80)
 elseif dist<100 then r.distL.TextColor3=Color3.fromRGB(255,200,50)
 else r.distL.TextColor3=Color3.fromRGB(100,200,255) end end
 elseif char and hum and hum.Health<=0 then
-r.statusL.Text="Мёртв";r.statusL.TextColor3=Color3.fromRGB(255,80,80)
-r.distL.Text="- м";r.distL.TextColor3=C.textDim
-else r.statusL.Text="Нет персонажа";r.statusL.TextColor3=C.textDim end end end end)
+r.statusL.Text="🔴 Мёртв";r.statusL.TextColor3=Color3.fromRGB(255,80,80)
+r.distL.Text="📏 — м";r.distL.TextColor3=C.textDim
+else r.statusL.Text="⚫ Нет персонажа";r.statusL.TextColor3=C.textDim end end end end)
 searchBox:GetPropertyChangedSignal("Text"):Connect(function() refresh(searchBox.Text) end)
 refresh("") end
-makeToggle(armyPage,"ТП к игроку",false,function(on) if on then openTP() else closeTP() end end)
+makeToggle(armyPage,"🎯 ТП к игроку",false,function(on) if on then openTP() else closeTP() end end)
 
 -- СПЕКТАТОР
 local specGui,specRows=nil,{}
@@ -1035,12 +1041,12 @@ f.BackgroundColor3=C.bg;f.BorderSizePixel=0;f.Active=true;f.Parent=specGui
 Instance.new("UICorner",f).CornerRadius=UDim.new(0,8)
 local s=Instance.new("UIStroke",f);s.Color=C.accentDk;s.Thickness=1
 local title=Instance.new("TextLabel")
-title.Size=UDim2.new(1,0,0,35);title.Text="СПЕКТАТОР (тяни за шапку)"
+title.Size=UDim2.new(1,0,0,35);title.Text="👁️ СПЕКТАТОР (тяни за шапку)"
 title.TextColor3=Color3.fromRGB(240,240,245);title.BackgroundColor3=C.topbar
 title.Font=Enum.Font.GothamBold;title.TextSize=13;title.BorderSizePixel=0;title.Parent=f;title.Active=true
 Instance.new("UICorner",title).CornerRadius=UDim.new(0,8)
 local xb=Instance.new("TextButton")
-xb.Size=UDim2.new(0,28,0,28);xb.Position=UDim2.new(1,-33,0,3);xb.Text="X"
+xb.Size=UDim2.new(0,28,0,28);xb.Position=UDim2.new(1,-33,0,3);xb.Text="✕"
 xb.TextColor3=C.textDim;xb.BackgroundColor3=C.red;xb.Font=Enum.Font.GothamBold
 xb.TextSize=14;xb.BorderSizePixel=0;xb.ZIndex=10;xb.Parent=f
 Instance.new("UICorner",xb).CornerRadius=UDim.new(0,5)
@@ -1050,7 +1056,7 @@ makeDraggable(f, title)
 local myFactionLbl=Instance.new("TextLabel")
 myFactionLbl.Size=UDim2.new(0.92,0,0,22);myFactionLbl.Position=UDim2.new(0.04,0,0.055,0)
 myFactionLbl.BackgroundTransparency=1
-myFactionLbl.Text="Ваша фракция: -"
+myFactionLbl.Text="👤 Ваша фракция: —"
 myFactionLbl.TextColor3=Color3.fromRGB(255,200,50)
 myFactionLbl.Font=Enum.Font.GothamBold
 myFactionLbl.TextSize=12
@@ -1059,7 +1065,7 @@ myFactionLbl.Parent=f
 
 local meBtn=Instance.new("TextButton")
 meBtn.Size=UDim2.new(0.92,0,0,28);meBtn.Position=UDim2.new(0.04,0,0.105,0)
-meBtn.Text="ВЕРНУТЬСЯ К СЕБЕ";meBtn.TextColor3=C.text
+meBtn.Text="🔄 ВЕРНУТЬСЯ К СЕБЕ";meBtn.TextColor3=C.text
 meBtn.BackgroundColor3=Color3.fromRGB(100,180,100);meBtn.Font=Enum.Font.GothamBold
 meBtn.TextSize=11;meBtn.BorderSizePixel=0;meBtn.Parent=f
 Instance.new("UICorner",meBtn).CornerRadius=UDim.new(0,5)
@@ -1074,7 +1080,7 @@ Instance.new("UIListLayout",sb).Padding=UDim.new(0,6)
 local facSectionLbl=Instance.new("TextLabel")
 facSectionLbl.Size=UDim2.new(0.92,0,0,20);facSectionLbl.Position=UDim2.new(0.04,0,0.685,0)
 facSectionLbl.BackgroundTransparency=1
-facSectionLbl.Text="СОСТОЯЩИЕ В ВАШЕЙ ФРАКЦИИ"
+facSectionLbl.Text="🎖 СОСТОЯЩИЕ В ВАШЕЙ ФРАКЦИИ"
 facSectionLbl.TextColor3=C.badgeText
 facSectionLbl.Font=Enum.Font.GothamBold
 facSectionLbl.TextSize=11
@@ -1084,7 +1090,7 @@ facSectionLbl.Parent=f
 local facCountLbl=Instance.new("TextLabel")
 facCountLbl.Size=UDim2.new(0.92,0,0,16);facCountLbl.Position=UDim2.new(0.04,0,0.715,0)
 facCountLbl.BackgroundTransparency=1
-facCountLbl.Text="-: 0 чел."
+facCountLbl.Text="🎖 —: 0 чел."
 facCountLbl.TextColor3=Color3.fromRGB(255,200,50)
 facCountLbl.Font=Enum.Font.GothamBold
 facCountLbl.TextSize=11
@@ -1103,11 +1109,11 @@ local function refreshFacSection()
 for _,r in ipairs(facRows) do pcall(function() r:Destroy() end) end
 facRows={}
 if not player.Team then
-facCountLbl.Text="Вы без фракции"
+facCountLbl.Text="🎖 Вы без фракции"
 facCountLbl.TextColor3=Color3.fromRGB(140,140,150)
 local empty=Instance.new("TextLabel")
 empty.Size=UDim2.new(1,-8,0,30);empty.BackgroundTransparency=1
-empty.Text="- нет фракции -"
+empty.Text="— нет фракции —"
 empty.TextColor3=C.textDim;empty.Font=Enum.Font.GothamMedium
 empty.TextSize=11;empty.Parent=facSb
 table.insert(facRows,empty)
@@ -1118,12 +1124,12 @@ local col=getFactionColor(player)
 local mates={}
 for _,p in ipairs(game.Players:GetPlayers()) do
 if p~=player and p.Team==myTeam then table.insert(mates,p) end end
-facCountLbl.Text=myTeam.Name..": "..#mates.." чел."
+facCountLbl.Text="🎖 "..myTeam.Name..": "..#mates.." чел."
 facCountLbl.TextColor3=col
 if #mates==0 then
 local empty=Instance.new("TextLabel")
 empty.Size=UDim2.new(1,-8,0,30);empty.BackgroundTransparency=1
-empty.Text="- в вашей фракции больше никого -"
+empty.Text="— в вашей фракции больше никого —"
 empty.TextColor3=C.textDim;empty.Font=Enum.Font.GothamMedium
 empty.TextSize=11;empty.Parent=facSb
 table.insert(facRows,empty)
@@ -1136,7 +1142,7 @@ b.BorderSizePixel=0;b.AutoButtonColor=false;b.Parent=facSb
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,5)
 local nl=Instance.new("TextLabel")
 nl.Size=UDim2.new(1,-10,0,14);nl.Position=UDim2.new(0,8,0,2)
-nl.Text=p.Name
+nl.Text="👤 "..p.Name
 nl.TextColor3=Color3.fromRGB(240,240,245)
 nl.BackgroundTransparency=1;nl.Font=Enum.Font.GothamBold
 nl.TextSize=11;nl.TextXAlignment=Enum.TextXAlignment.Left;nl.Parent=b
@@ -1144,10 +1150,10 @@ local sl=Instance.new("TextLabel")
 sl.Size=UDim2.new(1,-10,0,12);sl.Position=UDim2.new(0,8,0,16)
 local h=p.Character and p.Character:FindFirstChildOfClass("Humanoid")
 if h and h.Health>0 then
-sl.Text=math.floor(h.Health).." HP"
+sl.Text="🟢 "..math.floor(h.Health).." HP"
 sl.TextColor3=Color3.fromRGB(150,200,150)
 else
-sl.Text="Мёртв"
+sl.Text="🔴 Мёртв"
 sl.TextColor3=Color3.fromRGB(200,120,120) end
 sl.BackgroundTransparency=1;sl.Font=Enum.Font.GothamSemibold
 sl.TextSize=9;sl.TextXAlignment=Enum.TextXAlignment.Left;sl.Parent=b
@@ -1164,10 +1170,10 @@ for _,r in ipairs(specRows) do pcall(function() r:Destroy() end) end
 specRows={}
 if player.Team then
 local col=getFactionColor(player)
-myFactionLbl.Text="Ваша фракция: "..player.Team.Name
+myFactionLbl.Text="👤 Ваша фракция: "..player.Team.Name
 myFactionLbl.TextColor3=col
 else
-myFactionLbl.Text="Ваша фракция: без фракции"
+myFactionLbl.Text="👤 Ваша фракция: без фракции"
 myFactionLbl.TextColor3=Color3.fromRGB(140,140,150) end
 for _,p in ipairs(game.Players:GetPlayers()) do
 if p~=player then
@@ -1178,7 +1184,7 @@ b.BorderSizePixel=0;b.AutoButtonColor=false;b.Parent=sb
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
 local nl=Instance.new("TextLabel")
 nl.Size=UDim2.new(1,-10,0,18);nl.Position=UDim2.new(0,8,0,3)
-nl.Text=p.Name
+nl.Text="👤 "..p.Name
 nl.TextColor3=Color3.fromRGB(240,240,245)
 nl.BackgroundTransparency=1;nl.Font=Enum.Font.GothamBold
 nl.TextSize=12;nl.TextXAlignment=Enum.TextXAlignment.Left;nl.Parent=b
@@ -1186,7 +1192,7 @@ local fac=Instance.new("TextLabel")
 fac.Size=UDim2.new(0.55,-10,0,14);fac.Position=UDim2.new(0,8,0,22)
 local factionName=p.Team and p.Team.Name or "Без фракции"
 local factionColor=getFactionColor(p)
-fac.Text=factionName
+fac.Text="🎖 "..factionName
 fac.TextColor3=factionColor
 fac.BackgroundTransparency=1;fac.Font=Enum.Font.GothamSemibold
 fac.TextSize=10;fac.TextXAlignment=Enum.TextXAlignment.Left
@@ -1195,10 +1201,10 @@ local sl=Instance.new("TextLabel")
 sl.Size=UDim2.new(0.45,-10,0,14);sl.Position=UDim2.new(0.55,0,0,22)
 local h=p.Character and p.Character:FindFirstChildOfClass("Humanoid")
 if h and h.Health>0 then
-sl.Text="В игре"
+sl.Text="🟢 В игре"
 sl.TextColor3=Color3.fromRGB(150,200,150)
 else
-sl.Text="Мёртв"
+sl.Text="🔴 Мёртв"
 sl.TextColor3=Color3.fromRGB(200,120,120) end
 sl.BackgroundTransparency=1;sl.Font=Enum.Font.GothamSemibold
 sl.TextSize=10;sl.TextXAlignment=Enum.TextXAlignment.Right
@@ -1216,27 +1222,13 @@ refreshFacSection()
 task.spawn(function()
 while specGui do task.wait(1); if specGui then refreshList();refreshFacSection() end end
 end) end
-makeToggle(armyPage,"Спектатор",false,function(on) if on then openSpecWin() else closeSpecWin() end end)
+makeToggle(armyPage,"👁️ Спектатор",false,function(on) if on then openSpecWin() else closeSpecWin() end end)
 
 -- ПВП
-makeSectionLabel(pvpPage,"ОРУЖИЕ")
-
+makeSectionLabel(pvpPage,"🔫 ОРУЖИЕ")
 local soundReplaceOn=false
 local soundReplaceConn=nil
 local NEW_SHOOT_ID="rbxassetid://109502137778920"
-
-local function parseSoundInput(str)
-    if not str or str=="" then return nil end
-    str=tostring(str)
-    local id=str:match("rbxassetid://(%d+)")
-    if id then return "rbxassetid://"..id end
-    id=str:match("rbxasset://(%d+)")
-    if id then return "rbxassetid://"..id end
-    id=str:match("(%d%d%d%d%d%d%d%d%d+)")
-    if id then return "rbxassetid://"..id end
-    return nil
-end
-
 local function replaceSounds(tool)
 for _,s in ipairs(tool:GetDescendants()) do
 if s:IsA("Sound") then
@@ -1249,66 +1241,19 @@ local ch=player.Character
 if ch then for _,t in ipairs(ch:GetChildren()) do if t:IsA("Tool") then replaceSounds(t) end end end
 local bp=player:FindFirstChild("Backpack")
 if bp then for _,t in ipairs(bp:GetChildren()) do if t:IsA("Tool") then replaceSounds(t) end end end end
-
--- === БЛОК ВВОДА ID ЗВУКА ===
-local soundInputRow=Instance.new("Frame")
-soundInputRow.Size=UDim2.new(1,-12,0,72);soundInputRow.BackgroundColor3=C.row
-soundInputRow.BorderSizePixel=0;soundInputRow.Parent=pvpPage
-Instance.new("UICorner",soundInputRow).CornerRadius=UDim.new(0,6)
-
-local soundInputLbl=Instance.new("TextLabel")
-soundInputLbl.Size=UDim2.new(1,-20,0,16);soundInputLbl.Position=UDim2.new(0,10,0,5)
-soundInputLbl.BackgroundTransparency=1
-soundInputLbl.Text="ID звука (вставь что угодно)"
-soundInputLbl.TextColor3=C.text
-soundInputLbl.Font=Enum.Font.GothamMedium;soundInputLbl.TextSize=11
-soundInputLbl.TextXAlignment=Enum.TextXAlignment.Left;soundInputLbl.Parent=soundInputRow
-
-local soundInputBox=Instance.new("TextBox")
-soundInputBox.Size=UDim2.new(0.68,-14,0,34);soundInputBox.Position=UDim2.new(0,10,0,26)
-soundInputBox.PlaceholderText="rbxassetid://1234567890"
-soundInputBox.Text=""
-soundInputBox.TextColor3=C.text
-soundInputBox.BackgroundColor3=C.badge
-soundInputBox.PlaceholderColor3=C.textDim
-soundInputBox.Font=Enum.Font.GothamMedium;soundInputBox.TextSize=11
-soundInputBox.BorderSizePixel=0;soundInputBox.ClearTextOnFocus=false
-soundInputBox.Parent=soundInputRow
-Instance.new("UICorner",soundInputBox).CornerRadius=UDim.new(0,4)
-
-local soundApplyBtn=Instance.new("TextButton")
-soundApplyBtn.Size=UDim2.new(0.32,-14,0,34);soundApplyBtn.Position=UDim2.new(0.68,4,0,26)
-soundApplyBtn.Text="Применить"
-soundApplyBtn.TextColor3=C.text
-soundApplyBtn.BackgroundColor3=C.accentDk
-soundApplyBtn.Font=Enum.Font.GothamBold;soundApplyBtn.TextSize=11
-soundApplyBtn.BorderSizePixel=0;soundApplyBtn.Parent=soundInputRow
-Instance.new("UICorner",soundApplyBtn).CornerRadius=UDim.new(0,4)
-
-soundApplyBtn.MouseButton1Click:Connect(function()
-local parsed=parseSoundInput(soundInputBox.Text)
-if parsed then
-NEW_SHOOT_ID=parsed
-soundInputBox.Text=parsed
-showNotif("OK: "..parsed,Color3.fromRGB(100,255,100))
-if soundReplaceOn then scanSounds() end
-else
-showNotif("Не найден ID",Color3.fromRGB(255,100,100)) end end)
--- === КОНЕЦ БЛОКА ВВОДА ===
-
-makeToggle(pvpPage,"Свой звук выстрела",true,function(on)
+makeToggle(pvpPage,"🔊 Свой звук выстрела",true,function(on)
 soundReplaceOn=on
 if on then scanSounds()
 if soundReplaceConn then soundReplaceConn:Disconnect() end
 soundReplaceConn=runService.Heartbeat:Connect(function() if soundReplaceOn then scanSounds() end end)
-showNotif("Звуки заменены",C.accent)
+showNotif("🔊 Звуки заменены",C.accent)
 else if soundReplaceConn then soundReplaceConn:Disconnect();soundReplaceConn=nil end
-showNotif("Звуки выкл",Color3.fromRGB(255,200,80)) end end)
+showNotif("🔊 Звуки выкл",Color3.fromRGB(255,200,80)) end end)
 
-makeToggle(pvpPage,"Оружие без отдачи",true,function(on) if on then startNoRecoil() else stopNoRecoil() end end)
+makeToggle(pvpPage,"🔫 Оружие без отдачи",true,function(on) if on then startNoRecoil() else stopNoRecoil() end end)
 
 local noWeaponRecoilOn,weaponRecoilConn=false,nil
-makeToggle(pvpPage,"Убрать отдачу",true,function(on)
+makeToggle(pvpPage,"🎯 Убрать отдачу",true,function(on)
 noWeaponRecoilOn=on
 if on then
 if weaponRecoilConn then weaponRecoilConn:Disconnect() end
@@ -1327,22 +1272,22 @@ else if weaponRecoilConn then weaponRecoilConn:Disconnect();weaponRecoilConn=nil
 -- TELEPORTY
 local function teleportTo(x,y,z,label)
 local hrp=getHRP()
-if not hrp then showNotif("Нет персонажа",Color3.fromRGB(255,100,100));return end
+if not hrp then showNotif("❌ Нет персонажа",Color3.fromRGB(255,100,100));return end
 hrp.CFrame=CFrame.new(Vector3.new(x,y,z))
-showNotif("ТП: "..(label or "точка"),Color3.fromRGB(100,255,100)) end
-makeSectionLabel(tpPage,"ГОС. СТРУКТУРЫ")
-makeButton(tpPage,"Армия",Color3.fromRGB(70,100,60),function() teleportTo(256.9,4.2,83.3,"Армия") end)
-makeButton(tpPage,"МВД",Color3.fromRGB(60,80,130),function() teleportTo(1861.1,5.0,-61.0,"МВД") end)
-makeButton(tpPage,"ФСБ",Color3.fromRGB(90,60,60),function() teleportTo(2201.7,1.0,-601.0,"ФСБ") end)
-makeButton(tpPage,"КБ",Color3.fromRGB(70,70,90),function() teleportTo(805.1,5.0,-902.6,"КБ") end)
-makeButton(tpPage,"Прокуратура",Color3.fromRGB(80,90,120),function() teleportTo(2585.4,1.1,-1025.0,"Прокуратура") end)
-makeSectionLabel(tpPage,"ТОРГОВЦЫ")
-makeButton(tpPage,"Торговец",Color3.fromRGB(110,80,40),function() teleportTo(840.5,41.0,-118.7,"Торговец") end)
-makeSectionLabel(tpPage,"НЕЛЕГАЛЬНЫЕ")
-makeButton(tpPage,"Наём",Color3.fromRGB(130,60,60),function() teleportTo(1543.9,3.0,770.3,"Наём") end)
-makeButton(tpPage,"Брокеры",Color3.fromRGB(100,70,130),function() teleportTo(1661.7,25.0,-1937.1,"Брокеры") end)
-makeSectionLabel(tpPage,"ИВЕНТЫ")
-makeButton(tpPage,"ШТОРМ",Color3.fromRGB(70,90,120),function() teleportTo(441.3,9.0,997.0,"Шторм") end)
+showNotif("📍 ТП: "..(label or "точка"),Color3.fromRGB(100,255,100)) end
+makeSectionLabel(tpPage,"🏛 ГОС. СТРУКТУРЫ")
+makeButton(tpPage,"🪖 Армия",Color3.fromRGB(70,100,60),function() teleportTo(256.9,4.2,83.3,"Армия") end)
+makeButton(tpPage,"👮 МВД",Color3.fromRGB(60,80,130),function() teleportTo(1861.1,5.0,-61.0,"МВД") end)
+makeButton(tpPage,"🕵️ ФСБ",Color3.fromRGB(90,60,60),function() teleportTo(2201.7,1.0,-601.0,"ФСБ") end)
+makeButton(tpPage,"🏢 КБ",Color3.fromRGB(70,70,90),function() teleportTo(805.1,5.0,-902.6,"КБ") end)
+makeButton(tpPage,"⚖️ Прокуратура",Color3.fromRGB(80,90,120),function() teleportTo(2585.4,1.1,-1025.0,"Прокуратура") end)
+makeSectionLabel(tpPage,"🛒 ТОРГОВЦЫ")
+makeButton(tpPage,"🔫 Торговец",Color3.fromRGB(110,80,40),function() teleportTo(840.5,41.0,-118.7,"Торговец") end)
+makeSectionLabel(tpPage,"⚔️ НЕЛЕГАЛЬНЫЕ")
+makeButton(tpPage,"🎯 Наём",Color3.fromRGB(130,60,60),function() teleportTo(1543.9,3.0,770.3,"Наём") end)
+makeButton(tpPage,"💼 Брокеры",Color3.fromRGB(100,70,130),function() teleportTo(1661.7,25.0,-1937.1,"Брокеры") end)
+makeSectionLabel(tpPage,"🌪️ ИВЕНТЫ")
+makeButton(tpPage,"🌪️ ШТОРМ",Color3.fromRGB(70,90,120),function() teleportTo(441.3,9.0,997.0,"Шторм") end)
 
 -- SETTINGS
 local function makeSettingRow(text)
@@ -1356,7 +1301,7 @@ label.Text=text;label.TextColor3=C.text;label.BackgroundTransparency=1
 label.Font=Enum.Font.GothamMedium;label.TextSize=12
 label.TextXAlignment=Enum.TextXAlignment.Left;label.Parent=row
 return row end
-makeSectionLabel(settingsPage,"ЦВЕТ АКЦЕНТА")
+makeSectionLabel(settingsPage,"🎨 ЦВЕТ АКЦЕНТА")
 local colorsRow=Instance.new("Frame")
 colorsRow.Size=UDim2.new(1,-12,0,46);colorsRow.BackgroundColor3=C.row
 colorsRow.BorderSizePixel=0;colorsRow.Parent=settingsPage
@@ -1382,7 +1327,7 @@ Instance.new("UICorner",cBtn).CornerRadius=UDim.new(1,0)
 local stroke=Instance.new("UIStroke",cBtn);stroke.Color=Color3.fromRGB(60,60,70);stroke.Thickness=1
 cBtn.MouseButton1Click:Connect(function() applyAccent(col) end) end
 
-makeSectionLabel(settingsPage,"РАЗМЕР ОКНА")
+makeSectionLabel(settingsPage,"📐 РАЗМЕР ОКНА")
 local sizeRow = makeSettingRow("Ширина / Высота")
 local wBox = Instance.new("TextBox")
 wBox.Size = UDim2.new(0,46,0,26);wBox.Position = UDim2.new(1,-170,0.5,-13)
@@ -1403,18 +1348,18 @@ applySizeBtn.BackgroundColor3 = C.accentDk;applySizeBtn.Font = Enum.Font.GothamB
 applySizeBtn.TextSize = 12;applySizeBtn.BorderSizePixel = 0;applySizeBtn.Parent = sizeRow
 Instance.new("UICorner", applySizeBtn).CornerRadius = UDim.new(0,4)
 applySizeBtn.MouseButton1Click:Connect(function()
-local w = tonumber(wBox.Text)
-local h = tonumber(hBox.Text)
-if w and h then
-w = math.clamp(math.floor(w), 300, 900)
-h = math.clamp(math.floor(h), 200, 700)
-main.Size = UDim2.new(0, w, 0, h)
-wBox.Text = tostring(w)
-hBox.Text = tostring(h)
-end
+    local w = tonumber(wBox.Text)
+    local h = tonumber(hBox.Text)
+    if w and h then
+        w = math.clamp(math.floor(w), 300, 900)
+        h = math.clamp(math.floor(h), 200, 700)
+        main.Size = UDim2.new(0, w, 0, h)
+        wBox.Text = tostring(w)
+        hBox.Text = tostring(h)
+    end
 end)
 
-makeSectionLabel(settingsPage,"КНОПКА МЕНЮ")
+makeSectionLabel(settingsPage,"⌨️ КНОПКА МЕНЮ")
 local keyRow=makeSettingRow("Текущая клавиша")
 local keyShow=Instance.new("TextLabel")
 keyShow.Size=UDim2.new(0,80,0,26);keyShow.Position=UDim2.new(1,-168,0.5,-13)
@@ -1484,4 +1429,4 @@ if soundReplaceConn then soundReplaceConn:Disconnect();soundReplaceConn=nil end
 fullbrightOn=false;restoreFB()
 setSpeed(defaultSpeed);jumpOn=false
 gui:Destroy() end)
-print("Eclipse Menu loaded. F4 - menu.")
+print("✅ Eclipse Menu загружен. F4 — меню.")
