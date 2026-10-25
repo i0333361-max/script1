@@ -1,4 +1,4 @@
--- ECLIPSE MENU — Война Монгат (Fly+Noclip) + Aimbot (predict) + ПВП
+-- ECLIPSE MENU — Война Монгат + Aimbot + ПВП + ОБОИ (ImgBB)
 local player=game.Players.LocalPlayer
 local camera=workspace.CurrentCamera
 local runService=game:GetService("RunService")
@@ -8,6 +8,16 @@ local waitingForMenuKey=false
 local setMenuKeyDisplay=nil
 local C={bg=Color3.fromRGB(15,15,22),topbar=Color3.fromRGB(20,20,30),sidebar=Color3.fromRGB(18,18,26),row=Color3.fromRGB(22,22,32),accent=Color3.fromRGB(130,70,220),accentDk=Color3.fromRGB(90,40,160),text=Color3.fromRGB(220,220,230),textDim=Color3.fromRGB(140,140,160),badge=Color3.fromRGB(35,30,50),badgeText=Color3.fromRGB(150,130,180),toggleOff=Color3.fromRGB(50,50,65),knob=Color3.fromRGB(230,230,240),red=Color3.fromRGB(180,40,40),green=Color3.fromRGB(80,130,80)}
 
+-- ===== НАСТРОЙКИ ОБОЕВ =====
+-- Твоя картинка с ImgBB:
+local WALLPAPER_URL = "https://i.ibb.co/gbLHsRcZ/image.webp"
+-- ⚠️ ЕСЛИ НЕ ЗАГРУЗИТСЯ: залей картинку в Roblox (create.roblox.com → Decals),
+-- скопируй Texture ID и вставь сюда вместо строки выше:
+--   local WALLPAPER_URL = "rbxassetid://ТВОЙ_IMAGE_ID"
+local WALLPAPER_TRANSPARENCY = 0.35
+local WALLPAPER_DIM = 0.55
+local WALLPAPER_ENABLED = true
+
 local gui=Instance.new("ScreenGui")
 gui.Name="EclipseMenu";gui.ResetOnSpawn=false;gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
 gui.Parent=player:WaitForChild("PlayerGui")
@@ -15,31 +25,66 @@ gui.Parent=player:WaitForChild("PlayerGui")
 local main=Instance.new("Frame")
 main.Size=UDim2.new(0,540,0,460);main.Position=UDim2.new(0.5,-270,0.5,-230)
 main.BackgroundColor3=C.bg;main.BorderSizePixel=0;main.Active=true;main.Parent=gui
+main.ClipsDescendants=true
 Instance.new("UICorner",main).CornerRadius=UDim.new(0,8)
+
+-- ===== ОБОИ =====
+local wallpaperAssetId = nil
+if WALLPAPER_ENABLED and WALLPAPER_URL and WALLPAPER_URL ~= "" then
+    wallpaperAssetId = WALLPAPER_URL
+end
+
+if wallpaperAssetId then
+    local wallpaper=Instance.new("ImageLabel")
+    wallpaper.Name="Wallpaper"
+    wallpaper.Size=UDim2.new(1,0,1,0)
+    wallpaper.Position=UDim2.new(0,0,0,0)
+    wallpaper.BackgroundTransparency=1
+    wallpaper.BorderSizePixel=0
+    wallpaper.ZIndex=0
+    wallpaper.ScaleType=Enum.ScaleType.Crop
+    wallpaper.Image=wallpaperAssetId
+    wallpaper.ImageTransparency=WALLPAPER_TRANSPARENCY
+    wallpaper.Parent=main
+    Instance.new("UICorner",wallpaper).CornerRadius=UDim.new(0,8)
+
+    local dim=Instance.new("Frame")
+    dim.Name="WallpaperDim"
+    dim.Size=UDim2.new(1,0,1,0)
+    dim.BackgroundColor3=Color3.fromRGB(10,10,15)
+    dim.BackgroundTransparency=1-WALLPAPER_DIM
+    dim.BorderSizePixel=0
+    dim.ZIndex=0
+    dim.Parent=main
+    Instance.new("UICorner",dim).CornerRadius=UDim.new(0,8)
+
+    main.BackgroundTransparency=0.4
+end
+
 local mStroke=Instance.new("UIStroke",main);mStroke.Color=C.accentDk;mStroke.Thickness=1;mStroke.Transparency=0.4
 
 local topbar=Instance.new("Frame")
 topbar.Size=UDim2.new(1,0,0,40);topbar.BackgroundColor3=C.topbar;topbar.BorderSizePixel=0
-topbar.Parent=main;topbar.Active=true
+topbar.BackgroundTransparency=wallpaperAssetId and 0.3 or 0
+topbar.Parent=main;topbar.Active=true;topbar.ZIndex=2
 Instance.new("UICorner",topbar).CornerRadius=UDim.new(0,8)
 
 local titleLbl=Instance.new("TextLabel")
 titleLbl.Size=UDim2.new(0,200,1,0);titleLbl.Position=UDim2.new(0,18,0,0)
 titleLbl.Text="ECLIPSE";titleLbl.TextColor3=Color3.fromRGB(240,240,245)
 titleLbl.BackgroundTransparency=1;titleLbl.Font=Enum.Font.GothamBold;titleLbl.TextSize=16
-titleLbl.TextXAlignment=Enum.TextXAlignment.Left;titleLbl.Parent=topbar
+titleLbl.TextXAlignment=Enum.TextXAlignment.Left;titleLbl.Parent=topbar;titleLbl.ZIndex=3
 
 local minBtn=Instance.new("TextButton")
 minBtn.Size=UDim2.new(0,30,0,30);minBtn.Position=UDim2.new(1,-76,0,5)
 minBtn.Text="—";minBtn.TextColor3=C.textDim;minBtn.BackgroundTransparency=1
-minBtn.Font=Enum.Font.GothamBold;minBtn.TextSize=16;minBtn.Parent=topbar
+minBtn.Font=Enum.Font.GothamBold;minBtn.TextSize=16;minBtn.Parent=topbar;minBtn.ZIndex=3
 
 local closeBtn=Instance.new("TextButton")
 closeBtn.Size=UDim2.new(0,30,0,30);closeBtn.Position=UDim2.new(1,-42,0,5)
 closeBtn.Text="✕";closeBtn.TextColor3=C.textDim;closeBtn.BackgroundTransparency=1
-closeBtn.Font=Enum.Font.GothamBold;closeBtn.TextSize=14;closeBtn.Parent=topbar
+closeBtn.Font=Enum.Font.GothamBold;closeBtn.TextSize=14;closeBtn.Parent=topbar;closeBtn.ZIndex=3
 
--- перетаскивание
 local dragging,dragStart,startPos=false,nil,nil
 local function beginDrag(i)
 if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
@@ -56,15 +101,17 @@ main.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+d.X,startPos.Y.Scale,
 
 local sidebar=Instance.new("Frame")
 sidebar.Size=UDim2.new(0,140,1,-54);sidebar.Position=UDim2.new(0,8,0,46)
-sidebar.BackgroundColor3=C.sidebar;sidebar.BorderSizePixel=0;sidebar.Parent=main
+sidebar.BackgroundColor3=C.sidebar;sidebar.BackgroundTransparency=wallpaperAssetId and 0.35 or 0
+sidebar.BorderSizePixel=0;sidebar.Parent=main;sidebar.ZIndex=2
 Instance.new("UICorner",sidebar).CornerRadius=UDim.new(0,6)
 
 local function makeTabBtn(text,y)
 local b=Instance.new("TextButton")
 b.Size=UDim2.new(1,-16,0,32);b.Position=UDim2.new(0,8,0,y)
 b.Text=text;b.TextColor3=Color3.fromRGB(240,240,245);b.BackgroundColor3=C.sidebar
+b.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
 b.Font=Enum.Font.GothamSemibold;b.TextSize=11;b.BorderSizePixel=0
-b.TextXAlignment=Enum.TextXAlignment.Left;b.Parent=sidebar
+b.TextXAlignment=Enum.TextXAlignment.Left;b.Parent=sidebar;b.ZIndex=3
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
 Instance.new("UIPadding",b).PaddingLeft=UDim.new(0,10)
 return b end
@@ -77,14 +124,15 @@ local tabSettings=makeTabBtn("Настройки",152)
 
 local content=Instance.new("Frame")
 content.Size=UDim2.new(1,-156,1,-54);content.Position=UDim2.new(0,148,0,46)
-content.BackgroundColor3=C.bg;content.BorderSizePixel=0;content.Parent=main
+content.BackgroundColor3=C.bg;content.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+content.BorderSizePixel=0;content.Parent=main;content.ZIndex=2
 Instance.new("UICorner",content).CornerRadius=UDim.new(0,6)
 
 local function makePage()
 local p=Instance.new("ScrollingFrame")
 p.Size=UDim2.new(1,-16,1,-16);p.Position=UDim2.new(0,8,0,8)
 p.BackgroundTransparency=1;p.BorderSizePixel=0;p.CanvasSize=UDim2.new(0,0,0,0)
-p.ScrollBarThickness=4;p.ScrollBarImageColor3=C.accent;p.Visible=false;p.Parent=content
+p.ScrollBarThickness=4;p.ScrollBarImageColor3=C.accent;p.Visible=false;p.Parent=content;p.ZIndex=3
 Instance.new("UIListLayout",p).Padding=UDim.new(0,6)
 return p end
 
@@ -120,36 +168,38 @@ if k then b.Text="[ "..keyToShortName(k).." ]";b.TextColor3=C.accent
 else b.Text="[ NONE ]";b.TextColor3=C.badgeText end end
 local function makeToggle(parent,text,hasBadge,onClick)
 local row=Instance.new("Frame")
-row.Size=UDim2.new(1,-12,0,42);row.BackgroundColor3=C.row;row.BorderSizePixel=0;row.Parent=parent
+row.Size=UDim2.new(1,-12,0,42);row.BackgroundColor3=C.row
+row.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+row.BorderSizePixel=0;row.Parent=parent;row.ZIndex=4
 Instance.new("UICorner",row).CornerRadius=UDim.new(0,6)
 local dot=Instance.new("Frame")
 dot.Size=UDim2.new(0,6,0,6);dot.Position=UDim2.new(0,12,0.5,-3)
-dot.BackgroundColor3=C.textDim;dot.BorderSizePixel=0;dot.Parent=row
+dot.BackgroundColor3=C.textDim;dot.BorderSizePixel=0;dot.Parent=row;dot.ZIndex=5
 Instance.new("UICorner",dot).CornerRadius=UDim.new(1,0)
 local label=Instance.new("TextLabel")
 label.Size=UDim2.new(0.55,0,1,0);label.Position=UDim2.new(0,26,0,0)
 label.Text=text;label.TextColor3=C.text;label.BackgroundTransparency=1
 label.Font=Enum.Font.GothamMedium;label.TextSize=12
-label.TextXAlignment=Enum.TextXAlignment.Left;label.Parent=row
+label.TextXAlignment=Enum.TextXAlignment.Left;label.Parent=row;label.ZIndex=5
 local badge=nil
 if hasBadge then
 badge=Instance.new("TextButton")
 badge.Size=UDim2.new(0,88,0,20);badge.Position=UDim2.new(1,-138,0.5,-10)
 badge.Text="[ NONE ]";badge.TextColor3=C.badgeText;badge.BackgroundColor3=C.badge
 badge.Font=Enum.Font.GothamMedium;badge.TextSize=10;badge.BorderSizePixel=0
-badge.Parent=row;badge.AutoButtonColor=false;badge.ZIndex=5
+badge.Parent=row;badge.AutoButtonColor=false;badge.ZIndex=6
 Instance.new("UICorner",badge).CornerRadius=UDim.new(0,4) end
 local tBg=Instance.new("Frame")
 tBg.Size=UDim2.new(0,34,0,18);tBg.Position=UDim2.new(1,-46,0.5,-9)
-tBg.BackgroundColor3=C.toggleOff;tBg.BorderSizePixel=0;tBg.Parent=row
+tBg.BackgroundColor3=C.toggleOff;tBg.BorderSizePixel=0;tBg.Parent=row;tBg.ZIndex=5
 Instance.new("UICorner",tBg).CornerRadius=UDim.new(1,0)
 local knob=Instance.new("Frame")
 knob.Size=UDim2.new(0,14,0,14);knob.Position=UDim2.new(0,2,0.5,-7)
-knob.BackgroundColor3=C.knob;knob.BorderSizePixel=0;knob.Parent=tBg
+knob.BackgroundColor3=C.knob;knob.BorderSizePixel=0;knob.Parent=tBg;knob.ZIndex=6
 Instance.new("UICorner",knob).CornerRadius=UDim.new(1,0)
 local click=Instance.new("TextButton")
 click.Size=UDim2.new(1,0,1,0);click.BackgroundTransparency=1;click.Text=""
-click.Parent=row;click.ZIndex=1
+click.Parent=row;click.ZIndex=7
 local state=false;local hotkey=nil
 local function render()
 if state then tBg.BackgroundColor3=C.accent;knob.Position=UDim2.new(1,-16,0.5,-7);dot.BackgroundColor3=C.accent
@@ -179,30 +229,31 @@ return api end
 local function makeSlider(parent,label,minVal,maxVal,defaultVal,isFloat,onChange)
 local row=Instance.new("Frame")
 row.Size=UDim2.new(1,-12,0,58);row.BackgroundColor3=C.row
-row.BorderSizePixel=0;row.Parent=parent
+row.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+row.BorderSizePixel=0;row.Parent=parent;row.ZIndex=4
 Instance.new("UICorner",row).CornerRadius=UDim.new(0,6)
 local lbl=Instance.new("TextLabel")
 lbl.Size=UDim2.new(0.7,-12,0,18);lbl.Position=UDim2.new(0,12,0,4)
 lbl.BackgroundTransparency=1;lbl.Text=label;lbl.TextColor3=C.text
 lbl.Font=Enum.Font.GothamMedium;lbl.TextSize=12
-lbl.TextXAlignment=Enum.TextXAlignment.Left;lbl.Parent=row
+lbl.TextXAlignment=Enum.TextXAlignment.Left;lbl.Parent=row;lbl.ZIndex=5
 local valLbl=Instance.new("TextLabel")
 valLbl.Size=UDim2.new(0.3,-12,0,18);valLbl.Position=UDim2.new(0.7,0,0,4)
 valLbl.BackgroundTransparency=1
 valLbl.Text=isFloat and string.format("%.2f",defaultVal) or tostring(defaultVal)
 valLbl.TextColor3=C.accent;valLbl.Font=Enum.Font.GothamBold
-valLbl.TextSize=12;valLbl.TextXAlignment=Enum.TextXAlignment.Right;valLbl.Parent=row
+valLbl.TextSize=12;valLbl.TextXAlignment=Enum.TextXAlignment.Right;valLbl.Parent=row;valLbl.ZIndex=5
 local barBg=Instance.new("Frame")
 barBg.Size=UDim2.new(1,-24,0,6);barBg.Position=UDim2.new(0,12,0,34)
-barBg.BackgroundColor3=C.toggleOff;barBg.BorderSizePixel=0;barBg.Parent=row
+barBg.BackgroundColor3=C.toggleOff;barBg.BorderSizePixel=0;barBg.Parent=row;barBg.ZIndex=5
 Instance.new("UICorner",barBg).CornerRadius=UDim.new(1,0)
 local barFill=Instance.new("Frame")
 barFill.Size=UDim2.new(0,0,1,0);barFill.BackgroundColor3=C.accent
-barFill.BorderSizePixel=0;barFill.Parent=barBg
+barFill.BorderSizePixel=0;barFill.Parent=barBg;barFill.ZIndex=6
 Instance.new("UICorner",barFill).CornerRadius=UDim.new(1,0)
 local knob=Instance.new("Frame")
 knob.Size=UDim2.new(0,14,0,14);knob.Position=UDim2.new(0,0,0.5,-7)
-knob.BackgroundColor3=C.knob;knob.BorderSizePixel=0;knob.ZIndex=2;knob.Parent=barBg
+knob.BackgroundColor3=C.knob;knob.BorderSizePixel=0;knob.ZIndex=7;knob.Parent=barBg
 Instance.new("UICorner",knob).CornerRadius=UDim.new(1,0)
 local value=defaultVal
 local function setValue(v)
@@ -232,13 +283,13 @@ local function makeSectionLabel(parent,text)
 local lbl=Instance.new("TextLabel")
 lbl.Size=UDim2.new(1,-12,0,22);lbl.BackgroundTransparency=1
 lbl.Text=text;lbl.TextColor3=C.badgeText;lbl.Font=Enum.Font.GothamBold
-lbl.TextSize=11;lbl.TextXAlignment=Enum.TextXAlignment.Left;lbl.Parent=parent
+lbl.TextSize=11;lbl.TextXAlignment=Enum.TextXAlignment.Left;lbl.Parent=parent;lbl.ZIndex=4
 return lbl end
 local function makeButton(parent,text,color,onClick)
 local b=Instance.new("TextButton")
 b.Size=UDim2.new(1,-12,0,40);b.BackgroundColor3=color or C.accentDk
 b.Text=text;b.TextColor3=C.text;b.Font=Enum.Font.GothamBold
-b.TextSize=12;b.BorderSizePixel=0;b.Parent=parent
+b.TextSize=12;b.BorderSizePixel=0;b.Parent=parent;b.ZIndex=4
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
 b.MouseButton1Click:Connect(onClick)
 return b end
@@ -305,31 +356,29 @@ if c then for _,p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") then p.C
 -- ========== ПУСТАЯ ВКЛАДКА ТП ==========
 local l1=Instance.new("TextLabel")
 l1.Size=UDim2.new(1,-12,0,120);l1.BackgroundColor3=C.row
+l1.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
 l1.Text="🚫 Все функции этой вкладки удалены.";l1.TextColor3=C.textDim
 l1.Font=Enum.Font.GothamMedium;l1.TextSize=12;l1.TextWrapped=true
-l1.BorderSizePixel=0;l1.Parent=tpPage
+l1.BorderSizePixel=0;l1.Parent=tpPage;l1.ZIndex=4
 Instance.new("UICorner",l1).CornerRadius=UDim.new(0,6)
 
--- ========== AIMBOT (с предсказанием движения) ==========
+-- ========== AIMBOT ==========
 local aimbotOn,aimbotConn=false,nil
 local aimbotFOV,aimbotSmooth=300,0.35
 local aimbotVisible=true
 local aimbotButtonMode="RMB"
 local aimbotPrediction,aimbotSticky=true,true
 local aimbotTargetMode,aimbotIgnoreTeammates="Auto",true
-local aimbotPredictionAmount=0.15   -- новый параметр — сила предсказания
+local aimbotPredictionAmount=0.15
 local currentTarget=nil
-
 local function isTeammate(p)
 if not p then return false end
 return player.Team~=nil and p.Team==player.Team end
-
 local function isAimbotActive()
 if aimbotButtonMode=="Always" then return true end
 if aimbotButtonMode=="RMB" then return uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) end
 if aimbotButtonMode=="LMB" then return uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) end
 return false end
-
 local function rayVisible(from,to,ign)
 local params=RaycastParams.new()
 params.FilterType=Enum.RaycastFilterType.Exclude
@@ -338,7 +387,6 @@ if player.Character then table.insert(filter,player.Character) end
 if ign then table.insert(filter,ign) end
 params.FilterDescendantsInstances=filter
 return workspace:Raycast(from,to-from,params)==nil end
-
 local function getAimParts(char)
 local out={}
 if aimbotTargetMode=="Head" then
@@ -352,7 +400,6 @@ local u=char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso") or cha
 if h then table.insert(out,h) end
 if u and u~=h then table.insert(out,u) end end
 return out end
-
 local function scoreTarget(part,scrCenter,myPos)
 local sp,onScreen=camera:WorldToViewportPoint(part.Position)
 if not onScreen then return nil end
@@ -360,7 +407,6 @@ local d2d=(Vector2.new(sp.X,sp.Y)-scrCenter).Magnitude
 if d2d>aimbotFOV then return nil end
 if aimbotVisible and not rayVisible(myPos,part.Position,part.Parent) then return nil end
 return d2d+(myPos-part.Position).Magnitude*0.05 end
-
 local function findTarget()
 local myPos=camera.CFrame.Position
 local scrCenter=Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y/2)
@@ -373,7 +419,6 @@ for _,part in ipairs(getAimParts(p.Character)) do
 local score=scoreTarget(part,scrCenter,myPos)
 if score and score<bestScore then bestScore=score;best={part=part,character=p.Character,player=p} end end end end end
 return best end
-
 local function validateTarget(t)
 if not t or not t.player or not t.player.Parent then return false end
 if not t.character or not t.character.Parent then return false end
@@ -384,14 +429,11 @@ if not hum or hum.Health<=0 then return false end
 local score=scoreTarget(t.part,Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y/2),camera.CFrame.Position)
 if not score or score>aimbotFOV*1.5 then return false end
 return true end
-
--- ПРЕДСКАЗАНИЕ: смотрим на velocity части и умножаем на aimbotPredictionAmount
 local function predictPos(t)
 if not aimbotPrediction then return t.part.Position end
 local vel=t.part.AssemblyLinearVelocity
 if not vel or vel.Magnitude<1 then return t.part.Position end
 return t.part.Position+vel*aimbotPredictionAmount end
-
 local function startAimbot()
 if aimbotConn then aimbotConn:Disconnect() end
 currentTarget=nil
@@ -406,30 +448,29 @@ if target then
 local desired=CFrame.new(camera.CFrame.Position,predictPos(target))
 local alpha=math.clamp(dt/math.max(aimbotSmooth,0.01)*10,0,1)
 camera.CFrame=camera.CFrame:Lerp(desired,alpha) end end) end
-
 local function stopAimbot()
 if aimbotConn then aimbotConn:Disconnect();aimbotConn=nil end
 currentTarget=nil end
 
--- UI Aimbot
 makeSectionLabel(aimbotPage,"🎯 УПРАВЛЕНИЕ")
 makeToggle(aimbotPage,"Аимбот включён",true,function(on) aimbotOn=on;if on then startAimbot() else stopAimbot() end end)
 
 local btnModeRow=Instance.new("Frame")
 btnModeRow.Size=UDim2.new(1,-12,0,62);btnModeRow.BackgroundColor3=C.row
-btnModeRow.BorderSizePixel=0;btnModeRow.Parent=aimbotPage
+btnModeRow.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+btnModeRow.BorderSizePixel=0;btnModeRow.Parent=aimbotPage;btnModeRow.ZIndex=4
 Instance.new("UICorner",btnModeRow).CornerRadius=UDim.new(0,6)
 local btnModeLbl=Instance.new("TextLabel")
 btnModeLbl.Size=UDim2.new(1,-20,0,18);btnModeLbl.Position=UDim2.new(0,12,0,4)
 btnModeLbl.BackgroundTransparency=1;btnModeLbl.Text="Кнопка активации"
 btnModeLbl.TextColor3=C.text;btnModeLbl.Font=Enum.Font.GothamMedium
-btnModeLbl.TextSize=12;btnModeLbl.TextXAlignment=Enum.TextXAlignment.Left;btnModeLbl.Parent=btnModeRow
+btnModeLbl.TextSize=12;btnModeLbl.TextXAlignment=Enum.TextXAlignment.Left;btnModeLbl.Parent=btnModeRow;btnModeLbl.ZIndex=5
 local function makeModeBtn(text,x,mode)
 local b=Instance.new("TextButton")
 b.Size=UDim2.new(0.31,-6,0,28);b.Position=UDim2.new(x,0,0,28)
 b.Text=text;b.TextColor3=C.text
 b.BackgroundColor3=(aimbotButtonMode==mode) and C.accent or C.badge
-b.Font=Enum.Font.GothamBold;b.TextSize=11;b.BorderSizePixel=0;b.Parent=btnModeRow
+b.Font=Enum.Font.GothamBold;b.TextSize=11;b.BorderSizePixel=0;b.Parent=btnModeRow;b.ZIndex=5
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,4)
 return b end
 local btnRMB=makeModeBtn("ПКМ",0.02,"RMB")
@@ -448,19 +489,20 @@ makeToggle(aimbotPage,"Держать цель",true,function(on) aimbotSticky=o
 
 local partRow=Instance.new("Frame")
 partRow.Size=UDim2.new(1,-12,0,62);partRow.BackgroundColor3=C.row
-partRow.BorderSizePixel=0;partRow.Parent=aimbotPage
+partRow.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+partRow.BorderSizePixel=0;partRow.Parent=aimbotPage;partRow.ZIndex=4
 Instance.new("UICorner",partRow).CornerRadius=UDim.new(0,6)
 local partLbl=Instance.new("TextLabel")
 partLbl.Size=UDim2.new(1,-20,0,18);partLbl.Position=UDim2.new(0,12,0,4)
 partLbl.BackgroundTransparency=1;partLbl.Text="Точка"
 partLbl.TextColor3=C.text;partLbl.Font=Enum.Font.GothamMedium
-partLbl.TextSize=12;partLbl.TextXAlignment=Enum.TextXAlignment.Left;partLbl.Parent=partRow
+partLbl.TextSize=12;partLbl.TextXAlignment=Enum.TextXAlignment.Left;partLbl.Parent=partRow;partLbl.ZIndex=5
 local function makePartBtn(text,x,mode)
 local b=Instance.new("TextButton")
 b.Size=UDim2.new(0.31,-6,0,28);b.Position=UDim2.new(x,0,0,28)
 b.Text=text;b.TextColor3=C.text
 b.BackgroundColor3=(aimbotTargetMode==mode) and C.accent or C.badge
-b.Font=Enum.Font.GothamBold;b.TextSize=11;b.BorderSizePixel=0;b.Parent=partRow
+b.Font=Enum.Font.GothamBold;b.TextSize=11;b.BorderSizePixel=0;b.Parent=partRow;b.ZIndex=5
 Instance.new("UICorner",b).CornerRadius=UDim.new(0,4)
 return b end
 local pBtnAuto=makePartBtn("Авто",0.02,"Auto")
@@ -481,9 +523,8 @@ makeSlider(aimbotPage,"Сила предсказания",0.05,0.5,0.15,true,fun
 makeToggle(aimbotPage,"Только видимые",true,function(on) aimbotVisible=on end)
 makeToggle(aimbotPage,"Не стрелять по своим",true,function(on) aimbotIgnoreTeammates=on;currentTarget=nil end)
 
--- ========== ПВП (из старого скрипта) ==========
+-- ========== ПВП ==========
 makeSectionLabel(pvpPage,"🔫 ОРУЖИЕ")
-
 local soundReplaceOn=false
 local soundReplaceConn=nil
 local NEW_SHOOT_ID="rbxassetid://109502137778920"
@@ -508,7 +549,6 @@ showNotif("🔊 Звуки заменены",C.accent)
 else if soundReplaceConn then soundReplaceConn:Disconnect();soundReplaceConn=nil end
 showNotif("🔊 Звуки выкл",Color3.fromRGB(255,200,80)) end end)
 
--- отдача (комплексная)
 local noRecoilOn=false
 local noRecoilConn=nil
 local recoilMouseDelta=Vector2.new(0,0)
@@ -577,19 +617,21 @@ else if weaponRecoilConn then weaponRecoilConn:Disconnect();weaponRecoilConn=nil
 local function makeSettingRow(text)
 local row=Instance.new("Frame")
 row.Size=UDim2.new(1,-12,0,42);row.BackgroundColor3=C.row
-row.BorderSizePixel=0;row.Parent=settingsPage
+row.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+row.BorderSizePixel=0;row.Parent=settingsPage;row.ZIndex=4
 Instance.new("UICorner",row).CornerRadius=UDim.new(0,6)
 local label=Instance.new("TextLabel")
 label.Size=UDim2.new(0.55,0,1,0);label.Position=UDim2.new(0,26,0,0)
 label.Text=text;label.TextColor3=C.text;label.BackgroundTransparency=1
 label.Font=Enum.Font.GothamMedium;label.TextSize=12
-label.TextXAlignment=Enum.TextXAlignment.Left;label.Parent=row
+label.TextXAlignment=Enum.TextXAlignment.Left;label.Parent=row;label.ZIndex=5
 return row end
 
 makeSectionLabel(settingsPage,"🎨 ЦВЕТ АКЦЕНТА")
 local colorsRow=Instance.new("Frame")
 colorsRow.Size=UDim2.new(1,-12,0,46);colorsRow.BackgroundColor3=C.row
-colorsRow.BorderSizePixel=0;colorsRow.Parent=settingsPage
+colorsRow.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+colorsRow.BorderSizePixel=0;colorsRow.Parent=settingsPage;colorsRow.ZIndex=4
 Instance.new("UICorner",colorsRow).CornerRadius=UDim.new(0,6)
 local presets={Color3.fromRGB(130,70,220),Color3.fromRGB(60,120,220),Color3.fromRGB(60,180,100),Color3.fromRGB(200,50,60),Color3.fromRGB(230,140,40),Color3.fromRGB(220,80,180)}
 local function applyAccent(newColor)
@@ -607,7 +649,7 @@ if td.api.get() and td.tBg and td.dot then td.tBg.BackgroundColor3=C.accent;td.d
 for i,col in ipairs(presets) do
 local cBtn=Instance.new("TextButton")
 cBtn.Size=UDim2.new(0,30,0,30);cBtn.Position=UDim2.new(0,8+(i-1)*36,0.5,-15)
-cBtn.Text="";cBtn.BackgroundColor3=col;cBtn.BorderSizePixel=0;cBtn.Parent=colorsRow
+cBtn.Text="";cBtn.BackgroundColor3=col;cBtn.BorderSizePixel=0;cBtn.Parent=colorsRow;cBtn.ZIndex=5
 Instance.new("UICorner",cBtn).CornerRadius=UDim.new(1,0)
 local stroke=Instance.new("UIStroke",cBtn);stroke.Color=Color3.fromRGB(60,60,70);stroke.Thickness=1
 cBtn.MouseButton1Click:Connect(function() applyAccent(col) end) end
@@ -618,19 +660,19 @@ local wBox=Instance.new("TextBox")
 wBox.Size=UDim2.new(0,46,0,26);wBox.Position=UDim2.new(1,-170,0.5,-13)
 wBox.Text="540";wBox.TextColor3=C.text;wBox.BackgroundColor3=C.badge
 wBox.Font=Enum.Font.GothamSemibold;wBox.TextSize=12;wBox.BorderSizePixel=0
-wBox.ClearTextOnFocus=false;wBox.Parent=sizeRow
+wBox.ClearTextOnFocus=false;wBox.Parent=sizeRow;wBox.ZIndex=5
 Instance.new("UICorner",wBox).CornerRadius=UDim.new(0,4)
 local hBox=Instance.new("TextBox")
 hBox.Size=UDim2.new(0,46,0,26);hBox.Position=UDim2.new(1,-118,0.5,-13)
 hBox.Text="460";hBox.TextColor3=C.text;hBox.BackgroundColor3=C.badge
 hBox.Font=Enum.Font.GothamSemibold;hBox.TextSize=12;hBox.BorderSizePixel=0
-hBox.ClearTextOnFocus=false;hBox.Parent=sizeRow
+hBox.ClearTextOnFocus=false;hBox.Parent=sizeRow;hBox.ZIndex=5
 Instance.new("UICorner",hBox).CornerRadius=UDim.new(0,4)
 local applySizeBtn=Instance.new("TextButton")
 applySizeBtn.Size=UDim2.new(0,60,0,26);applySizeBtn.Position=UDim2.new(1,-66,0.5,-13)
 applySizeBtn.Text="OK";applySizeBtn.TextColor3=C.text
 applySizeBtn.BackgroundColor3=C.accentDk;applySizeBtn.Font=Enum.Font.GothamBold
-applySizeBtn.TextSize=12;applySizeBtn.BorderSizePixel=0;applySizeBtn.Parent=sizeRow
+applySizeBtn.TextSize=12;applySizeBtn.BorderSizePixel=0;applySizeBtn.Parent=sizeRow;applySizeBtn.ZIndex=5
 Instance.new("UICorner",applySizeBtn).CornerRadius=UDim.new(0,4)
 applySizeBtn.MouseButton1Click:Connect(function()
 local w=tonumber(wBox.Text)
@@ -646,13 +688,13 @@ local keyRow=makeSettingRow("Текущая клавиша")
 local keyShow=Instance.new("TextLabel")
 keyShow.Size=UDim2.new(0,80,0,26);keyShow.Position=UDim2.new(1,-168,0.5,-13)
 keyShow.Text="F4";keyShow.TextColor3=C.badgeText;keyShow.BackgroundColor3=C.badge
-keyShow.Font=Enum.Font.GothamBold;keyShow.TextSize=11;keyShow.BorderSizePixel=0;keyShow.Parent=keyRow
+keyShow.Font=Enum.Font.GothamBold;keyShow.TextSize=11;keyShow.BorderSizePixel=0;keyShow.Parent=keyRow;keyShow.ZIndex=5
 Instance.new("UICorner",keyShow).CornerRadius=UDim.new(0,4)
 local assignKeyBtn=Instance.new("TextButton")
 assignKeyBtn.Size=UDim2.new(0,90,0,26);assignKeyBtn.Position=UDim2.new(1,-80,0.5,-13)
 assignKeyBtn.Text="Назначить";assignKeyBtn.TextColor3=C.text
 assignKeyBtn.BackgroundColor3=C.accentDk;assignKeyBtn.Font=Enum.Font.GothamBold
-assignKeyBtn.TextSize=11;assignKeyBtn.BorderSizePixel=0;assignKeyBtn.Parent=keyRow
+assignKeyBtn.TextSize=11;assignKeyBtn.BorderSizePixel=0;assignKeyBtn.Parent=keyRow;assignKeyBtn.ZIndex=5
 Instance.new("UICorner",assignKeyBtn).CornerRadius=UDim.new(0,4)
 assignKeyBtn.MouseButton1Click:Connect(function()
 waitingForMenuKey=true;assignKeyBtn.Text="Жми..." end)
@@ -715,4 +757,4 @@ stopNoRecoil()
 if weaponRecoilConn then weaponRecoilConn:Disconnect();weaponRecoilConn=nil end
 gui:Destroy() end)
 
-print("✅ Eclipse Menu загружен. F4 — меню.")
+print("✅ Eclipse Menu загружен. F4 — меню. Обои: "..(wallpaperAssetId and "установлены" or "нет"))
