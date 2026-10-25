@@ -1,4 +1,4 @@
--- ECLIPSE MENU — Война Монгат (ESP + Fly + Noclip) + Aimbot + ПВП + ТП к игрокам
+-- ECLIPSE MENU — Война Монгат (ESP + Fly + Noclip) + Aimbot (транспорт) + ПВП + ТП
 local player=game.Players.LocalPlayer
 local camera=workspace.CurrentCamera
 local runService=game:GetService("RunService")
@@ -24,11 +24,8 @@ main.BackgroundColor3=C.bg;main.BorderSizePixel=0;main.Active=true;main.Parent=g
 main.ClipsDescendants=true
 Instance.new("UICorner",main).CornerRadius=UDim.new(0,8)
 
--- ===== ОБОИ =====
 local wallpaperAssetId = nil
-if WALLPAPER_ENABLED and WALLPAPER_URL and WALLPAPER_URL ~= "" then
-    wallpaperAssetId = WALLPAPER_URL
-end
+if WALLPAPER_ENABLED and WALLPAPER_URL and WALLPAPER_URL ~= "" then wallpaperAssetId = WALLPAPER_URL end
 
 if wallpaperAssetId then
     local wallpaper=Instance.new("ImageLabel")
@@ -53,7 +50,6 @@ if wallpaperAssetId then
     dim.ZIndex=0
     dim.Parent=main
     Instance.new("UICorner",dim).CornerRadius=UDim.new(0,8)
-
     main.BackgroundTransparency=0.4
 end
 
@@ -506,9 +502,8 @@ if ncConn then
 local c=player.Character
 if c then for _,p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide=false end end end end end)
 
--- ========== ТЕЛЕПОРТЫ: ТП К ИГРОКАМ ==========
+-- ========== ТЕЛЕПОРТЫ ==========
 makeSectionLabel(tpPage,"🎯 ТП К ИГРОКУ")
-
 local tpSearchBox=Instance.new("TextBox")
 tpSearchBox.Size=UDim2.new(1,-12,0,32)
 tpSearchBox.PlaceholderText="🔍 Поиск игрока..."
@@ -531,40 +526,27 @@ local function clearTPRows()
 for _,r in ipairs(tpRows) do pcall(function() r:Destroy() end) end
 tpRows={}
 end
-
 local function tpToPlayer(targetPlayer)
 if not targetPlayer or not targetPlayer.Character then
-showNotif("❌ У игрока нет персонажа",Color3.fromRGB(255,100,100))
-return
-end
-local myChar=player.Character
-if not myChar then return end
-local myHRP=myChar:FindFirstChild("HumanoidRootPart")
-if not myHRP then return end
+showNotif("❌ У игрока нет персонажа",Color3.fromRGB(255,100,100));return end
+local myChar=player.Character;if not myChar then return end
+local myHRP=myChar:FindFirstChild("HumanoidRootPart");if not myHRP then return end
 local tChar=targetPlayer.Character
 local tHRP=tChar:FindFirstChild("HumanoidRootPart")
 local tHum=tChar:FindFirstChildOfClass("Humanoid")
 local tPos=nil
-if tHum and tHum.SeatPart then
-tPos=tHum.SeatPart.Position
-elseif tHRP then
-tPos=tHRP.Position
-end
-if not tPos then
-showNotif("❌ Не найдена позиция цели",Color3.fromRGB(255,100,100))
-return
-end
+if tHum and tHum.SeatPart then tPos=tHum.SeatPart.Position
+elseif tHRP then tPos=tHRP.Position end
+if not tPos then showNotif("❌ Не найдена позиция цели",Color3.fromRGB(255,100,100));return end
 local final=tPos+Vector3.new(0,3,0)
 pcall(function() myChar:PivotTo(CFrame.new(final)) end)
 pcall(function() myHRP.CFrame=CFrame.new(final) end)
 task.delay(0.05,function()
 local c2=player.Character
-if c2 then
-local h2=c2:FindFirstChild("HumanoidRootPart")
+if c2 then local h2=c2:FindFirstChild("HumanoidRootPart")
 if h2 then pcall(function() h2.CFrame=CFrame.new(final) end) end end end)
 showNotif("✅ ТП к "..targetPlayer.Name,Color3.fromRGB(100,255,100))
 end
-
 local function refreshTPList()
 clearTPRows()
 local filter=tpSearchBox.Text:lower()
@@ -575,28 +557,24 @@ row.Size=UDim2.new(1,-12,0,48);row.BackgroundColor3=C.row
 row.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
 row.BorderSizePixel=0;row.Parent=tpPage;row.ZIndex=4
 Instance.new("UICorner",row).CornerRadius=UDim.new(0,6)
-
 local nameLbl=Instance.new("TextLabel")
 nameLbl.Size=UDim2.new(1,-110,0,18);nameLbl.Position=UDim2.new(0,10,0,4)
 nameLbl.BackgroundTransparency=1;nameLbl.Text="👤 "..p.Name
 nameLbl.TextColor3=Color3.fromRGB(240,240,245);nameLbl.Font=Enum.Font.GothamBold
 nameLbl.TextSize=12;nameLbl.TextXAlignment=Enum.TextXAlignment.Left
 nameLbl.Parent=row;nameLbl.ZIndex=5
-
 local statusLbl=Instance.new("TextLabel")
 statusLbl.Size=UDim2.new(0.55,-10,0,14);statusLbl.Position=UDim2.new(0,10,0,24)
 statusLbl.BackgroundTransparency=1;statusLbl.Text="—"
 statusLbl.TextColor3=Color3.fromRGB(100,255,100);statusLbl.Font=Enum.Font.GothamSemibold
 statusLbl.TextSize=10;statusLbl.TextXAlignment=Enum.TextXAlignment.Left
 statusLbl.Parent=row;statusLbl.ZIndex=5
-
 local distLbl=Instance.new("TextLabel")
 distLbl.Size=UDim2.new(0.45,-10,0,14);distLbl.Position=UDim2.new(0.55,0,0,24)
 distLbl.BackgroundTransparency=1;distLbl.Text="📏 —"
 distLbl.TextColor3=C.textDim;distLbl.Font=Enum.Font.GothamBold
 distLbl.TextSize=10;distLbl.TextXAlignment=Enum.TextXAlignment.Right
 distLbl.Parent=row;distLbl.ZIndex=5
-
 local tpBtn=Instance.new("TextButton")
 tpBtn.Size=UDim2.new(0,80,0,26);tpBtn.Position=UDim2.new(1,-90,0.5,-13)
 tpBtn.Text="ТП";tpBtn.TextColor3=C.text;tpBtn.BackgroundColor3=C.accentDk
@@ -604,9 +582,7 @@ tpBtn.Font=Enum.Font.GothamBold;tpBtn.TextSize=11
 tpBtn.BorderSizePixel=0;tpBtn.ZIndex=6;tpBtn.Parent=row
 Instance.new("UICorner",tpBtn).CornerRadius=UDim.new(0,4)
 tpBtn.MouseButton1Click:Connect(function() tpToPlayer(p) end)
-
-table.insert(tpRows,row)
-end end
+table.insert(tpRows,row) end end
 task.wait(0.05)
 local h=0
 for _,c in ipairs(tpPage:GetChildren()) do
@@ -614,20 +590,16 @@ if c:IsA("Frame") or c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox
 h=h+c.Size.Y.Offset+6 end end
 tpPage.CanvasSize=UDim2.new(0,0,0,h+20)
 end
-
 tpSearchBox:GetPropertyChangedSignal("Text"):Connect(function() refreshTPList() end)
 game.Players.PlayerAdded:Connect(function() task.wait(0.5);refreshTPList() end)
 game.Players.PlayerRemoving:Connect(function() task.wait(0.2);refreshTPList() end)
-
 task.spawn(function()
 while gui.Parent do
 task.wait(0.5)
 if tpPage.Visible then
 for _,r in ipairs(tpRows) do
 if r.Parent and r.Parent.Parent then
-local nameLbl=nil
-local statusLbl=nil
-local distLbl=nil
+local nameLbl=nil;local statusLbl=nil;local distLbl=nil
 for _,c in ipairs(r:GetChildren()) do
 if c:IsA("TextLabel") then
 if c.Position.Y.Offset==4 then nameLbl=c
@@ -639,15 +611,9 @@ local p=game.Players:FindFirstChild(pName)
 if p and p.Character then
 local hum=p.Character:FindFirstChildOfClass("Humanoid")
 local hrp=p.Character:FindFirstChild("HumanoidRootPart")
-if hum and hum.Health>0 then
-statusLbl.Text="🟢 ❤"..math.floor(hum.Health)
-statusLbl.TextColor3=Color3.fromRGB(100,255,100)
-elseif hum then
-statusLbl.Text="🔴 Мёртв"
-statusLbl.TextColor3=Color3.fromRGB(255,80,80)
-else
-statusLbl.Text="⚫ Нет персонажа"
-statusLbl.TextColor3=C.textDim end
+if hum and hum.Health>0 then statusLbl.Text="🟢 ❤"..math.floor(hum.Health);statusLbl.TextColor3=Color3.fromRGB(100,255,100)
+elseif hum then statusLbl.Text="🔴 Мёртв";statusLbl.TextColor3=Color3.fromRGB(255,80,80)
+else statusLbl.Text="⚫ Нет персонажа";statusLbl.TextColor3=C.textDim end
 local myHRP=getHRP()
 if myHRP and hrp and distLbl then
 local d=(myHRP.Position-hrp.Position).Magnitude
@@ -655,14 +621,11 @@ distLbl.Text=string.format("📏 %.0fм",d)
 if d<30 then distLbl.TextColor3=Color3.fromRGB(255,80,80)
 elseif d<100 then distLbl.TextColor3=Color3.fromRGB(255,200,50)
 else distLbl.TextColor3=Color3.fromRGB(100,200,255) end end
-elseif not p then
-statusLbl.Text="⚫ Вышел"
-statusLbl.TextColor3=C.textDim end
+elseif not p then statusLbl.Text="⚫ Вышел";statusLbl.TextColor3=C.textDim end
 end end end end end end)
-
 refreshTPList()
 
--- ========== AIMBOT ==========
+-- ========== AIMBOT (с поддержкой транспорта) ==========
 local aimbotOn,aimbotConn=false,nil
 local aimbotFOV,aimbotSmooth=300,0.35
 local aimbotVisible=true
@@ -671,14 +634,23 @@ local aimbotPrediction,aimbotSticky=true,true
 local aimbotTargetMode,aimbotIgnoreTeammates="Auto",true
 local aimbotPredictionAmount=0.15
 local currentTarget=nil
+
+-- Баллистика танка (для медленных снарядов)
+local vehicleBallistic=false
+local tankShellSpeed=200
+local tankGravity=100
+local tankExtraLead=0
+
 local function isTeammate(p)
 if not p then return false end
 return player.Team~=nil and p.Team==player.Team end
+
 local function isAimbotActive()
 if aimbotButtonMode=="Always" then return true end
 if aimbotButtonMode=="RMB" then return uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) end
 if aimbotButtonMode=="LMB" then return uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) end
 return false end
+
 local function rayVisible(from,to,ign)
 local params=RaycastParams.new()
 params.FilterType=Enum.RaycastFilterType.Exclude
@@ -687,6 +659,7 @@ if player.Character then table.insert(filter,player.Character) end
 if ign then table.insert(filter,ign) end
 params.FilterDescendantsInstances=filter
 return workspace:Raycast(from,to-from,params)==nil end
+
 local function getAimParts(char)
 local out={}
 if aimbotTargetMode=="Head" then
@@ -700,6 +673,57 @@ local u=char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso") or cha
 if h then table.insert(out,h) end
 if u and u~=h then table.insert(out,u) end end
 return out end
+
+-- === ПОЗИЦИЯ И СКОРОСТЬ ЦЕЛИ (учитывая транспорт) ===
+local function getTargetPosAndVel(t)
+if not t or not t.character then return Vector3.new(0,0,0), Vector3.new(0,0,0) end
+local hum=t.character:FindFirstChildOfClass("Humanoid")
+if hum and hum.SeatPart then
+local seat=hum.SeatPart
+local pos=seat.Position
+local vel=seat.AssemblyLinearVelocity or Vector3.new(0,0,0)
+if vel.Magnitude<0.5 then
+local model=seat.Parent
+if model and (model:IsA("Model") or (model.Parent and model.Parent:IsA("Model"))) then
+local vehModel=model:IsA("Model") and model or model.Parent
+if vehModel.PrimaryPart then
+local pv=vehModel.PrimaryPart.AssemblyLinearVelocity
+if pv and pv.Magnitude>0.5 then return pos, pv end end
+local bestMag=0
+local bestVel=vel
+for _,p in ipairs(vehModel:GetDescendants()) do
+if p:IsA("BasePart") then
+local pv=p.AssemblyLinearVelocity
+if pv and pv.Magnitude>bestMag then bestMag=pv.Magnitude;bestVel=pv end end end
+if bestMag>0.5 then vel=bestVel end
+end end
+return pos, vel
+end
+return t.part.Position, t.part.AssemblyLinearVelocity or Vector3.new(0,0,0)
+end
+
+-- === МОЙ ТРАНСПОРТ (чтобы не целиться в своих пассажиров) ===
+local function getMyVehicleModel()
+local hum=getHum()
+if not hum or not hum.SeatPart then return nil end
+local seat=hum.SeatPart
+local model=seat.Parent
+if model and not model:IsA("Model") and model.Parent and model.Parent:IsA("Model") then
+model=model.Parent end
+return model end
+
+local function isInMyVehicle(p)
+if p==player then return false end
+local myVeh=getMyVehicleModel()
+if not myVeh then return false end
+local theirHum=p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+if not theirHum or not theirHum.SeatPart then return false end
+local theirSeat=theirHum.SeatPart
+local theirModel=theirSeat.Parent
+if theirModel and not theirModel:IsA("Model") and theirModel.Parent and theirModel.Parent:IsA("Model") then
+theirModel=theirModel.Parent end
+return theirModel==myVeh end
+
 local function scoreTarget(part,scrCenter,myPos)
 local sp,onScreen=camera:WorldToViewportPoint(part.Position)
 if not onScreen then return nil end
@@ -707,33 +731,56 @@ local d2d=(Vector2.new(sp.X,sp.Y)-scrCenter).Magnitude
 if d2d>aimbotFOV then return nil end
 if aimbotVisible and not rayVisible(myPos,part.Position,part.Parent) then return nil end
 return d2d+(myPos-part.Position).Magnitude*0.05 end
+
 local function findTarget()
 local myPos=camera.CFrame.Position
 local scrCenter=Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y/2)
 local best,bestScore=nil,math.huge
 for _,p in ipairs(game.Players:GetPlayers()) do
-if p~=player and p.Character and not (aimbotIgnoreTeammates and isTeammate(p)) then
+if p~=player and p.Character and not (aimbotIgnoreTeammates and isTeammate(p)) and not isInMyVehicle(p) then
 local hum=p.Character:FindFirstChildOfClass("Humanoid")
 if hum and hum.Health>0 then
 for _,part in ipairs(getAimParts(p.Character)) do
 local score=scoreTarget(part,scrCenter,myPos)
 if score and score<bestScore then bestScore=score;best={part=part,character=p.Character,player=p} end end end end end
 return best end
+
 local function validateTarget(t)
 if not t or not t.player or not t.player.Parent then return false end
 if not t.character or not t.character.Parent then return false end
-if t.part.Parent~=t.character then return false end
 if aimbotIgnoreTeammates and isTeammate(t.player) then return false end
+if isInMyVehicle(t.player) then return false end
 local hum=t.character:FindFirstChildOfClass("Humanoid")
 if not hum or hum.Health<=0 then return false end
-local score=scoreTarget(t.part,Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y/2),camera.CFrame.Position)
-if not score or score>aimbotFOV*1.5 then return false end
+-- если цель в транспорте — позиция сиденья, part.Parent может отличаться
+local inVehicle=hum.SeatPart~=nil
+if not inVehicle and t.part.Parent~=t.character then return false end
+local checkPos,_=getTargetPosAndVel(t)
+local sp,onScreen=camera:WorldToViewportPoint(checkPos)
+if not onScreen then return false end
+local d2d=(Vector2.new(sp.X,sp.Y)-Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y/2)).Magnitude
+if d2d>aimbotFOV*1.5 then return false end
 return true end
+
+-- === ПРЕДСКАЗАНИЕ (учитывает транспорт и баллистику) ===
 local function predictPos(t)
-if not aimbotPrediction then return t.part.Position end
-local vel=t.part.AssemblyLinearVelocity
-if not vel or vel.Magnitude<1 then return t.part.Position end
-return t.part.Position+vel*aimbotPredictionAmount end
+local pos,vel=getTargetPosAndVel(t)
+if not aimbotPrediction and not vehicleBallistic then return pos end
+
+if vehicleBallistic then
+local myPos=camera.CFrame.Position
+local dist=(pos-myPos).Magnitude
+local flightTime=dist/math.max(tankShellSpeed,10)+tankExtraLead
+local predicted=pos+vel*flightTime
+if tankGravity>0 then
+predicted=predicted+Vector3.new(0,0.5*tankGravity*flightTime*flightTime,0) end
+return predicted
+end
+
+if vel.Magnitude<0.5 then return pos end
+return pos+vel*aimbotPredictionAmount
+end
+
 local function startAimbot()
 if aimbotConn then aimbotConn:Disconnect() end
 currentTarget=nil
@@ -748,6 +795,7 @@ if target then
 local desired=CFrame.new(camera.CFrame.Position,predictPos(target))
 local alpha=math.clamp(dt/math.max(aimbotSmooth,0.01)*10,0,1)
 camera.CFrame=camera.CFrame:Lerp(desired,alpha) end end) end
+
 local function stopAimbot()
 if aimbotConn then aimbotConn:Disconnect();aimbotConn=nil end
 currentTarget=nil end
@@ -782,6 +830,23 @@ for k,b in pairs(modeBtns) do if k==m then b.BackgroundColor3=C.accent else b.Ba
 btnRMB.MouseButton1Click:Connect(function() setMode("RMB") end)
 btnLMB.MouseButton1Click:Connect(function() setMode("LMB") end)
 btnAlways.MouseButton1Click:Connect(function() setMode("Always") end)
+
+makeSectionLabel(aimbotPage,"🚀 РЕЖИМ ТРАНСПОРТА")
+local infoLbl=Instance.new("TextLabel")
+infoLbl.Size=UDim2.new(1,-12,0,44);infoLbl.BackgroundColor3=C.row
+infoLbl.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+infoLbl.Text="Работает в танке/корабле: камера привязана к пушке, аим наводит её на цель. Также предсказывает движение вражеских танков."
+infoLbl.TextColor3=C.textDim;infoLbl.Font=Enum.Font.GothamMedium
+infoLbl.TextSize=10;infoLbl.TextWrapped=true;infoLbl.BorderSizePixel=0
+infoLbl.Parent=aimbotPage;infoLbl.ZIndex=4
+Instance.new("UICorner",infoLbl).CornerRadius=UDim.new(0,6)
+
+makeToggle(aimbotPage,"💥 Баллистика танка (медленные снаряды)",true,function(on) vehicleBallistic=on
+showNotif(on and "💥 Баллистика: ВКЛ" or "💥 Баллистика: ВЫКЛ",on and C.accent or Color3.fromRGB(255,200,80)) end)
+
+makeSlider(aimbotPage,"Скорость снаряда танка (м/с)",50,1000,200,false,function(v) tankShellSpeed=v end)
+makeSlider(aimbotPage,"Гравитация танка (0 = нет)",0,300,100,false,function(v) tankGravity=v end)
+makeSlider(aimbotPage,"Доп. упреждение танка (сек)",0,1,0,true,function(v) tankExtraLead=v end)
 
 makeSectionLabel(aimbotPage,"🎯 ЦЕЛЬ")
 makeToggle(aimbotPage,"Предсказание движения",true,function(on) aimbotPrediction=on end)
@@ -819,7 +884,7 @@ pBtnBody.MouseButton1Click:Connect(function() setTargetMode("Body") end)
 makeSectionLabel(aimbotPage,"⚙️ ПАРАМЕТРЫ")
 makeSlider(aimbotPage,"FOV",50,800,300,false,function(v) aimbotFOV=v end)
 makeSlider(aimbotPage,"Плавность",0.05,1,0.35,true,function(v) aimbotSmooth=v end)
-makeSlider(aimbotPage,"Сила предсказания",0.05,0.5,0.15,true,function(v) aimbotPredictionAmount=v end)
+makeSlider(aimbotPage,"Сила предсказания (пешком)",0.05,0.5,0.15,true,function(v) aimbotPredictionAmount=v end)
 makeToggle(aimbotPage,"Только видимые",true,function(on) aimbotVisible=on end)
 makeToggle(aimbotPage,"Не стрелять по своим",true,function(on) aimbotIgnoreTeammates=on;currentTarget=nil end)
 
@@ -1057,4 +1122,4 @@ stopNoRecoil()
 if weaponRecoilConn then weaponRecoilConn:Disconnect();weaponRecoilConn=nil end
 gui:Destroy() end)
 
-print("✅ Eclipse Menu загружен. F4 — меню.")
+print("✅ Eclipse Menu загружен. F4 — меню. Аимбот работает и пешком, и в танке/корабле.")
