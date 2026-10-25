@@ -1,4 +1,4 @@
--- ECLIPSE MENU — Война Монгат + Aimbot + ПВП + ОБОИ (ImgBB)
+-- ECLIPSE MENU — Война Монгат (ESP + Fly + Noclip) + Aimbot + ПВП + ТП к игрокам
 local player=game.Players.LocalPlayer
 local camera=workspace.CurrentCamera
 local runService=game:GetService("RunService")
@@ -9,11 +9,7 @@ local setMenuKeyDisplay=nil
 local C={bg=Color3.fromRGB(15,15,22),topbar=Color3.fromRGB(20,20,30),sidebar=Color3.fromRGB(18,18,26),row=Color3.fromRGB(22,22,32),accent=Color3.fromRGB(130,70,220),accentDk=Color3.fromRGB(90,40,160),text=Color3.fromRGB(220,220,230),textDim=Color3.fromRGB(140,140,160),badge=Color3.fromRGB(35,30,50),badgeText=Color3.fromRGB(150,130,180),toggleOff=Color3.fromRGB(50,50,65),knob=Color3.fromRGB(230,230,240),red=Color3.fromRGB(180,40,40),green=Color3.fromRGB(80,130,80)}
 
 -- ===== НАСТРОЙКИ ОБОЕВ =====
--- Твоя картинка с ImgBB:
 local WALLPAPER_URL = "https://i.ibb.co/gbLHsRcZ/image.webp"
--- ⚠️ ЕСЛИ НЕ ЗАГРУЗИТСЯ: залей картинку в Roblox (create.roblox.com → Decals),
--- скопируй Texture ID и вставь сюда вместо строки выше:
---   local WALLPAPER_URL = "rbxassetid://ТВОЙ_IMAGE_ID"
 local WALLPAPER_TRANSPARENCY = 0.35
 local WALLPAPER_DIM = 0.55
 local WALLPAPER_ENABLED = true
@@ -187,7 +183,7 @@ badge=Instance.new("TextButton")
 badge.Size=UDim2.new(0,88,0,20);badge.Position=UDim2.new(1,-138,0.5,-10)
 badge.Text="[ NONE ]";badge.TextColor3=C.badgeText;badge.BackgroundColor3=C.badge
 badge.Font=Enum.Font.GothamMedium;badge.TextSize=10;badge.BorderSizePixel=0
-badge.Parent=row;badge.AutoButtonColor=false;badge.ZIndex=6
+badge.Parent=row;badge.AutoButtonColor=false;badge.ZIndex=10
 Instance.new("UICorner",badge).CornerRadius=UDim.new(0,4) end
 local tBg=Instance.new("Frame")
 tBg.Size=UDim2.new(0,34,0,18);tBg.Position=UDim2.new(1,-46,0.5,-9)
@@ -295,6 +291,9 @@ b.MouseButton1Click:Connect(onClick)
 return b end
 local function getHum() local c=player.Character;return c and c:FindFirstChildOfClass("Humanoid") end
 local function getHRP() local c=player.Character;return c and c:FindFirstChild("HumanoidRootPart") end
+local function getFactionColor(p)
+if p.Team and p.Team.TeamColor then return p.Team.TeamColor.Color end
+return Color3.fromRGB(180,180,180) end
 local function showNotif(text,color)
 local n=Instance.new("TextLabel")
 n.Size=UDim2.new(0,500,0,50);n.Position=UDim2.new(0.5,-250,0.15,0)
@@ -305,7 +304,159 @@ Instance.new("UICorner",n).CornerRadius=UDim.new(0,8)
 game:GetService("Debris"):AddItem(n,3)
 return n end
 
--- ========== ВОЙНА МОНГАТ: FLY + NOCLIP ==========
+-- ========== ESP ИГРОКОВ ==========
+local espList,espData,espConn={},{},nil
+local playerConns,statCache={},{}
+local function clearESP()
+for _,o in ipairs(espList) do pcall(function() o:Destroy() end) end
+espList,espData={},{} end
+local function formatNum(n)
+if not n then return "—" end
+n=tonumber(n) or 0
+if n>=1e6 then return string.format("%.1fM",n/1e6) end
+if n>=1e3 then return string.format("%.1fK",n/1e3) end
+return tostring(math.floor(n)) end
+local function updateStats()
+for _,d in ipairs(espData) do
+local p=d.plr;local cache=statCache[p]
+if not cache then cache={};statCache[p]=cache end
+local cs={p:FindFirstChild("leaderstats"),p:FindFirstChild("Stats"),p}
+local cash,minutes
+for _,c in ipairs(cs) do
+if c then local v=c:FindFirstChild("Cash") or c:FindFirstChild("Деньги") or c:FindFirstChild("Money") or c:FindFirstChild("Баланс")
+if v and (v:IsA("IntValue") or v:IsA("NumberValue")) then cash=v.Value;break end end end
+for _,c in ipairs(cs) do
+if c then local v=c:FindFirstChild("Minute") or c:FindFirstChild("Minutes") or c:FindFirstChild("Минуты") or c:FindFirstChild("Time")
+if v and (v:IsA("IntValue") or v:IsA("NumberValue")) then minutes=v.Value;break end end end
+cache.cash=cash;cache.minutes=minutes
+cache.faction=p.Team and p.Team.Name or nil
+cache.factionColor=getFactionColor(p) end end
+local function createESP(p)
+if p==player then return end
+local ch=p.Character;if not ch then return end
+local head=ch:FindFirstChild("Head");if not head then return end
+local bb=Instance.new("BillboardGui")
+bb.Size=UDim2.new(0,260,0,68);bb.StudsOffset=Vector3.new(0,3.5,0)
+bb.AlwaysOnTop=true;bb.Parent=head
+local bg=Instance.new("Frame")
+bg.Size=UDim2.new(1,0,1,0);bg.BackgroundColor3=Color3.fromRGB(0,0,0)
+bg.BackgroundTransparency=0.85;bg.BorderSizePixel=0;bg.Parent=bb
+Instance.new("UICorner",bg).CornerRadius=UDim.new(0,3)
+local function mt(pos,size,font,txtSize,color,align)
+local t=Instance.new("TextLabel")
+t.Size=size;t.Position=pos;t.BackgroundTransparency=1;t.Font=font
+t.TextSize=txtSize;t.TextColor3=color;t.TextXAlignment=align
+t.TextStrokeTransparency=0;t.TextStrokeColor3=Color3.fromRGB(0,0,0);t.Parent=bg;return t end
+local nameL=mt(UDim2.new(0,3,0,1),UDim2.new(0.45,-3,0,15),Enum.Font.GothamBold,11,Color3.fromRGB(255,255,255),Enum.TextXAlignment.Left)
+local factionL=mt(UDim2.new(0.45,0,0,1),UDim2.new(0.4,-3,0,15),Enum.Font.GothamBold,11,Color3.fromRGB(255,200,50),Enum.TextXAlignment.Left)
+local hpTextL=mt(UDim2.new(0.85,0,0,1),UDim2.new(0.15,-3,0,15),Enum.Font.GothamBold,10,Color3.fromRGB(100,255,100),Enum.TextXAlignment.Right)
+local distL=mt(UDim2.new(0,3,0,18),UDim2.new(0.4,-3,0,13),Enum.Font.GothamBold,10,Color3.fromRGB(255,200,50),Enum.TextXAlignment.Left)
+local cashL=mt(UDim2.new(0.4,0,0,18),UDim2.new(0.3,-3,0,13),Enum.Font.GothamBold,10,Color3.fromRGB(100,255,100),Enum.TextXAlignment.Center)
+local minL=mt(UDim2.new(0.7,0,0,18),UDim2.new(0.3,-3,0,13),Enum.Font.GothamBold,10,Color3.fromRGB(100,200,255),Enum.TextXAlignment.Right)
+local hpBg=Instance.new("Frame")
+hpBg.Size=UDim2.new(1,-6,0,4);hpBg.Position=UDim2.new(0,3,0,34)
+hpBg.BackgroundColor3=Color3.fromRGB(40,15,15);hpBg.BackgroundTransparency=0.4
+hpBg.BorderSizePixel=0;hpBg.Parent=bg
+Instance.new("UICorner",hpBg).CornerRadius=UDim.new(1,0)
+local hpF=Instance.new("Frame")
+hpF.Size=UDim2.new(1,0,1,0);hpF.BackgroundColor3=Color3.fromRGB(0,200,0)
+hpF.BackgroundTransparency=0.15;hpF.BorderSizePixel=0;hpF.Parent=hpBg
+Instance.new("UICorner",hpF).CornerRadius=UDim.new(1,0)
+local hl=Instance.new("Highlight")
+hl.FillColor=Color3.fromRGB(255,0,0);hl.FillTransparency=0.85
+hl.OutlineColor=Color3.fromRGB(255,255,0);hl.OutlineTransparency=0.3;hl.Parent=ch
+table.insert(espList,hl)
+return {bb=bb,nameL=nameL,factionL=factionL,distL=distL,hpTextL=hpTextL,cashL=cashL,minL=minL,hpF=hpF,plr=p,hl=hl} end
+local function removeESPFor(p)
+statCache[p]=nil
+for i=#espData,1,-1 do
+if espData[i].plr==p then
+if espData[i].hl then pcall(function() espData[i].hl:Destroy() end) end
+pcall(function() espData[i].bb:Destroy() end)
+table.remove(espData,i) end end end
+local function refreshPlayerESP(p)
+if p==player or not p.Character then return end
+removeESPFor(p)
+local d=createESP(p)
+if d then table.insert(espList,d.bb);table.insert(espData,d) end end
+local function hookPlayer(p)
+if p==player or playerConns[p] then return end
+playerConns[p]=true
+p.CharacterAdded:Connect(function() task.wait(0.15);if espConn then refreshPlayerESP(p) end end)
+p.CharacterRemoving:Connect(function() task.wait(0.1);removeESPFor(p) end) end
+local function syncESP()
+for _,p in ipairs(game.Players:GetPlayers()) do
+if p~=player then
+hookPlayer(p)
+local hasChar=p.Character and p.Character:FindFirstChild("Head")
+local hasESP=false
+for _,d in ipairs(espData) do
+if d.plr==p and d.bb.Parent then
+if d.bb.Parent==p.Character:FindFirstChild("Head") then hasESP=true end
+break end end
+if hasChar and not hasESP then refreshPlayerESP(p)
+elseif not hasChar then removeESPFor(p) end end end
+for i=#espData,1,-1 do
+local d=espData[i]
+if not d.plr or not d.plr.Parent or not game.Players:FindFirstChild(d.plr.Name) then
+if d.hl then pcall(function() d.hl:Destroy() end) end
+pcall(function() d.bb:Destroy() end);table.remove(espData,i) end end end
+game.Players.PlayerAdded:Connect(function(p) hookPlayer(p);task.wait(0.5);if espConn then refreshPlayerESP(p) end end)
+game.Players.PlayerRemoving:Connect(function(p) playerConns[p]=nil;removeESPFor(p) end)
+local function startESP()
+clearESP()
+for _,p in ipairs(game.Players:GetPlayers()) do
+hookPlayer(p)
+if p~=player and p.Character then
+local d=createESP(p)
+if d then table.insert(espList,d.bb);table.insert(espData,d) end end end
+espConn=runService.RenderStepped:Connect(function()
+local myHRP=getHRP()
+for _,d in ipairs(espData) do
+local char=d.plr.Character
+if char and d.bb.Parent then
+local theirHRP=char:FindFirstChild("HumanoidRootPart")
+if myHRP and theirHRP then
+local dist=(myHRP.Position-theirHRP.Position).Magnitude
+d.distL.Text=string.format("📍%.0fм",dist)
+if dist<30 then d.distL.TextColor3=Color3.fromRGB(255,80,80)
+elseif dist<100 then d.distL.TextColor3=Color3.fromRGB(255,200,50)
+else d.distL.TextColor3=Color3.fromRGB(100,200,255) end
+else d.distL.Text="📍—" end
+local hum=char:FindFirstChildOfClass("Humanoid")
+if hum then
+local pct=math.clamp(hum.Health/hum.MaxHealth,0,1)
+d.hpF.Size=UDim2.new(pct,0,1,0)
+d.hpTextL.Text=string.format("❤%d",math.floor(hum.Health))
+if pct>0.6 then d.hpF.BackgroundColor3=Color3.fromRGB(0,200,0);d.hpTextL.TextColor3=Color3.fromRGB(100,255,100)
+elseif pct>0.3 then d.hpF.BackgroundColor3=Color3.fromRGB(255,200,0);d.hpTextL.TextColor3=Color3.fromRGB(255,200,50)
+else d.hpF.BackgroundColor3=Color3.fromRGB(255,0,0);d.hpTextL.TextColor3=Color3.fromRGB(255,80,80) end end end end end)
+task.spawn(function() while espConn do syncESP();task.wait(0.5) end end)
+task.spawn(function()
+while espConn do
+updateStats()
+for _,d in ipairs(espData) do
+local cache=statCache[d.plr]
+if cache and d.bb.Parent then
+d.nameL.Text=d.plr.Name
+if cache.faction and cache.faction~="" then d.factionL.Text="| "..cache.faction;d.factionL.TextColor3=cache.factionColor
+else d.factionL.Text="| Без фракции";d.factionL.TextColor3=Color3.fromRGB(140,140,140) end
+d.cashL.Text="💰"..formatNum(cache.cash)
+d.minL.Text="⏱"..formatNum(cache.minutes) end end
+task.wait(0.4) end end) end
+local function stopESP()
+if espConn then espConn:Disconnect();espConn=nil end
+clearESP();playerConns={};statCache={} end
+
+-- ========== ВОЙНА МОНГАТ: ESP + FLY + NOCLIP ==========
+makeSectionLabel(armyPage,"👁 ВИДЕТЬ ИГРОКОВ")
+makeToggle(armyPage,"ESP Игроков",true,function(on) if on then startESP() else stopESP() end end)
+makeButton(armyPage,"🔄 Обновить ESP",Color3.fromRGB(50,80,120),function()
+if not espConn then showNotif("⚠ Сначала включи ESP",Color3.fromRGB(255,200,80));return end
+syncESP()
+showNotif("✅ ESP обновлён ("..#espData..")",Color3.fromRGB(100,255,100)) end)
+
+makeSectionLabel(armyPage,"✈️ ПЕРЕМЕЩЕНИЕ")
 local flyBV,flyConn,flyOn,flySpeed=nil,nil,false,70
 local function startFly()
 local hrp,hum=getHRP(),getHum()
@@ -335,6 +486,8 @@ if flyConn then flyConn:Disconnect();flyConn=nil end
 local h=getHum();if h then h.PlatformStand=false end end
 makeToggle(armyPage,"✈️ Fly (WASD + Space/Ctrl)",true,function(on) if on then startFly() else stopFly() end end)
 makeSlider(armyPage,"✈️ Скорость Fly",20,250,70,false,function(v) flySpeed=v end)
+
+makeSectionLabel(armyPage,"🚪 ПРОХОЖДЕНИЕ")
 local ncConn
 local function startNC()
 if ncConn then return end
@@ -353,14 +506,161 @@ if ncConn then
 local c=player.Character
 if c then for _,p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide=false end end end end end)
 
--- ========== ПУСТАЯ ВКЛАДКА ТП ==========
-local l1=Instance.new("TextLabel")
-l1.Size=UDim2.new(1,-12,0,120);l1.BackgroundColor3=C.row
-l1.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
-l1.Text="🚫 Все функции этой вкладки удалены.";l1.TextColor3=C.textDim
-l1.Font=Enum.Font.GothamMedium;l1.TextSize=12;l1.TextWrapped=true
-l1.BorderSizePixel=0;l1.Parent=tpPage;l1.ZIndex=4
-Instance.new("UICorner",l1).CornerRadius=UDim.new(0,6)
+-- ========== ТЕЛЕПОРТЫ: ТП К ИГРОКАМ ==========
+makeSectionLabel(tpPage,"🎯 ТП К ИГРОКУ")
+
+local tpSearchBox=Instance.new("TextBox")
+tpSearchBox.Size=UDim2.new(1,-12,0,32)
+tpSearchBox.PlaceholderText="🔍 Поиск игрока..."
+tpSearchBox.Text=""
+tpSearchBox.TextColor3=C.text
+tpSearchBox.BackgroundColor3=C.row
+tpSearchBox.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+tpSearchBox.PlaceholderColor3=C.textDim
+tpSearchBox.Font=Enum.Font.GothamMedium
+tpSearchBox.TextSize=12
+tpSearchBox.BorderSizePixel=0
+tpSearchBox.ClearTextOnFocus=false
+tpSearchBox.Parent=tpPage
+tpSearchBox.ZIndex=4
+Instance.new("UICorner",tpSearchBox).CornerRadius=UDim.new(0,6)
+Instance.new("UIPadding",tpSearchBox).PaddingLeft=UDim.new(0,10)
+
+local tpRows={}
+local function clearTPRows()
+for _,r in ipairs(tpRows) do pcall(function() r:Destroy() end) end
+tpRows={}
+end
+
+local function tpToPlayer(targetPlayer)
+if not targetPlayer or not targetPlayer.Character then
+showNotif("❌ У игрока нет персонажа",Color3.fromRGB(255,100,100))
+return
+end
+local myChar=player.Character
+if not myChar then return end
+local myHRP=myChar:FindFirstChild("HumanoidRootPart")
+if not myHRP then return end
+local tChar=targetPlayer.Character
+local tHRP=tChar:FindFirstChild("HumanoidRootPart")
+local tHum=tChar:FindFirstChildOfClass("Humanoid")
+local tPos=nil
+if tHum and tHum.SeatPart then
+tPos=tHum.SeatPart.Position
+elseif tHRP then
+tPos=tHRP.Position
+end
+if not tPos then
+showNotif("❌ Не найдена позиция цели",Color3.fromRGB(255,100,100))
+return
+end
+local final=tPos+Vector3.new(0,3,0)
+pcall(function() myChar:PivotTo(CFrame.new(final)) end)
+pcall(function() myHRP.CFrame=CFrame.new(final) end)
+task.delay(0.05,function()
+local c2=player.Character
+if c2 then
+local h2=c2:FindFirstChild("HumanoidRootPart")
+if h2 then pcall(function() h2.CFrame=CFrame.new(final) end) end end end)
+showNotif("✅ ТП к "..targetPlayer.Name,Color3.fromRGB(100,255,100))
+end
+
+local function refreshTPList()
+clearTPRows()
+local filter=tpSearchBox.Text:lower()
+for _,p in ipairs(game.Players:GetPlayers()) do
+if p~=player and (filter=="" or p.Name:lower():find(filter,1,true)) then
+local row=Instance.new("Frame")
+row.Size=UDim2.new(1,-12,0,48);row.BackgroundColor3=C.row
+row.BackgroundTransparency=wallpaperAssetId and 0.5 or 0
+row.BorderSizePixel=0;row.Parent=tpPage;row.ZIndex=4
+Instance.new("UICorner",row).CornerRadius=UDim.new(0,6)
+
+local nameLbl=Instance.new("TextLabel")
+nameLbl.Size=UDim2.new(1,-110,0,18);nameLbl.Position=UDim2.new(0,10,0,4)
+nameLbl.BackgroundTransparency=1;nameLbl.Text="👤 "..p.Name
+nameLbl.TextColor3=Color3.fromRGB(240,240,245);nameLbl.Font=Enum.Font.GothamBold
+nameLbl.TextSize=12;nameLbl.TextXAlignment=Enum.TextXAlignment.Left
+nameLbl.Parent=row;nameLbl.ZIndex=5
+
+local statusLbl=Instance.new("TextLabel")
+statusLbl.Size=UDim2.new(0.55,-10,0,14);statusLbl.Position=UDim2.new(0,10,0,24)
+statusLbl.BackgroundTransparency=1;statusLbl.Text="—"
+statusLbl.TextColor3=Color3.fromRGB(100,255,100);statusLbl.Font=Enum.Font.GothamSemibold
+statusLbl.TextSize=10;statusLbl.TextXAlignment=Enum.TextXAlignment.Left
+statusLbl.Parent=row;statusLbl.ZIndex=5
+
+local distLbl=Instance.new("TextLabel")
+distLbl.Size=UDim2.new(0.45,-10,0,14);distLbl.Position=UDim2.new(0.55,0,0,24)
+distLbl.BackgroundTransparency=1;distLbl.Text="📏 —"
+distLbl.TextColor3=C.textDim;distLbl.Font=Enum.Font.GothamBold
+distLbl.TextSize=10;distLbl.TextXAlignment=Enum.TextXAlignment.Right
+distLbl.Parent=row;distLbl.ZIndex=5
+
+local tpBtn=Instance.new("TextButton")
+tpBtn.Size=UDim2.new(0,80,0,26);tpBtn.Position=UDim2.new(1,-90,0.5,-13)
+tpBtn.Text="ТП";tpBtn.TextColor3=C.text;tpBtn.BackgroundColor3=C.accentDk
+tpBtn.Font=Enum.Font.GothamBold;tpBtn.TextSize=11
+tpBtn.BorderSizePixel=0;tpBtn.ZIndex=6;tpBtn.Parent=row
+Instance.new("UICorner",tpBtn).CornerRadius=UDim.new(0,4)
+tpBtn.MouseButton1Click:Connect(function() tpToPlayer(p) end)
+
+table.insert(tpRows,row)
+end end
+task.wait(0.05)
+local h=0
+for _,c in ipairs(tpPage:GetChildren()) do
+if c:IsA("Frame") or c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
+h=h+c.Size.Y.Offset+6 end end
+tpPage.CanvasSize=UDim2.new(0,0,0,h+20)
+end
+
+tpSearchBox:GetPropertyChangedSignal("Text"):Connect(function() refreshTPList() end)
+game.Players.PlayerAdded:Connect(function() task.wait(0.5);refreshTPList() end)
+game.Players.PlayerRemoving:Connect(function() task.wait(0.2);refreshTPList() end)
+
+task.spawn(function()
+while gui.Parent do
+task.wait(0.5)
+if tpPage.Visible then
+for _,r in ipairs(tpRows) do
+if r.Parent and r.Parent.Parent then
+local nameLbl=nil
+local statusLbl=nil
+local distLbl=nil
+for _,c in ipairs(r:GetChildren()) do
+if c:IsA("TextLabel") then
+if c.Position.Y.Offset==4 then nameLbl=c
+elseif c.Position.X.Offset==10 then statusLbl=c
+else distLbl=c end end end
+if nameLbl and statusLbl then
+local pName=nameLbl.Text:gsub("^👤 ","")
+local p=game.Players:FindFirstChild(pName)
+if p and p.Character then
+local hum=p.Character:FindFirstChildOfClass("Humanoid")
+local hrp=p.Character:FindFirstChild("HumanoidRootPart")
+if hum and hum.Health>0 then
+statusLbl.Text="🟢 ❤"..math.floor(hum.Health)
+statusLbl.TextColor3=Color3.fromRGB(100,255,100)
+elseif hum then
+statusLbl.Text="🔴 Мёртв"
+statusLbl.TextColor3=Color3.fromRGB(255,80,80)
+else
+statusLbl.Text="⚫ Нет персонажа"
+statusLbl.TextColor3=C.textDim end
+local myHRP=getHRP()
+if myHRP and hrp and distLbl then
+local d=(myHRP.Position-hrp.Position).Magnitude
+distLbl.Text=string.format("📏 %.0fм",d)
+if d<30 then distLbl.TextColor3=Color3.fromRGB(255,80,80)
+elseif d<100 then distLbl.TextColor3=Color3.fromRGB(255,200,50)
+else distLbl.TextColor3=Color3.fromRGB(100,200,255) end end
+elseif not p then
+statusLbl.Text="⚫ Вышел"
+statusLbl.TextColor3=C.textDim end
+end end end end end end)
+
+refreshTPList()
 
 -- ========== AIMBOT ==========
 local aimbotOn,aimbotConn=false,nil
@@ -751,10 +1051,10 @@ main.Size=UDim2.new(0,540,0,40)
 else sidebar.Visible=true;content.Visible=true;main.Size=origSize end end)
 
 closeBtn.MouseButton1Click:Connect(function()
-stopFly();stopNC();stopAimbot()
+stopESP();stopFly();stopNC();stopAimbot()
 if soundReplaceConn then soundReplaceConn:Disconnect();soundReplaceConn=nil end
 stopNoRecoil()
 if weaponRecoilConn then weaponRecoilConn:Disconnect();weaponRecoilConn=nil end
 gui:Destroy() end)
 
-print("✅ Eclipse Menu загружен. F4 — меню. Обои: "..(wallpaperAssetId and "установлены" or "нет"))
+print("✅ Eclipse Menu загружен. F4 — меню.")
